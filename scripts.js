@@ -1064,6 +1064,7 @@
 var elem = document.querySelector('.draggable');
 var draggie = new Draggabilly(
     elem, {
-        grid: [1000000000, 20]
+      axis: 'y', // To only have it shift on the y axis
+      grid: [0, 20] // Make the objects move by a set amount, which I will make 1U (1.75")
     }
 );
