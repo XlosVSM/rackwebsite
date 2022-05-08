@@ -1061,6 +1061,9 @@
   
   } ) );
 
+var w = window.innerWidth / 2;
+var h = window.innerHeight / 2;
+
 var elem = document.querySelector('.draggable');
 var draggie = new Draggabilly(
     elem, {
@@ -1068,3 +1071,5 @@ var draggie = new Draggabilly(
       grid: [0, 20] // Make the objects move by a set amount, which I will make 1U (1.75")
     }
 );
+
+draggie.setPosition(w, h)
