@@ -5,13 +5,9 @@ body {
 .draggable {
     width: 140px;
     height: 140px;
-    background: #F90;
+    background-image: url("GitHub-Mark-120px-plus.png"); /* Using this image as a place holder */
     border-radius: 10px;
     cursor: move;
-}
-
-.draggable.is-pointer-down {
-    background: #09F;
 }
 
 .draggable.is-dragging { 
