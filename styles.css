@@ -6,6 +6,7 @@ body {
     height: 43.75px; /* 1U */
     width: 475px; /* 19 inches */
     background-image: url("images/racks/fulltone-that-80s-chorus.png");
+    background-size: 475px 43.75px; /* Makes the image fit the draggable */
     cursor: move;
 }
 

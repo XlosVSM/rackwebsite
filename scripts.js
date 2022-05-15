@@ -1161,6 +1161,8 @@
 
 // Website JavaScript //
 
+// Rack size //
+
 var w = window.innerWidth / 2;
 var h = window.innerHeight / 2;
 
@@ -1169,10 +1171,25 @@ var h = window.innerHeight / 2;
 
 var elem = document.querySelector('.draggable');
 var draggie = new Draggabilly(
-    elem, {
-      axis: 'y', // To only have it shift on the y axis
-      grid: [0, 20] // Make the objects move by a set amount, which I will make 1U (1.75")
-    }
+  elem, {
+    axis: 'y', // To only have it shift on the y axis
+    grid: [0, 20] // Make the objects move by a set amount, which I will make 1U (1.75")
+  }
 );
 
 draggie.setPosition(w, h);
+
+// Button //
+
+function addRack() {
+  alert("Test executed");
+}
+
+let btn = document.getElementById("btn");
+btn.addEventListener(
+  'click', event => {
+    addRack();
+  }
+);
+
+// Test calling data from a JSON file //
