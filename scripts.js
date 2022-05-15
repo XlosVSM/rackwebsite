@@ -1185,8 +1185,8 @@ function addRack() {
   alert("Test executed");
 }
 
-let btn = document.getElementById("btn");
-btn.addEventListener(
+let btn = document.getElementById("addRackBtn");
+addRackBtn.addEventListener(
   'click', event => {
     addRack();
   }
