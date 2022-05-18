@@ -4,5 +4,12 @@
         "Name": "That 80s Chorus",
         "Size": "1U",
         "Image": "fulltone-that-80s-chorus.png"
+    },
+    
+    {
+        "Brand": "Mellotron",
+        "Name": "M4000D Rack",
+        "Size": "2U",
+        "Image": "mellotron-m4000d.png"
     }
 ]
