@@ -11944,16 +11944,16 @@ return jQuery;
 let $draggable = $('.draggable').draggabilly();
 
 function addDrag() {
-    var div = document.createElement('div');
+	var div = document.createElement('div');
 
-    div.className = "draggable";
+  	div.className = "draggable";
 
-    document.body.appendChild(div);
-}
+  	document.body.appendChild(div);
+};
 
 let btn = document.getElementById("addDragBtn");
 addDragBtn.addEventListener(
     'click', event => {
-        addDrag();
+        addDrag();	
     }
 );
