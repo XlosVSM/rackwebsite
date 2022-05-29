@@ -926,7 +926,7 @@
           // All others
           return select(selector.replace(rtrim, "$1"), context, results, seed);
         }
-//Marker
+
         /**
          * Create key-value caches of limited size
          * @returns {function(string, object)} Returns the Object data after storing it on itself with
@@ -936,16 +936,16 @@
         function createCache() {
           var keys = [];
 
-          function cache( key, value ) {
-
+          function cache(key, value) {
             // Use (key + " ") to avoid collision with native prototype properties (see Issue #157)
-            if ( keys.push( key + " " ) > Expr.cacheLength ) {
-
+            if (keys.push(key + " ") > Expr.cacheLength) {
               // Only keep the most recent entries
-              delete cache[ keys.shift() ];
+              delete cache[keys.shift()];
             }
-            return ( cache[ key + " " ] = value );
+
+            return (cache[key + " "] = value);
           }
+
           return cache;
         }
 
@@ -953,8 +953,8 @@
          * Mark a function for special use by Sizzle
          * @param {Function} fn The function to mark
          */
-        function markFunction( fn ) {
-          fn[ expando ] = true;
+        function markFunction(fn) {
+          fn[expando] = true;
           return fn;
         }
 
@@ -962,18 +962,21 @@
         * Support testing using an element
         * @param {Function} fn Passed the created element and returns a boolean result
         */
-        function assert( fn ) {
-          var el = document.createElement( "fieldset" );
+        function assert(fn) {
+          var el = document.createElement("fieldset");
 
           try {
-            return !!fn( el );
-          } catch ( e ) {
+            return !!fn(el);
+          } 
+          
+          catch (e) {
             return false;
-          } finally {
-
+          } 
+          
+          finally {
             // Remove from its parent by default
-            if ( el.parentNode ) {
-              el.parentNode.removeChild( el );
+            if (el.parentNode) {
+              el.parentNode.removeChild(el);
             }
 
             // release memory in IE
@@ -986,12 +989,12 @@
         * @param {String} attrs Pipe-separated list of attributes
         * @param {Function} handler The method that will be applied
         */
-        function addHandle( attrs, handler ) {
-          var arr = attrs.split( "|" ),
+        function addHandle(attrs, handler) {
+          var arr = attrs.split("|"),
             i = arr.length;
 
-          while ( i-- ) {
-            Expr.attrHandle[ arr[ i ] ] = handler;
+          while (i--) {
+            Expr.attrHandle[arr[i]] = handler;
           }
         }
 
@@ -1001,35 +1004,35 @@
         * @param {Element} b
         * @returns {Number} Returns less than 0 if a precedes b, greater than 0 if a follows b
         */
-        function siblingCheck( a, b ) {
+        function siblingCheck(a, b) {
           var cur = b && a,
-            diff = cur && a.nodeType === 1 && b.nodeType === 1 &&
-              a.sourceIndex - b.sourceIndex;
+            diff = cur && a.nodeType === 1 && b.nodeType === 1 && a.sourceIndex - b.sourceIndex;
 
           // Use IE sourceIndex if available on both nodes
-          if ( diff ) {
+          if (diff) {
             return diff;
           }
 
           // Check if b follows a
-          if ( cur ) {
-            while ( ( cur = cur.nextSibling ) ) {
-              if ( cur === b ) {
+          if (cur) {
+            while ((cur = cur.nextSibling)) {
+              if (cur === b) {
                 return -1;
               }
             }
           }
 
-          return a ? 1 : -1;
+          return a ? 1: -1;
         }
 
         /**
         * Returns a function to use in pseudos for input types
         * @param {String} type
         */
-        function createInputPseudo( type ) {
-          return function( elem ) {
+        function createInputPseudo(type) {
+          return function(elem) {
             var name = elem.nodeName.toLowerCase();
+
             return name === "input" && elem.type === type;
           };
         }
@@ -1049,16 +1052,13 @@
         * Returns a function to use in pseudos for :enabled/:disabled
         * @param {Boolean} disabled true for :disabled; false for :enabled
         */
-        function createDisabledPseudo( disabled ) {
-
+        function createDisabledPseudo(disabled) {
           // Known :disabled false positives: fieldset[disabled] > legend:nth-of-type(n+2) :can-disable
-          return function( elem ) {
-
+          return function(elem) {
             // Only certain elements can match :enabled or :disabled
             // https://html.spec.whatwg.org/multipage/scripting.html#selector-enabled
             // https://html.spec.whatwg.org/multipage/scripting.html#selector-disabled
-            if ( "form" in elem ) {
-
+            if ("form" in elem) {
               // Check for inherited disabledness on relevant non-disabled elements:
               // * listed form-associated elements in a disabled fieldset
               //   https://html.spec.whatwg.org/multipage/forms.html#category-listed
@@ -1066,13 +1066,14 @@
               // * option elements in a disabled optgroup
               //   https://html.spec.whatwg.org/multipage/forms.html#concept-option-disabled
               // All such elements have a "form" property.
-              if ( elem.parentNode && elem.disabled === false ) {
-
+              if (elem.parentNode && elem.disabled === false) {
                 // Option elements defer to a parent optgroup if present
-                if ( "label" in elem ) {
-                  if ( "label" in elem.parentNode ) {
+                if ("label" in elem) {
+                  if ("label" in elem.parentNode) {
                     return elem.parentNode.disabled === disabled;
-                  } else {
+                  } 
+                  
+                  else {
                     return elem.disabled === disabled;
                   }
                 }
@@ -1084,15 +1085,16 @@
                   // Where there is no isDisabled, check manually
                   /* jshint -W018 */
                   elem.isDisabled !== !disabled &&
-                  inDisabledFieldset( elem ) === disabled;
+                  inDisabledFieldset(elem) === disabled;
               }
 
               return elem.disabled === disabled;
+            } 
 
             // Try to winnow out elements that can't be disabled before trusting the disabled property.
             // Some victims get caught in our net (label, legend, menu, track), but it shouldn't
             // even exist on them, let alone have a boolean value.
-            } else if ( "label" in elem ) {
+            else if ("label" in elem) {
               return elem.disabled === disabled;
             }
 
@@ -1105,22 +1107,26 @@
         * Returns a function to use in pseudos for positionals
         * @param {Function} fn
         */
-        function createPositionalPseudo( fn ) {
-          return markFunction( function( argument ) {
-            argument = +argument;
-            return markFunction( function( seed, matches ) {
-              var j,
-                matchIndexes = fn( [], seed.length, argument ),
-                i = matchIndexes.length;
+        function createPositionalPseudo(fn) {
+          return markFunction(
+            function(argument) {
+              argument = +argument;
+              return markFunction(
+                function(seed, matches) {
+                  var j,
+                    matchIndexes = fn([], seed.length, argument),
+                    i = matchIndexes.length;
 
-              // Match elements found at the specified indexes
-              while ( i-- ) {
-                if ( seed[ ( j = matchIndexes[ i ] ) ] ) {
-                  seed[ j ] = !( matches[ j ] = seed[ j ] );
-                }
-              }
-            } );
-          } );
+                  // Match elements found at the specified indexes
+                  while (i--) {
+                    if (seed[(j = matchIndexes[i])]) {
+                      seed[j] = !(matches[j] = seed[j]);
+                    }
+                  }
+                } 
+              );
+            } 
+          );
         }
 
         /**
@@ -1128,7 +1134,7 @@
         * @param {Element|Object=} context
         * @returns {Element|Object|Boolean} The input node if acceptable, otherwise a falsy value
         */
-        function testContext( context ) {
+        function testContext(context) {
           return context && typeof context.getElementsByTagName !== "undefined" && context;
         }
 
@@ -1140,14 +1146,14 @@
         * @param {Element|Object} elem An element or a document
         * @returns {Boolean} True iff elem is a non-HTML XML node
         */
-        isXML = Sizzle.isXML = function( elem ) {
+        isXML = Sizzle.isXML = function(elem) {
           var namespace = elem && elem.namespaceURI,
-            docElem = elem && ( elem.ownerDocument || elem ).documentElement;
+            docElem = elem && (elem.ownerDocument || elem).documentElement;
 
           // Support: IE <=8
           // Assume HTML when documentElement doesn't yet exist, such as inside loading iframes
           // https://bugs.jquery.com/ticket/4833
-          return !rhtml.test( namespace || docElem && docElem.nodeName || "HTML" );
+          return !rhtml.test(namespace || docElem && docElem.nodeName || "HTML");
         };
 
         /**
@@ -1155,23 +1161,23 @@
         * @param {Element|Object} [doc] An element or document object to use to set the document
         * @returns {Object} Returns the current document
         */
-        setDocument = Sizzle.setDocument = function( node ) {
+        setDocument = Sizzle.setDocument = function(node) {
           var hasCompare, subWindow,
-            doc = node ? node.ownerDocument || node : preferredDoc;
+            doc = node ? node.ownerDocument || node: preferredDoc;
 
           // Return early if doc is invalid or already selected
           // Support: IE 11+, Edge 17 - 18+
           // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
           // two documents; shallow comparisons work.
           // eslint-disable-next-line eqeqeq
-          if ( doc == document || doc.nodeType !== 9 || !doc.documentElement ) {
+          if (doc == document || doc.nodeType !== 9 || !doc.documentElement) {
             return document;
           }
 
           // Update global variables
           document = doc;
           docElem = document.documentElement;
-          documentIsHTML = !isXML( document );
+          documentIsHTML = !isXML(document);
 
           // Support: IE 9 - 11+, Edge 12 - 18+
           // Accessing iframe documents after unload throws "permission denied" errors (jQuery #13936)
@@ -1179,16 +1185,17 @@
           // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
           // two documents; shallow comparisons work.
           // eslint-disable-next-line eqeqeq
-          if ( preferredDoc != document &&
-            ( subWindow = document.defaultView ) && subWindow.top !== subWindow ) {
-
+          if (
+            preferredDoc != document && (subWindow = document.defaultView) && subWindow.top !== subWindow 
+          ) {
             // Support: IE 11, Edge
-            if ( subWindow.addEventListener ) {
-              subWindow.addEventListener( "unload", unloadHandler, false );
-
+            if (subWindow.addEventListener) {
+              subWindow.addEventListener("unload", unloadHandler, false);
+            } 
+            
             // Support: IE 9 - 10 only
-            } else if ( subWindow.attachEvent ) {
-              subWindow.attachEvent( "onunload", unloadHandler );
+            else if (subWindow.attachEvent) {
+              subWindow.attachEvent("onunload", unloadHandler);
             }
           }
 
@@ -1197,11 +1204,13 @@
           // IE/Edge & older browsers don't support the :scope pseudo-class.
           // Support: Safari 6.0 only
           // Safari 6.0 supports :scope but it's an alias of :root there.
-          support.scope = assert( function( el ) {
-            docElem.appendChild( el ).appendChild( document.createElement( "div" ) );
-            return typeof el.querySelectorAll !== "undefined" &&
-              !el.querySelectorAll( ":scope fieldset div" ).length;
-          } );
+          support.scope = assert(
+            function(el) {
+              docElem.appendChild(el).appendChild(document.createElement("div"));
+              return typeof el.querySelectorAll !== "undefined" &&
+                !el.querySelectorAll(":scope fieldset div").length;
+            } 
+          );
 
           /* Attributes
           ---------------------------------------------------------------------- */
@@ -1209,78 +1218,90 @@
           // Support: IE<8
           // Verify that getAttribute really returns attributes and not properties
           // (excepting IE8 booleans)
-          support.attributes = assert( function( el ) {
-            el.className = "i";
-            return !el.getAttribute( "className" );
-          } );
+          support.attributes = assert(
+            function(el) {
+              el.className = "i";
+              return !el.getAttribute("className");
+            } 
+          );
 
           /* getElement(s)By*
           ---------------------------------------------------------------------- */
 
           // Check if getElementsByTagName("*") returns only elements
-          support.getElementsByTagName = assert( function( el ) {
-            el.appendChild( document.createComment( "" ) );
-            return !el.getElementsByTagName( "*" ).length;
-          } );
+          support.getElementsByTagName = assert(
+            function(el) {
+              el.appendChild(document.createComment(""));
+              return !el.getElementsByTagName("*").length;
+            } 
+          );
 
           // Support: IE<9
-          support.getElementsByClassName = rnative.test( document.getElementsByClassName );
+          support.getElementsByClassName = rnative.test(document.getElementsByClassName);
 
           // Support: IE<10
           // Check if getElementById returns elements by name
           // The broken getElementById methods don't pick up programmatically-set names,
           // so use a roundabout getElementsByName test
-          support.getById = assert( function( el ) {
-            docElem.appendChild( el ).id = expando;
-            return !document.getElementsByName || !document.getElementsByName( expando ).length;
-          } );
+          support.getById = assert(
+            function(el) {
+              docElem.appendChild(el).id = expando;
+              return !document.getElementsByName || !document.getElementsByName(expando).length;
+            } 
+          );
 
           // ID filter and find
-          if ( support.getById ) {
-            Expr.filter[ "ID" ] = function( id ) {
-              var attrId = id.replace( runescape, funescape );
-              return function( elem ) {
-                return elem.getAttribute( "id" ) === attrId;
+          if (support.getById) {
+            Expr.filter["ID"] = function(id) {
+              var attrId = id.replace(runescape, funescape);
+
+              return function(elem) {
+                return elem.getAttribute("id") === attrId;
               };
             };
-            Expr.find[ "ID" ] = function( id, context ) {
-              if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
-                var elem = context.getElementById( id );
-                return elem ? [ elem ] : [];
+
+            Expr.find["ID"] = function(id, context) {
+              if (typeof context.getElementById !== "undefined" && documentIsHTML) {
+                var elem = context.getElementById(id);
+
+                return elem ? [elem]: [];
               }
             };
-          } else {
-            Expr.filter[ "ID" ] =  function( id ) {
-              var attrId = id.replace( runescape, funescape );
-              return function( elem ) {
+          }
+          
+          else {
+            Expr.filter["ID"] =  function(id) {
+              var attrId = id.replace(runescape, funescape);
+
+              return function(elem) {
                 var node = typeof elem.getAttributeNode !== "undefined" &&
-                  elem.getAttributeNode( "id" );
+                  elem.getAttributeNode("id");
+
                 return node && node.value === attrId;
               };
             };
 
             // Support: IE 6 - 7 only
             // getElementById is not reliable as a find shortcut
-            Expr.find[ "ID" ] = function( id, context ) {
-              if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
+            Expr.find["ID"] = function(id, context) {
+              if (typeof context.getElementById !== "undefined" && documentIsHTML) {
                 var node, i, elems,
-                  elem = context.getElementById( id );
+                  elem = context.getElementById(id);
 
-                if ( elem ) {
-
+                if (elem) {
                   // Verify the id attribute
-                  node = elem.getAttributeNode( "id" );
-                  if ( node && node.value === id ) {
-                    return [ elem ];
+                  node = elem.getAttributeNode("id");
+                  if (node && node.value === id) {
+                    return [elem];
                   }
 
                   // Fall back on getElementsByName
-                  elems = context.getElementsByName( id );
+                  elems = context.getElementsByName(id);
                   i = 0;
-                  while ( ( elem = elems[ i++ ] ) ) {
-                    node = elem.getAttributeNode( "id" );
-                    if ( node && node.value === id ) {
-                      return [ elem ];
+                  while ((elem = elems[i++])) {
+                    node = elem.getAttributeNode("id");
+                    if (node && node.value === id) {
+                      return [elem];
                     }
                   }
                 }
@@ -1291,42 +1312,42 @@
           }
 
           // Tag
-          Expr.find[ "TAG" ] = support.getElementsByTagName ?
-            function( tag, context ) {
-              if ( typeof context.getElementsByTagName !== "undefined" ) {
-                return context.getElementsByTagName( tag );
+          Expr.find["TAG"] = support.getElementsByTagName ? function(tag, context) {
+            if (typeof context.getElementsByTagName !== "undefined") {
+              return context.getElementsByTagName( tag );
+            } 
 
-              // DocumentFragment nodes don't have gEBTN
-              } else if ( support.qsa ) {
-                return context.querySelectorAll( tag );
-              }
-            } :
-
-            function( tag, context ) {
+            // DocumentFragment nodes don't have gEBTN
+            else if (support.qsa) {
+              return context.querySelectorAll(tag);
+            }
+          }:
+            function(tag, context) {
               var elem,
                 tmp = [],
                 i = 0,
 
                 // By happy coincidence, a (broken) gEBTN appears on DocumentFragment nodes too
-                results = context.getElementsByTagName( tag );
+                results = context.getElementsByTagName(tag);
 
               // Filter out possible comments
-              if ( tag === "*" ) {
-                while ( ( elem = results[ i++ ] ) ) {
-                  if ( elem.nodeType === 1 ) {
-                    tmp.push( elem );
+              if (tag === "*") {
+                while ((elem = results[i++])) {
+                  if (elem.nodeType === 1) {
+                    tmp.push(elem);
                   }
                 }
 
                 return tmp;
               }
+
               return results;
             };
 
           // Class
-          Expr.find[ "CLASS" ] = support.getElementsByClassName && function( className, context ) {
-            if ( typeof context.getElementsByClassName !== "undefined" && documentIsHTML ) {
-              return context.getElementsByClassName( className );
+          Expr.find["CLASS"] = support.getElementsByClassName && function(className, context) {
+            if (typeof context.getElementsByClassName !== "undefined" && documentIsHTML) {
+              return context.getElementsByClassName(className);
             }
           };
 
@@ -1345,158 +1366,169 @@
           // See https://bugs.jquery.com/ticket/13378
           rbuggyQSA = [];
 
-          if ( ( support.qsa = rnative.test( document.querySelectorAll ) ) ) {
-
+          if ((support.qsa = rnative.test(document.querySelectorAll))) {
             // Build QSA regex
             // Regex strategy adopted from Diego Perini
-            assert( function( el ) {
+            assert(
+              function(el) {
+                var input;
 
-              var input;
+                // Select is set to empty string on purpose
+                // This is to test IE's treatment of not explicitly
+                // setting a boolean content attribute,
+                // since its presence should be enough
+                // https://bugs.jquery.com/ticket/12359
+                docElem.appendChild(el).innerHTML = "<a id='" + expando + "'></a>" +
+                  "<select id='" + expando + "-\r\\' msallowcapture=''>" +
+                  "<option selected=''></option></select>";
 
-              // Select is set to empty string on purpose
-              // This is to test IE's treatment of not explicitly
-              // setting a boolean content attribute,
-              // since its presence should be enough
-              // https://bugs.jquery.com/ticket/12359
-              docElem.appendChild( el ).innerHTML = "<a id='" + expando + "'></a>" +
-                "<select id='" + expando + "-\r\\' msallowcapture=''>" +
-                "<option selected=''></option></select>";
+                // Support: IE8, Opera 11-12.16
+                // Nothing should be selected when empty strings follow ^= or $= or *=
+                // The test attribute must be unknown in Opera but "safe" for WinRT
+                // https://msdn.microsoft.com/en-us/library/ie/hh465388.aspx#attribute_section
+                if (el.querySelectorAll("[msallowcapture^='']").length) {
+                  rbuggyQSA.push("[*^$]=" + whitespace + "*(?:''|\"\")");
+                }
 
-              // Support: IE8, Opera 11-12.16
-              // Nothing should be selected when empty strings follow ^= or $= or *=
-              // The test attribute must be unknown in Opera but "safe" for WinRT
-              // https://msdn.microsoft.com/en-us/library/ie/hh465388.aspx#attribute_section
-              if ( el.querySelectorAll( "[msallowcapture^='']" ).length ) {
-                rbuggyQSA.push( "[*^$]=" + whitespace + "*(?:''|\"\")" );
-              }
+                // Support: IE8
+                // Boolean attributes and "value" are not treated correctly
+                if (!el.querySelectorAll("[selected]").length) {
+                  rbuggyQSA.push("\\[" + whitespace + "*(?:value|" + booleans + ")");
+                }
 
-              // Support: IE8
-              // Boolean attributes and "value" are not treated correctly
-              if ( !el.querySelectorAll( "[selected]" ).length ) {
-                rbuggyQSA.push( "\\[" + whitespace + "*(?:value|" + booleans + ")" );
-              }
+                // Support: Chrome<29, Android<4.4, Safari<7.0+, iOS<7.0+, PhantomJS<1.9.8+
+                if (!el.querySelectorAll("[id~=" + expando + "-]").length) {
+                  rbuggyQSA.push("~=");
+                }
 
-              // Support: Chrome<29, Android<4.4, Safari<7.0+, iOS<7.0+, PhantomJS<1.9.8+
-              if ( !el.querySelectorAll( "[id~=" + expando + "-]" ).length ) {
-                rbuggyQSA.push( "~=" );
-              }
+                // Support: IE 11+, Edge 15 - 18+
+                // IE 11/Edge don't find elements on a `[name='']` query in some cases.
+                // Adding a temporary attribute to the document before the selection works
+                // around the issue.
+                // Interestingly, IE 10 & older don't seem to have the issue.
+                input = document.createElement("input");
+                input.setAttribute("name", "");
+                el.appendChild(input);
+                if (!el.querySelectorAll("[name='']").length) {
+                  rbuggyQSA.push("\\[" + whitespace + "*name" + whitespace + "*=" + whitespace + "*(?:''|\"\")");
+                }
 
-              // Support: IE 11+, Edge 15 - 18+
-              // IE 11/Edge don't find elements on a `[name='']` query in some cases.
-              // Adding a temporary attribute to the document before the selection works
-              // around the issue.
-              // Interestingly, IE 10 & older don't seem to have the issue.
-              input = document.createElement( "input" );
-              input.setAttribute( "name", "" );
-              el.appendChild( input );
-              if ( !el.querySelectorAll( "[name='']" ).length ) {
-                rbuggyQSA.push( "\\[" + whitespace + "*name" + whitespace + "*=" +
-                  whitespace + "*(?:''|\"\")" );
-              }
+                // Webkit/Opera - :checked should return selected option elements
+                // http://www.w3.org/TR/2011/REC-css3-selectors-20110929/#checked
+                // IE8 throws error here and will not see later tests
+                if (!el.querySelectorAll(":checked").length) {
+                  rbuggyQSA.push(":checked");
+                }
 
-              // Webkit/Opera - :checked should return selected option elements
-              // http://www.w3.org/TR/2011/REC-css3-selectors-20110929/#checked
-              // IE8 throws error here and will not see later tests
-              if ( !el.querySelectorAll( ":checked" ).length ) {
-                rbuggyQSA.push( ":checked" );
-              }
+                // Support: Safari 8+, iOS 8+
+                // https://bugs.webkit.org/show_bug.cgi?id=136851
+                // In-page `selector#id sibling-combinator selector` fails
+                if (!el.querySelectorAll("a#" + expando + "+*").length) {
+                  rbuggyQSA.push(".#.+[+~]");
+                }
 
-              // Support: Safari 8+, iOS 8+
-              // https://bugs.webkit.org/show_bug.cgi?id=136851
-              // In-page `selector#id sibling-combinator selector` fails
-              if ( !el.querySelectorAll( "a#" + expando + "+*" ).length ) {
-                rbuggyQSA.push( ".#.+[+~]" );
-              }
+                // Support: Firefox <=3.6 - 5 only
+                // Old Firefox doesn't throw on a badly-escaped identifier.
+                el.querySelectorAll("\\\f");
+                rbuggyQSA.push("[\\r\\n\\f]");
+              } 
+            );
 
-              // Support: Firefox <=3.6 - 5 only
-              // Old Firefox doesn't throw on a badly-escaped identifier.
-              el.querySelectorAll( "\\\f" );
-              rbuggyQSA.push( "[\\r\\n\\f]" );
-            } );
+            assert(
+              function(el) {
+                el.innerHTML = "<a href='' disabled='disabled'></a>" + "<select disabled='disabled'><option/></select>";
 
-            assert( function( el ) {
-              el.innerHTML = "<a href='' disabled='disabled'></a>" +
-                "<select disabled='disabled'><option/></select>";
+                // Support: Windows 8 Native Apps
+                // The type and name attributes are restricted during .innerHTML assignment
+                var input = document.createElement("input");
 
-              // Support: Windows 8 Native Apps
-              // The type and name attributes are restricted during .innerHTML assignment
-              var input = document.createElement( "input" );
-              input.setAttribute( "type", "hidden" );
-              el.appendChild( input ).setAttribute( "name", "D" );
+                input.setAttribute("type", "hidden");
+                el.appendChild(input).setAttribute("name", "D");
 
-              // Support: IE8
-              // Enforce case-sensitivity of name attribute
-              if ( el.querySelectorAll( "[name=d]" ).length ) {
-                rbuggyQSA.push( "name" + whitespace + "*[*^$|!~]?=" );
-              }
+                // Support: IE8
+                // Enforce case-sensitivity of name attribute
+                if (el.querySelectorAll("[name=d]").length) {
+                  rbuggyQSA.push("name" + whitespace + "*[*^$|!~]?=");
+                }
 
-              // FF 3.5 - :enabled/:disabled and hidden elements (hidden elements are still enabled)
-              // IE8 throws error here and will not see later tests
-              if ( el.querySelectorAll( ":enabled" ).length !== 2 ) {
-                rbuggyQSA.push( ":enabled", ":disabled" );
-              }
+                // FF 3.5 - :enabled/:disabled and hidden elements (hidden elements are still enabled)
+                // IE8 throws error here and will not see later tests
+                if (el.querySelectorAll(":enabled").length !== 2) {
+                  rbuggyQSA.push(":enabled", ":disabled");
+                }
 
-              // Support: IE9-11+
-              // IE's :disabled selector does not pick up the children of disabled fieldsets
-              docElem.appendChild( el ).disabled = true;
-              if ( el.querySelectorAll( ":disabled" ).length !== 2 ) {
-                rbuggyQSA.push( ":enabled", ":disabled" );
-              }
+                // Support: IE9-11+
+                // IE's :disabled selector does not pick up the children of disabled fieldsets
+                docElem.appendChild(el).disabled = true;
+                if (el.querySelectorAll(":disabled").length !== 2) {
+                  rbuggyQSA.push(":enabled", ":disabled");
+                }
 
-              // Support: Opera 10 - 11 only
-              // Opera 10-11 does not throw on post-comma invalid pseudos
-              el.querySelectorAll( "*,:x" );
-              rbuggyQSA.push( ",.*:" );
-            } );
+                // Support: Opera 10 - 11 only
+                // Opera 10-11 does not throw on post-comma invalid pseudos
+                el.querySelectorAll("*,:x");
+                rbuggyQSA.push(",.*:");
+              } 
+            );
           }
 
-          if ( ( support.matchesSelector = rnative.test( ( matches = docElem.matches ||
-            docElem.webkitMatchesSelector ||
-            docElem.mozMatchesSelector ||
-            docElem.oMatchesSelector ||
-            docElem.msMatchesSelector ) ) ) ) {
+          if (
+            (
+              support.matchesSelector = rnative.test(
+                (
+                  matches = docElem.matches ||
+                  docElem.webkitMatchesSelector ||
+                  docElem.mozMatchesSelector ||
+                  docElem.oMatchesSelector ||
+                  docElem.msMatchesSelector 
+                ) 
+              ) 
+            ) 
+          ) {
+            assert(
+              function(el) {
+                // Check to see if it's possible to do matchesSelector
+                // on a disconnected node (IE 9)
+                support.disconnectedMatch = matches.call(el, "*");
 
-            assert( function( el ) {
-
-              // Check to see if it's possible to do matchesSelector
-              // on a disconnected node (IE 9)
-              support.disconnectedMatch = matches.call( el, "*" );
-
-              // This should fail with an exception
-              // Gecko does not error, returns false instead
-              matches.call( el, "[s!='']:x" );
-              rbuggyMatches.push( "!=", pseudos );
-            } );
+                // This should fail with an exception
+                // Gecko does not error, returns false instead
+                matches.call(el, "[s!='']:x");
+                rbuggyMatches.push("!=", pseudos);
+              } 
+            );
           }
 
-          rbuggyQSA = rbuggyQSA.length && new RegExp( rbuggyQSA.join( "|" ) );
-          rbuggyMatches = rbuggyMatches.length && new RegExp( rbuggyMatches.join( "|" ) );
+          rbuggyQSA = rbuggyQSA.length && new RegExp(rbuggyQSA.join("|"));
+          rbuggyMatches = rbuggyMatches.length && new RegExp(rbuggyMatches.join("|"));
 
           /* Contains
           ---------------------------------------------------------------------- */
-          hasCompare = rnative.test( docElem.compareDocumentPosition );
+          hasCompare = rnative.test(docElem.compareDocumentPosition);
 
           // Element contains another
           // Purposefully self-exclusive
           // As in, an element does not contain itself
-          contains = hasCompare || rnative.test( docElem.contains ) ?
-            function( a, b ) {
-              var adown = a.nodeType === 9 ? a.documentElement : a,
-                bup = b && b.parentNode;
-              return a === bup || !!( bup && bup.nodeType === 1 && (
-                adown.contains ?
-                  adown.contains( bup ) :
-                  a.compareDocumentPosition && a.compareDocumentPosition( bup ) & 16
-              ) );
-            } :
-            function( a, b ) {
-              if ( b ) {
-                while ( ( b = b.parentNode ) ) {
-                  if ( b === a ) {
+          contains = hasCompare || rnative.test(docElem.contains) ? function(a, b) {
+            var adown = a.nodeType === 9 ? a.documentElement : a,
+              bup = b && b.parentNode;
+
+            return a === bup || !!(
+              bup && bup.nodeType === 1 && (
+                adown.contains ? adown.contains(bup):
+                  a.compareDocumentPosition && a.compareDocumentPosition(bup) & 16
+              ) 
+            );
+          }:
+            function(a, b) {
+              if (b) {
+                while ((b = b.parentNode)) {
+                  if (b === a) {
                     return true;
                   }
                 }
               }
+
               return false;
             };
 
@@ -1504,18 +1536,17 @@
           ---------------------------------------------------------------------- */
 
           // Document order sorting
-          sortOrder = hasCompare ?
-          function( a, b ) {
-
+          sortOrder = hasCompare ? function(a, b) {
             // Flag for duplicate removal
-            if ( a === b ) {
+            if (a === b) {
               hasDuplicate = true;
               return 0;
             }
 
             // Sort on method existence if only one input has compareDocumentPosition
             var compare = !a.compareDocumentPosition - !b.compareDocumentPosition;
-            if ( compare ) {
+
+            if (compare) {
               return compare;
             }
 
@@ -1524,23 +1555,24 @@
             // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
             // two documents; shallow comparisons work.
             // eslint-disable-next-line eqeqeq
-            compare = ( a.ownerDocument || a ) == ( b.ownerDocument || b ) ?
-              a.compareDocumentPosition( b ) :
-
+            compare = (a.ownerDocument || a) == (b.ownerDocument || b) ? a.compareDocumentPosition(b):
               // Otherwise we know they are disconnected
               1;
 
             // Disconnected nodes
-            if ( compare & 1 ||
-              ( !support.sortDetached && b.compareDocumentPosition( a ) === compare ) ) {
-
+            if (
+              compare & 1 || ( 
+                !support.sortDetached && b.compareDocumentPosition(a) === compare 
+              )
+            ) {
               // Choose the first element that is related to our preferred document
               // Support: IE 11+, Edge 17 - 18+
               // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
               // two documents; shallow comparisons work.
               // eslint-disable-next-line eqeqeq
-              if ( a == document || a.ownerDocument == preferredDoc &&
-                contains( preferredDoc, a ) ) {
+              if (
+                a == document || a.ownerDocument == preferredDoc && contains(preferredDoc, a) 
+              ) {
                 return -1;
               }
 
@@ -1548,120 +1580,118 @@
               // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
               // two documents; shallow comparisons work.
               // eslint-disable-next-line eqeqeq
-              if ( b == document || b.ownerDocument == preferredDoc &&
-                contains( preferredDoc, b ) ) {
+              if (b == document || b.ownerDocument == preferredDoc && contains(preferredDoc, b)) {
                 return 1;
               }
 
               // Maintain original order
-              return sortInput ?
-                ( indexOf( sortInput, a ) - indexOf( sortInput, b ) ) :
+              return sortInput ? (indexOf(sortInput, a) - indexOf(sortInput, b)):
                 0;
             }
 
-            return compare & 4 ? -1 : 1;
-          } :
-          function( a, b ) {
+            return compare & 4 ? -1: 1;
+          }:
+            function(a, b) {
+              // Exit early if the nodes are identical
+              if (a === b) {
+                hasDuplicate = true;
+                return 0;
+              }
 
-            // Exit early if the nodes are identical
-            if ( a === b ) {
-              hasDuplicate = true;
-              return 0;
-            }
+              var cur,
+                i = 0,
+                aup = a.parentNode,
+                bup = b.parentNode,
+                ap = [a],
+                bp = [b];
 
-            var cur,
-              i = 0,
-              aup = a.parentNode,
-              bup = b.parentNode,
-              ap = [ a ],
-              bp = [ b ];
+              // Parentless nodes are either documents or disconnected
+              if (!aup || !bup) {
+                // Support: IE 11+, Edge 17 - 18+
+                // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+                // two documents; shallow comparisons work.
+                /* eslint-disable eqeqeq */
+                return a == document ? -1:
+                  b == document ? 1:
+                    /* eslint-enable eqeqeq */
+                    aup ? -1:
+                      bup ? 1:
+                        sortInput ? (indexOf(sortInput, a) - indexOf(sortInput, b)):
+                          0;
+              } 
+              
+              // If the nodes are siblings, we can do a quick check
+              else if (aup === bup) {
+                return siblingCheck(a, b);
+              }
 
-            // Parentless nodes are either documents or disconnected
-            if ( !aup || !bup ) {
+              // Otherwise we need full lists of their ancestors for comparison
+              cur = a;
+              while ((cur = cur.parentNode)) {
+                ap.unshift(cur);
+              }
 
-              // Support: IE 11+, Edge 17 - 18+
-              // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-              // two documents; shallow comparisons work.
-              /* eslint-disable eqeqeq */
-              return a == document ? -1 :
-                b == document ? 1 :
-                /* eslint-enable eqeqeq */
-                aup ? -1 :
-                bup ? 1 :
-                sortInput ?
-                ( indexOf( sortInput, a ) - indexOf( sortInput, b ) ) :
-                0;
+              cur = b;
+              while ((cur = cur.parentNode)) {
+                bp.unshift(cur);
+              }
 
-            // If the nodes are siblings, we can do a quick check
-            } else if ( aup === bup ) {
-              return siblingCheck( a, b );
-            }
+              // Walk down the tree looking for a discrepancy
+              while (ap[i] === bp[i]) {
+                i++;
+              }
 
-            // Otherwise we need full lists of their ancestors for comparison
-            cur = a;
-            while ( ( cur = cur.parentNode ) ) {
-              ap.unshift( cur );
-            }
-            cur = b;
-            while ( ( cur = cur.parentNode ) ) {
-              bp.unshift( cur );
-            }
-
-            // Walk down the tree looking for a discrepancy
-            while ( ap[ i ] === bp[ i ] ) {
-              i++;
-            }
-
-            return i ?
-
-              // Do a sibling check if the nodes have a common ancestor
-              siblingCheck( ap[ i ], bp[ i ] ) :
-
-              // Otherwise nodes in our document sort first
-              // Support: IE 11+, Edge 17 - 18+
-              // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-              // two documents; shallow comparisons work.
-              /* eslint-disable eqeqeq */
-              ap[ i ] == preferredDoc ? -1 :
-              bp[ i ] == preferredDoc ? 1 :
-              /* eslint-enable eqeqeq */
-              0;
-          };
+              return i ?
+                // Do a sibling check if the nodes have a common ancestor
+                siblingCheck(ap[i], bp[i]):
+                  // Otherwise nodes in our document sort first
+                  // Support: IE 11+, Edge 17 - 18+
+                  // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+                  // two documents; shallow comparisons work.
+                  /* eslint-disable eqeqeq */
+                  ap[i] == preferredDoc ? -1:
+                    bp[i] == preferredDoc ? 1:
+                      /* eslint-enable eqeqeq */
+                      0;
+            };
 
           return document;
         };
 
-        Sizzle.matches = function( expr, elements ) {
-          return Sizzle( expr, null, null, elements );
+        Sizzle.matches = function(expr, elements) {
+          return Sizzle(expr, null, null, elements);
         };
 
-        Sizzle.matchesSelector = function( elem, expr ) {
-          setDocument( elem );
+        Sizzle.matchesSelector = function(elem, expr) {
+          setDocument(elem);
 
-          if ( support.matchesSelector && documentIsHTML &&
-            !nonnativeSelectorCache[ expr + " " ] &&
-            ( !rbuggyMatches || !rbuggyMatches.test( expr ) ) &&
-            ( !rbuggyQSA     || !rbuggyQSA.test( expr ) ) ) {
+          if (
+            support.matchesSelector && documentIsHTML &&
+            !nonnativeSelectorCache[expr + " "] &&
+            (!rbuggyMatches || !rbuggyMatches.test(expr)) &&
+            (!rbuggyQSA     || !rbuggyQSA.test(expr))) {
+              try {
+                var ret = matches.call(elem, expr);
 
-            try {
-              var ret = matches.call( elem, expr );
-
-              // IE 9's matchesSelector returns false on disconnected nodes
-              if ( ret || support.disconnectedMatch ||
-
-                // As well, disconnected nodes are said to be in a document
-                // fragment in IE 9
-                elem.document && elem.document.nodeType !== 11 ) {
-                return ret;
+                // IE 9's matchesSelector returns false on disconnected nodes
+                if (
+                  ret || support.disconnectedMatch ||
+                  // As well, disconnected nodes are said to be in a document
+                  // fragment in IE 9
+                  elem.document && elem.document.nodeType !== 11
+                ) {
+                  return ret;
+                }
+              } 
+              
+              catch (e) {
+                nonnativeSelectorCache(expr, true);
               }
-            } catch ( e ) {
-              nonnativeSelectorCache( expr, true );
             }
-          }
 
-          return Sizzle( expr, document, null, [ elem ] ).length > 0;
+          return Sizzle(expr, document, null, [elem]).length > 0;
         };
-
+// Marker
         Sizzle.contains = function( context, elem ) {
 
           // Set document vars if needed
