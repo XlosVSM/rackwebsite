@@ -11941,6 +11941,65 @@ return jQuery;
   } ) );
 
 // The actual website javascript
+var GenRandom = {
+	Stored: [],
+	Job: function () {
+		var newId = Date.now().toString().substr(3);
+		if (!this.Check(newId)) {
+			this.Stored.push(newId);
+			return newId;
+		}
+
+		return this.Job();
+	},
+
+	Check: function (id) {
+		for (var i = 0; i < this.Stored.length; i++) {
+			if (this.Stored[i] == id) return true;
+		}
+
+		return false;
+	},
+};
+
+window.rackEquip = function(type, brand, name, size, image) {
+	this.Type = type || "",
+	this.Brand = brand || "",
+	this.Name = name || "",
+	this.Size = size || "",
+	this.Image = image || "",
+};
+
+window.GetRackEquipData = function() {
+	$.ajax (
+		{
+			url: "racks.json",
+			dataType: "text",
+			type: "GET",
+			success: function(data) {
+				data = $parseJSON(data.replace(/\r\n/g, "").replace(/\t/g, ""));
+
+				var rackEquips = [];
+
+				for (var rackEquip in data) {
+					rackEquips.push (
+						new rackEquip (
+							data[rackEquip].Type || "",
+							data[rackEquip].Brand || "",
+							data[rackEquip].Name || "",
+							data[rackEquip].Size || "",
+							data[rackEquip].Image || ""
+						)
+					);
+				}
+
+				rackEquips.forEach(RenderRackEquips);
+			},
+		}
+	);
+};
+
+
 let $draggable = $('.draggable').draggabilly();
 
 function addDrag() {
@@ -11957,3 +12016,8 @@ addDragBtn.addEventListener(
         addDrag();	
     }
 );
+
+$(document).ready(
+	function () {
+		GetRackEquipData();
+})

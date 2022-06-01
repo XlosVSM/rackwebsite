@@ -1691,60 +1691,54 @@
 
           return Sizzle(expr, document, null, [elem]).length > 0;
         };
-// Marker
-        Sizzle.contains = function( context, elem ) {
 
+        Sizzle.contains = function(context, elem) {
           // Set document vars if needed
           // Support: IE 11+, Edge 17 - 18+
           // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
           // two documents; shallow comparisons work.
           // eslint-disable-next-line eqeqeq
-          if ( ( context.ownerDocument || context ) != document ) {
-            setDocument( context );
+          if ((context.ownerDocument || context) != document) {
+            setDocument(context);
           }
-          return contains( context, elem );
+
+          return contains(context, elem);
         };
 
-        Sizzle.attr = function( elem, name ) {
-
+        Sizzle.attr = function(elem, name) {
           // Set document vars if needed
           // Support: IE 11+, Edge 17 - 18+
           // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
           // two documents; shallow comparisons work.
           // eslint-disable-next-line eqeqeq
-          if ( ( elem.ownerDocument || elem ) != document ) {
-            setDocument( elem );
+          if ((elem.ownerDocument || elem) != document) {
+            setDocument(elem);
           }
 
-          var fn = Expr.attrHandle[ name.toLowerCase() ],
-
+          var fn = Expr.attrHandle[name.toLowerCase()],
             // Don't get fooled by Object.prototype properties (jQuery #13807)
-            val = fn && hasOwn.call( Expr.attrHandle, name.toLowerCase() ) ?
-              fn( elem, name, !documentIsHTML ) :
+            val = fn && hasOwn.call(Expr.attrHandle, name.toLowerCase()) ? fn(elem, name, !documentIsHTML):
               undefined;
 
-          return val !== undefined ?
-            val :
-            support.attributes || !documentIsHTML ?
-              elem.getAttribute( name ) :
-              ( val = elem.getAttributeNode( name ) ) && val.specified ?
-                val.value :
+          return val !== undefined ? val:
+            support.attributes || !documentIsHTML ? elem.getAttribute(name):
+              (val = elem.getAttributeNode(name)) && val.specified ? val.value:
                 null;
         };
 
-        Sizzle.escape = function( sel ) {
-          return ( sel + "" ).replace( rcssescape, fcssescape );
+        Sizzle.escape = function(sel) {
+          return (sel + "").replace(rcssescape, fcssescape);
         };
 
-        Sizzle.error = function( msg ) {
-          throw new Error( "Syntax error, unrecognized expression: " + msg );
+        Sizzle.error = function(msg) {
+          throw new Error("Syntax error, unrecognized expression: " + msg);
         };
 
         /**
         * Document sorting and removing duplicates
         * @param {ArrayLike} results
         */
-        Sizzle.uniqueSort = function( results ) {
+        Sizzle.uniqueSort = function(results) {
           var elem,
             duplicates = [],
             j = 0,
@@ -1752,17 +1746,18 @@
 
           // Unless we *know* we can detect duplicates, assume their presence
           hasDuplicate = !support.detectDuplicates;
-          sortInput = !support.sortStable && results.slice( 0 );
-          results.sort( sortOrder );
+          sortInput = !support.sortStable && results.slice(0);
+          results.sort(sortOrder);
 
-          if ( hasDuplicate ) {
-            while ( ( elem = results[ i++ ] ) ) {
-              if ( elem === results[ i ] ) {
-                j = duplicates.push( i );
+          if (hasDuplicate) {
+            while ((elem = results[i++])) {
+              if (elem === results[i]) {
+                j = duplicates.push(i);
               }
             }
-            while ( j-- ) {
-              results.splice( duplicates[ j ], 1 );
+
+            while (j--) {
+              results.splice(duplicates[j], 1);
             }
           }
 
@@ -1777,44 +1772,44 @@
         * Utility function for retrieving the text value of an array of DOM nodes
         * @param {Array|Element} elem
         */
-        getText = Sizzle.getText = function( elem ) {
+        getText = Sizzle.getText = function(elem) {
           var node,
             ret = "",
             i = 0,
             nodeType = elem.nodeType;
 
-          if ( !nodeType ) {
-
+          if (!nodeType) {
             // If no nodeType, this is expected to be an array
-            while ( ( node = elem[ i++ ] ) ) {
-
+            while ((node = elem[i++])) {
               // Do not traverse comment nodes
-              ret += getText( node );
+              ret += getText(node);
             }
-          } else if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
-
+          } 
+          
+          else if (nodeType === 1 || nodeType === 9 || nodeType === 11) {
             // Use textContent for elements
             // innerText usage removed for consistency of new lines (jQuery #11153)
-            if ( typeof elem.textContent === "string" ) {
+            if (typeof elem.textContent === "string") {
               return elem.textContent;
-            } else {
-
+            } 
+            
+            else {
               // Traverse its children
-              for ( elem = elem.firstChild; elem; elem = elem.nextSibling ) {
-                ret += getText( elem );
+              for (elem = elem.firstChild; elem; elem = elem.nextSibling) {
+                ret += getText(elem);
               }
             }
-          } else if ( nodeType === 3 || nodeType === 4 ) {
+          } 
+          
+          else if (nodeType === 3 || nodeType === 4) {
             return elem.nodeValue;
           }
 
           // Do not include comment or processing instruction nodes
-
           return ret;
         };
 
         Expr = Sizzle.selectors = {
-
           // Can be adjusted by the user
           cacheLength: 50,
 
@@ -1827,29 +1822,27 @@
           find: {},
 
           relative: {
-            ">": { dir: "parentNode", first: true },
-            " ": { dir: "parentNode" },
-            "+": { dir: "previousSibling", first: true },
-            "~": { dir: "previousSibling" }
+            ">": {dir: "parentNode", first: true},
+            " ": {dir: "parentNode"},
+            "+": {dir: "previousSibling", first: true},
+            "~": {dir: "previousSibling"}
           },
 
           preFilter: {
-            "ATTR": function( match ) {
-              match[ 1 ] = match[ 1 ].replace( runescape, funescape );
+            "ATTR": function(match) {
+              match[1] = match[1].replace(runescape, funescape);
 
               // Move the given value to match[3] whether quoted or unquoted
-              match[ 3 ] = ( match[ 3 ] || match[ 4 ] ||
-                match[ 5 ] || "" ).replace( runescape, funescape );
+              match[3] = (match[3] || match[4] || match[5] || "").replace(runescape, funescape);
 
-              if ( match[ 2 ] === "~=" ) {
-                match[ 3 ] = " " + match[ 3 ] + " ";
+              if (match[2] === "~=" ) {
+                match[3] = " " + match[3] + " ";
               }
 
-              return match.slice( 0, 4 );
+              return match.slice(0, 4);
             },
 
-            "CHILD": function( match ) {
-
+            "CHILD": function(match) {
               /* matches from matchExpr["CHILD"]
                 1 type (only|nth|...)
                 2 what (child|of-type)
@@ -1860,74 +1853,75 @@
                 7 sign of y-component
                 8 y of y-component
               */
-              match[ 1 ] = match[ 1 ].toLowerCase();
+              match[1] = match[1].toLowerCase();
 
-              if ( match[ 1 ].slice( 0, 3 ) === "nth" ) {
-
+              if (match[1].slice(0, 3) === "nth") {
                 // nth-* requires argument
-                if ( !match[ 3 ] ) {
-                  Sizzle.error( match[ 0 ] );
+                if (!match[3]) {
+                  Sizzle.error(match[0]);
                 }
 
                 // numeric x and y parameters for Expr.filter.CHILD
                 // remember that false/true cast respectively to 0/1
-                match[ 4 ] = +( match[ 4 ] ?
-                  match[ 5 ] + ( match[ 6 ] || 1 ) :
-                  2 * ( match[ 3 ] === "even" || match[ 3 ] === "odd" ) );
-                match[ 5 ] = +( ( match[ 7 ] + match[ 8 ] ) || match[ 3 ] === "odd" );
-
-                // other types prohibit arguments
-              } else if ( match[ 3 ] ) {
-                Sizzle.error( match[ 0 ] );
+                match[4] = +(
+                  match[4] ? match[5] + (match[6] || 1):
+                  2 * (match[3] === "even" || match[3] === "odd") 
+                );
+                match[5] = +((match[7] + match[8]) || match[3] === "odd");  
+              } 
+              
+              // other types prohibit arguments
+              else if (match[3]) {
+                Sizzle.error(match[0]);
               }
 
               return match;
             },
 
-            "PSEUDO": function( match ) {
-              var excess,
-                unquoted = !match[ 6 ] && match[ 2 ];
+            "PSEUDO": function(match) {
+              var excess, unquoted = !match[6] && match[2];
 
-              if ( matchExpr[ "CHILD" ].test( match[ 0 ] ) ) {
+              if (matchExpr["CHILD"].test(match[0])) {
                 return null;
               }
 
               // Accept quoted arguments as-is
-              if ( match[ 3 ] ) {
-                match[ 2 ] = match[ 4 ] || match[ 5 ] || "";
-
+              if (match[3]) {
+                match[2] = match[4] || match[5] || "";
+              } 
+              
               // Strip excess characters from unquoted arguments
-              } else if ( unquoted && rpseudo.test( unquoted ) &&
+              else if (
+                unquoted && rpseudo.test(unquoted) &&
 
                 // Get excess from tokenize (recursively)
-                ( excess = tokenize( unquoted, true ) ) &&
+                (excess = tokenize(unquoted, true)) &&
 
                 // advance to the next closing parenthesis
-                ( excess = unquoted.indexOf( ")", unquoted.length - excess ) - unquoted.length ) ) {
-
+                (excess = unquoted.indexOf(")", unquoted.length - excess) - unquoted.length) 
+              ) {
                 // excess is a negative index
-                match[ 0 ] = match[ 0 ].slice( 0, excess );
-                match[ 2 ] = unquoted.slice( 0, excess );
+                match[0] = match[0].slice(0, excess);
+                match[2] = unquoted.slice(0, excess);
               }
 
               // Return only captures needed by the pseudo filter method (type and argument)
-              return match.slice( 0, 3 );
+              return match.slice(0, 3);
             }
           },
 
           filter: {
+            "TAG": function(nodeNameSelector) {
+              var nodeName = nodeNameSelector.replace(runescape, funescape).toLowerCase();
 
-            "TAG": function( nodeNameSelector ) {
-              var nodeName = nodeNameSelector.replace( runescape, funescape ).toLowerCase();
-              return nodeNameSelector === "*" ?
-                function() {
-                  return true;
-                } :
-                function( elem ) {
+              return nodeNameSelector === "*" ? function() {
+                return true;
+              }:
+                function(elem) {
                   return elem.nodeName && elem.nodeName.toLowerCase() === nodeName;
                 };
             },
-
+// Marker
             "CLASS": function( className ) {
               var pattern = classCache[ className + " " ];
 
