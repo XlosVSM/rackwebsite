@@ -1921,31 +1921,35 @@
                   return elem.nodeName && elem.nodeName.toLowerCase() === nodeName;
                 };
             },
-// Marker
-            "CLASS": function( className ) {
-              var pattern = classCache[ className + " " ];
 
-              return pattern ||
-                ( pattern = new RegExp( "(^|" + whitespace +
-                  ")" + className + "(" + whitespace + "|$)" ) ) && classCache(
-                    className, function( elem ) {
-                      return pattern.test(
-                        typeof elem.className === "string" && elem.className ||
-                        typeof elem.getAttribute !== "undefined" &&
-                          elem.getAttribute( "class" ) ||
-                        ""
-                      );
-                } );
+            "CLASS": function(className) {
+              var pattern = classCache[className + " "];
+
+              return pattern || ( 
+                pattern = new RegExp(
+                  "(^|" + whitespace + ")" + className + "(" + whitespace + "|$)" 
+                ) 
+              ) && classCache(
+                className, function(elem) {
+                  return pattern.test(
+                    typeof elem.className === "string" && elem.className ||
+                    typeof elem.getAttribute !== "undefined" &&
+                      elem.getAttribute("class") ||
+                    ""
+                  );
+                } 
+              );
             },
 
-            "ATTR": function( name, operator, check ) {
-              return function( elem ) {
-                var result = Sizzle.attr( elem, name );
+            "ATTR": function(name, operator, check) {
+              return function(elem) {
+                var result = Sizzle.attr(elem, name);
 
-                if ( result == null ) {
+                if (result == null) {
                   return operator === "!=";
                 }
-                if ( !operator ) {
+
+                if (!operator) {
                   return true;
                 }
 
@@ -1953,192 +1957,191 @@
 
                 /* eslint-disable max-len */
 
-                return operator === "=" ? result === check :
-                  operator === "!=" ? result !== check :
-                  operator === "^=" ? check && result.indexOf( check ) === 0 :
-                  operator === "*=" ? check && result.indexOf( check ) > -1 :
-                  operator === "$=" ? check && result.slice( -check.length ) === check :
-                  operator === "~=" ? ( " " + result.replace( rwhitespace, " " ) + " " ).indexOf( check ) > -1 :
-                  operator === "|=" ? result === check || result.slice( 0, check.length + 1 ) === check + "-" :
-                  false;
-                /* eslint-enable max-len */
-
+                return operator === "=" ? result === check:
+                  operator === "!=" ? result !== check:
+                    operator === "^=" ? check && result.indexOf(check) === 0:
+                      operator === "*=" ? check && result.indexOf(check) > -1:
+                        operator === "$=" ? check && result.slice(-check.length) === check:
+                          operator === "~=" ? (" " + result.replace(rwhitespace, " ") + " ").indexOf(check) > -1:
+                            operator === "|=" ? result === check || result.slice(0, check.length + 1) === check + "-":
+                              false;
               };
             },
 
-            "CHILD": function( type, what, _argument, first, last ) {
-              var simple = type.slice( 0, 3 ) !== "nth",
-                forward = type.slice( -4 ) !== "last",
+            /* eslint-enable max-len */
+            "CHILD": function(type, what, _argument, first, last) {
+              var simple = type.slice(0, 3) !== "nth",
+                forward = type.slice(-4) !== "last",
                 ofType = what === "of-type";
 
               return first === 1 && last === 0 ?
-
                 // Shortcut for :nth-*(n)
-                function( elem ) {
+                function(elem) {
                   return !!elem.parentNode;
-                } :
+                }:
+                  function(elem, _context, xml) {
+                    var cache, uniqueCache, outerCache, node, nodeIndex, start,
+                      dir = simple !== forward ? "nextSibling": "previousSibling",
+                      parent = elem.parentNode,
+                      name = ofType && elem.nodeName.toLowerCase(),
+                      useCache = !xml && !ofType,
+                      diff = false;
 
-                function( elem, _context, xml ) {
-                  var cache, uniqueCache, outerCache, node, nodeIndex, start,
-                    dir = simple !== forward ? "nextSibling" : "previousSibling",
-                    parent = elem.parentNode,
-                    name = ofType && elem.nodeName.toLowerCase(),
-                    useCache = !xml && !ofType,
-                    diff = false;
-
-                  if ( parent ) {
-
-                    // :(first|last|only)-(child|of-type)
-                    if ( simple ) {
-                      while ( dir ) {
-                        node = elem;
-                        while ( ( node = node[ dir ] ) ) {
-                          if ( ofType ?
-                            node.nodeName.toLowerCase() === name :
-                            node.nodeType === 1 ) {
-
-                            return false;
+                    if (parent) {
+                      // :(first|last|only)-(child|of-type)
+                      if (simple) {
+                        while (dir) {
+                          node = elem;
+                          while ((node = node[dir])) {
+                            if (ofType ? node.nodeName.toLowerCase() === name: node.nodeType === 1) {
+                              return false;
+                            }
                           }
+
+                          // Reverse direction for :only-* (if we haven't yet done so)
+                          start = dir = type === "only" && !start && "nextSibling";
                         }
 
-                        // Reverse direction for :only-* (if we haven't yet done so)
-                        start = dir = type === "only" && !start && "nextSibling";
-                      }
-                      return true;
-                    }
-
-                    start = [ forward ? parent.firstChild : parent.lastChild ];
-
-                    // non-xml :nth-child(...) stores cache data on `parent`
-                    if ( forward && useCache ) {
-
-                      // Seek `elem` from a previously-cached index
-
-                      // ...in a gzip-friendly way
-                      node = parent;
-                      outerCache = node[ expando ] || ( node[ expando ] = {} );
-
-                      // Support: IE <9 only
-                      // Defend against cloned attroperties (jQuery gh-1709)
-                      uniqueCache = outerCache[ node.uniqueID ] ||
-                        ( outerCache[ node.uniqueID ] = {} );
-
-                      cache = uniqueCache[ type ] || [];
-                      nodeIndex = cache[ 0 ] === dirruns && cache[ 1 ];
-                      diff = nodeIndex && cache[ 2 ];
-                      node = nodeIndex && parent.childNodes[ nodeIndex ];
-
-                      while ( ( node = ++nodeIndex && node && node[ dir ] ||
-
-                        // Fallback to seeking `elem` from the start
-                        ( diff = nodeIndex = 0 ) || start.pop() ) ) {
-
-                        // When found, cache indexes on `parent` and break
-                        if ( node.nodeType === 1 && ++diff && node === elem ) {
-                          uniqueCache[ type ] = [ dirruns, nodeIndex, diff ];
-                          break;
-                        }
+                        return true;
                       }
 
-                    } else {
+                      start = [forward ? parent.firstChild: parent.lastChild];
 
-                      // Use previously-cached element index if available
-                      if ( useCache ) {
+                      // non-xml :nth-child(...) stores cache data on `parent`
+                      if (forward && useCache) {
+                        // Seek `elem` from a previously-cached index
 
                         // ...in a gzip-friendly way
-                        node = elem;
-                        outerCache = node[ expando ] || ( node[ expando ] = {} );
+                        node = parent;
+                        outerCache = node[expando] || (node[expando] = {});
 
                         // Support: IE <9 only
                         // Defend against cloned attroperties (jQuery gh-1709)
-                        uniqueCache = outerCache[ node.uniqueID ] ||
-                          ( outerCache[ node.uniqueID ] = {} );
+                        uniqueCache = outerCache[node.uniqueID] || (outerCache[node.uniqueID] = {});
 
-                        cache = uniqueCache[ type ] || [];
-                        nodeIndex = cache[ 0 ] === dirruns && cache[ 1 ];
-                        diff = nodeIndex;
-                      }
+                        cache = uniqueCache[type] || [];
+                        nodeIndex = cache[0] === dirruns && cache[1];
+                        diff = nodeIndex && cache[2];
+                        node = nodeIndex && parent.childNodes[nodeIndex];
 
-                      // xml :nth-child(...)
-                      // or :nth-last-child(...) or :nth(-last)?-of-type(...)
-                      if ( diff === false ) {
+                        while (
+                          (
+                            node = ++nodeIndex && node && node[dir] ||
 
-                        // Use the same loop as above to seek `elem` from the start
-                        while ( ( node = ++nodeIndex && node && node[ dir ] ||
-                          ( diff = nodeIndex = 0 ) || start.pop() ) ) {
+                            // Fallback to seeking `elem` from the start
+                            (diff = nodeIndex = 0) || start.pop() 
+                          ) 
+                        ) {
+                          // When found, cache indexes on `parent` and break
+                          if (node.nodeType === 1 && ++diff && node === elem) {
+                            uniqueCache[type] = [dirruns, nodeIndex, diff];
+                            break;
+                          }
+                        }
+                      } 
+                      
+                      else {
+                        // Use previously-cached element index if available
+                        if (useCache) {
+                          // ...in a gzip-friendly way
+                          node = elem;
+                          outerCache = node[expando] || (node[expando] = {});
 
-                          if ( ( ofType ?
-                            node.nodeName.toLowerCase() === name :
-                            node.nodeType === 1 ) &&
-                            ++diff ) {
+                          // Support: IE <9 only
+                          // Defend against cloned attroperties (jQuery gh-1709)
+                          uniqueCache = outerCache[node.uniqueID] || (outerCache[node.uniqueID] = {});
 
-                            // Cache the index of each encountered element
-                            if ( useCache ) {
-                              outerCache = node[ expando ] ||
-                                ( node[ expando ] = {} );
+                          cache = uniqueCache[type] || [];
+                          nodeIndex = cache[0] === dirruns && cache[1];
+                          diff = nodeIndex;
+                        }
 
-                              // Support: IE <9 only
-                              // Defend against cloned attroperties (jQuery gh-1709)
-                              uniqueCache = outerCache[ node.uniqueID ] ||
-                                ( outerCache[ node.uniqueID ] = {} );
+                        // xml :nth-child(...)
+                        // or :nth-last-child(...) or :nth(-last)?-of-type(...)
+                        if (diff === false) {
+                          // Use the same loop as above to seek `elem` from the start
+                          while (
+                            ( 
+                              node = ++nodeIndex && node && node[dir] ||
+                              (diff = nodeIndex = 0) || start.pop()
+                            ) 
+                          ) {
+                            if (
+                              ( 
+                                ofType ? node.nodeName.toLowerCase() === name:
+                                  node.nodeType === 1 
+                              ) 
+                              
+                              && ++diff 
+                            ) {
+                              // Cache the index of each encountered element
+                              if (useCache) {
+                                outerCache = node[expando] || (node[ expando ] = {});
 
-                              uniqueCache[ type ] = [ dirruns, diff ];
-                            }
+                                // Support: IE <9 only
+                                // Defend against cloned attroperties (jQuery gh-1709)
+                                uniqueCache = outerCache[node.uniqueID] || (outerCache[node.uniqueID] = {});
 
-                            if ( node === elem ) {
-                              break;
+                                uniqueCache[type] = [dirruns, diff];
+                              }
+
+                              if (node === elem) {
+                                break;
+                              }
                             }
                           }
                         }
                       }
-                    }
 
-                    // Incorporate the offset, then check against cycle size
-                    diff -= last;
-                    return diff === first || ( diff % first === 0 && diff / first >= 0 );
-                  }
-                };
+                      // Incorporate the offset, then check against cycle size
+                      diff -= last;
+
+                      return diff === first || (diff % first === 0 && diff / first >= 0);
+                    }
+                  };
             },
 
-            "PSEUDO": function( pseudo, argument ) {
-
+            "PSEUDO": function(pseudo, argument) {
               // pseudo-class names are case-insensitive
               // http://www.w3.org/TR/selectors/#pseudo-classes
               // Prioritize by case sensitivity in case custom pseudos are added with uppercase letters
               // Remember that setFilters inherits from pseudos
               var args,
-                fn = Expr.pseudos[ pseudo ] || Expr.setFilters[ pseudo.toLowerCase() ] ||
-                  Sizzle.error( "unsupported pseudo: " + pseudo );
+                fn = Expr.pseudos[pseudo] || Expr.setFilters[pseudo.toLowerCase()] ||
+                  Sizzle.error("unsupported pseudo: " + pseudo);
 
               // The user may use createPseudo to indicate that
               // arguments are needed to create the filter function
               // just as Sizzle does
-              if ( fn[ expando ] ) {
-                return fn( argument );
+              if (fn[expando]) {
+                return fn(argument);
               }
 
               // But maintain support for old signatures
-              if ( fn.length > 1 ) {
-                args = [ pseudo, pseudo, "", argument ];
-                return Expr.setFilters.hasOwnProperty( pseudo.toLowerCase() ) ?
-                  markFunction( function( seed, matches ) {
+              if (fn.length > 1) {
+                args = [pseudo, pseudo, "", argument];
+
+                return Expr.setFilters.hasOwnProperty(pseudo.toLowerCase()) ? markFunction(
+                  function(seed, matches) {
                     var idx,
-                      matched = fn( seed, argument ),
+                      matched = fn(seed, argument),
                       i = matched.length;
-                    while ( i-- ) {
-                      idx = indexOf( seed, matched[ i ] );
-                      seed[ idx ] = !( matches[ idx ] = matched[ i ] );
+
+                    while (i--) {
+                      idx = indexOf(seed, matched[i]);
+                      seed[idx] = !(matches[idx] = matched[i]);
                     }
-                  } ) :
-                  function( elem ) {
-                    return fn( elem, 0, args );
+                  } 
+                ):
+                  function(elem) {
+                    return fn(elem, 0, args);
                   };
               }
 
               return fn;
             }
           },
-
+// Marker
           pseudos: {
 
             // Potentially complex pseudos
