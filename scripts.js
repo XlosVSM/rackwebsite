@@ -2141,54 +2141,59 @@
               return fn;
             }
           },
-// Marker
+
           pseudos: {
-
             // Potentially complex pseudos
-            "not": markFunction( function( selector ) {
+            "not": markFunction(
+              function(selector) {
+                // Trim the selector passed to compile
+                // to avoid treating leading and trailing
+                // spaces as combinators
+                var input = [],
+                  results = [],
+                  matcher = compile(selector.replace(rtrim, "$1"));
 
-              // Trim the selector passed to compile
-              // to avoid treating leading and trailing
-              // spaces as combinators
-              var input = [],
-                results = [],
-                matcher = compile( selector.replace( rtrim, "$1" ) );
+                return matcher[expando] ? markFunction(
+                  function(seed, matches, _context, xml) {
+                    var elem,
+                      unmatched = matcher(seed, null, xml, []),
+                      i = seed.length;
 
-              return matcher[ expando ] ?
-                markFunction( function( seed, matches, _context, xml ) {
-                  var elem,
-                    unmatched = matcher( seed, null, xml, [] ),
-                    i = seed.length;
-
-                  // Match elements unmatched by `matcher`
-                  while ( i-- ) {
-                    if ( ( elem = unmatched[ i ] ) ) {
-                      seed[ i ] = !( matches[ i ] = elem );
+                    // Match elements unmatched by `matcher`
+                    while (i--) {
+                      if ((elem = unmatched[i])) {
+                        seed[i] = !(matches[i] = elem);
+                      }
                     }
-                  }
-                } ) :
-                function( elem, _context, xml ) {
-                  input[ 0 ] = elem;
-                  matcher( input, null, xml, results );
+                  } 
+                ):
+                  function(elem, _context, xml) {
+                    input[0] = elem;
+                    matcher(input, null, xml, results);
 
-                  // Don't keep the element (issue #299)
-                  input[ 0 ] = null;
-                  return !results.pop();
+                    // Don't keep the element (issue #299)
+                    input[0] = null;
+                    return !results.pop();
+                  };
+              } 
+            ),
+
+            "has": markFunction(
+              function(selector) {
+                return function(elem) {
+                  return Sizzle(selector, elem).length > 0;
                 };
-            } ),
+              } 
+            ),
 
-            "has": markFunction( function( selector ) {
-              return function( elem ) {
-                return Sizzle( selector, elem ).length > 0;
-              };
-            } ),
-
-            "contains": markFunction( function( text ) {
-              text = text.replace( runescape, funescape );
-              return function( elem ) {
-                return ( elem.textContent || getText( elem ) ).indexOf( text ) > -1;
-              };
-            } ),
+            "contains": markFunction(
+              function(text) {
+                text = text.replace(runescape, funescape);
+                return function(elem) {
+                  return (elem.textContent || getText(elem)).indexOf(text) > -1;
+                };
+              } 
+            ),
 
             // "Whether an element is represented by a :lang() selector
             // is based solely on the element's language value
@@ -2197,62 +2202,68 @@
             // The matching of C against the element's language value is performed case-insensitively.
             // The identifier C does not have to be a valid language name."
             // http://www.w3.org/TR/selectors/#lang-pseudo
-            "lang": markFunction( function( lang ) {
+            "lang": markFunction(
+              function(lang) {
+                // lang value must be a valid identifier
+                if (!ridentifier.test(lang || "")) {
+                  Sizzle.error("unsupported lang: " + lang);
+                }
 
-              // lang value must be a valid identifier
-              if ( !ridentifier.test( lang || "" ) ) {
-                Sizzle.error( "unsupported lang: " + lang );
-              }
-              lang = lang.replace( runescape, funescape ).toLowerCase();
-              return function( elem ) {
-                var elemLang;
-                do {
-                  if ( ( elemLang = documentIsHTML ?
-                    elem.lang :
-                    elem.getAttribute( "xml:lang" ) || elem.getAttribute( "lang" ) ) ) {
-
-                    elemLang = elemLang.toLowerCase();
-                    return elemLang === lang || elemLang.indexOf( lang + "-" ) === 0;
-                  }
-                } while ( ( elem = elem.parentNode ) && elem.nodeType === 1 );
-                return false;
-              };
-            } ),
+                lang = lang.replace(runescape, funescape).toLowerCase();
+                return function(elem) {
+                  var elemLang;
+                  do {
+                    if (
+                      (
+                        elemLang = documentIsHTML ? elem.lang:
+                          elem.getAttribute("xml:lang") || elem.getAttribute("lang") 
+                      ) 
+                    ) {
+                      elemLang = elemLang.toLowerCase();
+                      return elemLang === lang || elemLang.indexOf(lang + "-") === 0;
+                    }
+                  } 
+                  
+                  while ((elem = elem.parentNode) && elem.nodeType === 1);
+                  return false;
+                };
+              } 
+            ),
 
             // Miscellaneous
-            "target": function( elem ) {
+            "target": function(elem) {
               var hash = window.location && window.location.hash;
-              return hash && hash.slice( 1 ) === elem.id;
+
+              return hash && hash.slice(1) === elem.id;
             },
 
-            "root": function( elem ) {
+            "root": function(elem) {
               return elem === docElem;
             },
 
-            "focus": function( elem ) {
+            "focus": function(elem) {
               return elem === document.activeElement &&
-                ( !document.hasFocus || document.hasFocus() ) &&
-                !!( elem.type || elem.href || ~elem.tabIndex );
+                (!document.hasFocus || document.hasFocus()) &&
+                !!(elem.type || elem.href || ~elem.tabIndex);
             },
 
             // Boolean properties
-            "enabled": createDisabledPseudo( false ),
-            "disabled": createDisabledPseudo( true ),
+            "enabled": createDisabledPseudo(false),
+            "disabled": createDisabledPseudo(true),
 
-            "checked": function( elem ) {
-
+            "checked": function(elem) {
               // In CSS3, :checked should return both checked and selected elements
               // http://www.w3.org/TR/2011/REC-css3-selectors-20110929/#checked
               var nodeName = elem.nodeName.toLowerCase();
-              return ( nodeName === "input" && !!elem.checked ) ||
-                ( nodeName === "option" && !!elem.selected );
+
+              return (nodeName === "input" && !!elem.checked) ||
+                (nodeName === "option" && !!elem.selected);
             },
 
-            "selected": function( elem ) {
-
+            "selected": function(elem) {
               // Accessing this property makes selected-by-default
               // options in Safari work properly
-              if ( elem.parentNode ) {
+              if (elem.parentNode) {
                 // eslint-disable-next-line no-unused-expressions
                 elem.parentNode.selectedIndex;
               }
@@ -2261,70 +2272,81 @@
             },
 
             // Contents
-            "empty": function( elem ) {
-
+            "empty": function(elem) {
               // http://www.w3.org/TR/selectors/#empty-pseudo
               // :empty is negated by element (1) or content nodes (text: 3; cdata: 4; entity ref: 5),
               //   but not by others (comment: 8; processing instruction: 7; etc.)
               // nodeType < 6 works because attributes (2) do not appear as children
-              for ( elem = elem.firstChild; elem; elem = elem.nextSibling ) {
-                if ( elem.nodeType < 6 ) {
+              for (elem = elem.firstChild; elem; elem = elem.nextSibling) {
+                if (elem.nodeType < 6) {
                   return false;
                 }
               }
+
               return true;
             },
 
-            "parent": function( elem ) {
-              return !Expr.pseudos[ "empty" ]( elem );
+            "parent": function(elem) {
+              return !Expr.pseudos["empty"](elem);
             },
 
             // Element/input types
-            "header": function( elem ) {
-              return rheader.test( elem.nodeName );
+            "header": function(elem) {
+              return rheader.test(elem.nodeName);
             },
 
-            "input": function( elem ) {
-              return rinputs.test( elem.nodeName );
+            "input": function(elem) {
+              return rinputs.test(elem.nodeName);
             },
 
-            "button": function( elem ) {
+            "button": function(elem) {
               var name = elem.nodeName.toLowerCase();
+
               return name === "input" && elem.type === "button" || name === "button";
             },
 
-            "text": function( elem ) {
+            "text": function(elem) {
               var attr;
+
               return elem.nodeName.toLowerCase() === "input" &&
                 elem.type === "text" &&
 
                 // Support: IE<8
                 // New HTML5 attribute values (e.g., "search") appear with elem.type === "text"
-                ( ( attr = elem.getAttribute( "type" ) ) == null ||
-                  attr.toLowerCase() === "text" );
+                ((attr = elem.getAttribute("type")) == null || attr.toLowerCase() === "text");
             },
 
             // Position-in-collection
-            "first": createPositionalPseudo( function() {
-              return [ 0 ];
-            } ),
+            "first": createPositionalPseudo(
+              function() {
+                return [ 0 ];
+              } 
+            ),
 
-            "last": createPositionalPseudo( function( _matchIndexes, length ) {
-              return [ length - 1 ];
-            } ),
+            "last": createPositionalPseudo(
+              function(_matchIndexes, length) {
+                return [length - 1];
+              } 
+            ),
 
-            "eq": createPositionalPseudo( function( _matchIndexes, length, argument ) {
-              return [ argument < 0 ? argument + length : argument ];
-            } ),
+            "eq": createPositionalPseudo(
+              function(_matchIndexes, length, argument) {
+                return [argument < 0 ? argument + length: argument];
+              } 
+            ),
 
-            "even": createPositionalPseudo( function( matchIndexes, length ) {
-              var i = 0;
-              for ( ; i < length; i += 2 ) {
-                matchIndexes.push( i );
-              }
-              return matchIndexes;
-            } ),
+            "even": createPositionalPseudo(
+              function(matchIndexes, length) {
+                var i = 0;
 
+                for (; i < length; i += 2) {
+                  matchIndexes.push(i);
+                }
+
+                return matchIndexes;
+              } 
+            ),
+// Marker
             "odd": createPositionalPseudo( function( matchIndexes, length ) {
               var i = 1;
               for ( ; i < length; i += 2 ) {
@@ -12098,7 +12120,7 @@
 // Website JavaScript //
 
 // Rack size //
-
+/*
 var w = window.innerWidth / 2;
 var h = window.innerHeight / 2;
 
@@ -12127,55 +12149,74 @@ addRackBtn.addEventListener(
     addRack();
   }
 );
-
+*/
 // Test calling data from a JSON file //
+
+let $draggable = $('.draggable').draggabilly();
+
+$(document).ready(
+  function() {
+    // Get data
+    GetRackEquipData();
+
+    $('body').on(
+      "click", ".addDragBtn button", function () {
+        var selected = $("#addRackEquip").find(":selected");
+        var width = $(selected).data("width");
+        var height = $(selected).data("height");
+        var image = $(selected).data("image");
+        var rackEquip = '<div class="rackEquip" style="width:'+width+'px;height:'+height+'px; background-image:url('+image+')" />';
+
+        $('.rackEquip').draggabilly();
+
+        return false;
+      }
+    );
+  }
+);
+
+window.rackEquip = function(type, brand, name, width, height, image) {
+	this.Type = type || "";
+	this.Brand = brand || "";
+	this.Name = name || "";
+	this.Width = width || "";
+	this.Height = height || "";
+	this.Image = image || "";
+}
+
 window.GetRackEquipData = function () {
+  console.log("GetRackEquipData");
+
   $.ajax(
     {
       url: "data/rackEquip.json",
-      dataType: "text",
+      dataType: 'text',
       type: "GET",
-      success: function (data) {
+      success: function(data) {
         data = $.parseJSON(data.replace(/\r\n/g, "").replace(/\t/g, ""));
+			  var rackEquips = [];
 
-        var pedals = [];
-
-        for (var equip in data) {
-          equips.push (
-            new rackEquip (
-              data[equip].Type || "",
-              data[pedal].Brand || "",
-              data[pedal].Name || "",
-              data[pedal].Size || "",
-              data[pedal].Image || ""
+			  for(var rackEquip in data) {
+          rackEquips.push(
+            new RackEquip(
+              data[rackEquip].Type 	|| "",
+              data[rackEquip].Brand 	|| "",
+              data[rackEquip].Name 	|| "",
+              data[rackEquip].Width 	|| "",
+              data[rackEquip].Height 	|| "",
+              data[rackEquip].Image 	|| ""
             )
           );
         }
 
-        // Sort alphabetically just in case placed not in order
-        equips.sort (
-          function (a, b) {
-            if (a.Brand < b.Brand) {
-              return 1;
-            }
-
-            else {
-              if (a.Name <b.Name) {
-                return -1;
-              }
-
-              else if (b.Name < a.Name) {
-                return 1;
-              }
-              
-              return 0;
-            }
-          }
-        );
-
-        pedals.forEach(RenderEquip);
-        listRackEquip(equips);
-      },
-    }
+			  RenderRackEquips(rackEquips);
+			  console.log("ajax success");
+		  }
+	  }
   );
 };
+
+window.RenderRackEquips = function(rackEquips) {
+  // To be continued (https://github.com/PedalPlayground/PedalPlayground.github.io/commit/4aa04fd625f65dd7db4a7f392e282f6797694f2a#)
+}
+
