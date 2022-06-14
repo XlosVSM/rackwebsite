@@ -1,37 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
     <head>
-        <title>Rack Website</title>
-        <meta charset="UTF-8">
-        <meta name="viewpoint" content="width=device-width, initial-scale=1">
+        <title>Rack Planner</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-        <!--CSS files-->
         <link rel="stylesheet" href="styles.css">
     </head>
 
     <body>
-        <div class="header">
-            <h1>Rack Website</h1>
-            <a href="https://github.com/XlosVSM/rackwebsite">
-                <img src="images/GitHub-Mark-64px.png" alt="GitHub Logo">
-            </a>
-        </div>
-        
-        <!-- Test adding the Item selector -->
-        <select name="rackEquip">
-            <option value="Fulltone That 80s Chorus">Fulltone That 80s Chorus</option>
-            <option value="Mellotron M4000D Rack">Mellotron M4000D Rack</option>
-        </select>
+        <h4>Add a rackmount equipment</h4>
 
-        <button id="addDragBtn">Add a draggable</button>
+        <form id="add-rack-equip">
+            <select class="rack-equip-list">
+                <optgroup label="Fulltone">
+                    <option id="80s-chorus" data-width="2.75" data-height="5">That 80s Chorus</option>
+                </optgroup>
+            </select>
 
-        <div class="draggable"></div>
-
-        <script src="data/rackEquip.json"></script>
-        <script src="scripts.js"></script>
+            <button>Add rackequip</button>
+        </form>
     </body>
 </html>
-
-<!-- I will use a scale to have the sizes. The canvas scale is the number of pixels on the canvas 
-    that equal 1 inch. I plan that when the value is increased, so does all other items on the canvas
-    equally. -->

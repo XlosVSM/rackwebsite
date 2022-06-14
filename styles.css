@@ -2,7 +2,7 @@ body {
     font-family: sans-serif; 
 }
 
-.draggable {
+.rackEquip {
     height: 43.75px; /* 1U */
     width: 475px; /* 19 inches */
     background-image: url("images/racks/fulltone-that-80s-chorus.png");
