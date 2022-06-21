@@ -197,41 +197,53 @@
 			each: function(callback) {
 				return jQuery.each(this, callback);
 			},
-// Marker
-			map: function( callback ) {
-				return this.pushStack( jQuery.map( this, function( elem, i ) {
-					return callback.call( elem, i, elem );
-				} ) );
+
+			map: function(callback) {
+				return this.pushStack(
+					jQuery.map(
+						this, function(elem, i) {
+							return callback.call(elem, i, elem);
+						} 
+					) 
+				);
 			},
 
 			slice: function() {
-				return this.pushStack( slice.apply( this, arguments ) );
+				return this.pushStack(slice.apply(this, arguments));
 			},
 
 			first: function() {
-				return this.eq( 0 );
+				return this.eq(0);
 			},
 
 			last: function() {
-				return this.eq( -1 );
+				return this.eq(-1);
 			},
 
 			even: function() {
-				return this.pushStack( jQuery.grep( this, function( _elem, i ) {
-					return ( i + 1 ) % 2;
-				} ) );
+				return this.pushStack(
+					jQuery.grep(
+						this, function(_elem, i) {
+							return (i + 1) % 2;
+						} 
+					) 
+				);
 			},
 
 			odd: function() {
-				return this.pushStack( jQuery.grep( this, function( _elem, i ) {
-					return i % 2;
-				} ) );
+				return this.pushStack(
+					jQuery.grep(
+						this, function(_elem, i) {
+							return i % 2;
+						} 
+					) 
+				);
 			},
 
-			eq: function( i ) {
-				var len = this.length,
-					j = +i + ( i < 0 ? len : 0 );
-				return this.pushStack( j >= 0 && j < len ? [ this[ j ] ] : [] );
+			eq: function(i) {
+				var len = this.length, j = +i + (i < 0 ? len: 0);
+
+				return this.pushStack(j >= 0 && j < len ? [this[j]]: []);
 			},
 
 			end: function() {
@@ -253,61 +265,71 @@
 				deep = false;
 
 			// Handle a deep copy situation
-			if ( typeof target === "boolean" ) {
+			if (typeof target === "boolean") {
 				deep = target;
 
 				// Skip the boolean and the target
-				target = arguments[ i ] || {};
+				target = arguments[i] || {};
 				i++;
 			}
 
 			// Handle case when target is a string or something (possible in deep copy)
-			if ( typeof target !== "object" && !isFunction( target ) ) {
+			if (typeof target !== "object" && !isFunction(target)) {
 				target = {};
 			}
 
 			// Extend jQuery itself if only one argument is passed
-			if ( i === length ) {
+			if (i === length) {
 				target = this;
 				i--;
 			}
 
-			for ( ; i < length; i++ ) {
+			for (; i < length; i++) {
 
 				// Only deal with non-null/undefined values
-				if ( ( options = arguments[ i ] ) != null ) {
-
+				if ((options = arguments[i]) != null) {
 					// Extend the base object
-					for ( name in options ) {
+					for (name in options) {
 						copy = options[ name ];
 
 						// Prevent Object.prototype pollution
 						// Prevent never-ending loop
-						if ( name === "__proto__" || target === copy ) {
+						if (name === "__proto__" || target === copy) {
 							continue;
 						}
 
 						// Recurse if we're merging plain objects or arrays
-						if ( deep && copy && ( jQuery.isPlainObject( copy ) ||
-							( copyIsArray = Array.isArray( copy ) ) ) ) {
-							src = target[ name ];
+						if (
+							deep && copy && (
+								jQuery.isPlainObject(copy) || ( 
+									copyIsArray = Array.isArray(copy) 
+								) 
+							) 
+						) {
+							src = target[name];
 
 							// Ensure proper type for the source value
-							if ( copyIsArray && !Array.isArray( src ) ) {
+							if (copyIsArray && !Array.isArray(src)) {
 								clone = [];
-							} else if ( !copyIsArray && !jQuery.isPlainObject( src ) ) {
+							} 
+							
+							else if (!copyIsArray && !jQuery.isPlainObject(src)) {
 								clone = {};
-							} else {
+							} 
+							
+							else {
 								clone = src;
 							}
+
 							copyIsArray = false;
 
 							// Never move original objects, clone them
-							target[ name ] = jQuery.extend( deep, clone, copy );
+							target[name] = jQuery.extend(deep, clone, copy);
+						}
 
 						// Don't bring in undefined values
-						} else if ( copy !== undefined ) {
-							target[ name ] = copy;
+						else if (copy !== undefined) {
+							target[name] = copy;
 						}
 					}
 				}
@@ -317,2654 +339,2669 @@
 			return target;
 		};
 
-		jQuery.extend( {
+		jQuery.extend(
+			{
+				// Unique for each copy of jQuery on the page
+				expando: "jQuery" + (version + Math.random()).replace(/\D/g, ""),
 
-			// Unique for each copy of jQuery on the page
-			expando: "jQuery" + ( version + Math.random() ).replace( /\D/g, "" ),
+				// Assume jQuery is ready without the ready module
+				isReady: true,
 
-			// Assume jQuery is ready without the ready module
-			isReady: true,
+				error: function(msg) {
+					throw new Error(msg);
+				},
 
-			error: function( msg ) {
-				throw new Error( msg );
-			},
+				noop: function() {},
 
-			noop: function() {},
+				isPlainObject: function(obj) {
+					var proto, Ctor;
 
-			isPlainObject: function( obj ) {
-				var proto, Ctor;
+					// Detect obvious negatives
+					// Use toString instead of jQuery.type to catch host objects
+					if (!obj || toString.call(obj) !== "[object Object]") {
+						return false;
+					}
 
-				// Detect obvious negatives
-				// Use toString instead of jQuery.type to catch host objects
-				if ( !obj || toString.call( obj ) !== "[object Object]" ) {
-					return false;
-				}
+					proto = getProto(obj);
 
-				proto = getProto( obj );
+					// Objects with no prototype (e.g., `Object.create( null )`) are plain
+					if (!proto) {
+						return true;
+					}
 
-				// Objects with no prototype (e.g., `Object.create( null )`) are plain
-				if ( !proto ) {
+					// Objects with prototype are plain iff they were constructed by a global Object function
+					Ctor = hasOwn.call(proto, "constructor") && proto.constructor;
+					return typeof Ctor === "function" && fnToString.call(Ctor) === ObjectFunctionString;
+				},
+
+				isEmptyObject: function(obj) {
+					var name;
+
+					for (name in obj) {
+						return false;
+					}
+
 					return true;
-				}
+				},
 
-				// Objects with prototype are plain iff they were constructed by a global Object function
-				Ctor = hasOwn.call( proto, "constructor" ) && proto.constructor;
-				return typeof Ctor === "function" && fnToString.call( Ctor ) === ObjectFunctionString;
-			},
+				// Evaluates a script in a provided context; falls back to the global one
+				// if not specified.
+				globalEval: function(code, options, doc) {
+					DOMEval(code, {nonce: options && options.nonce}, doc);
+				},
 
-			isEmptyObject: function( obj ) {
-				var name;
+				each: function(obj, callback) {
+					var length, i = 0;
 
-				for ( name in obj ) {
-					return false;
-				}
-				return true;
-			},
-
-			// Evaluates a script in a provided context; falls back to the global one
-			// if not specified.
-			globalEval: function( code, options, doc ) {
-				DOMEval( code, { nonce: options && options.nonce }, doc );
-			},
-
-			each: function( obj, callback ) {
-				var length, i = 0;
-
-				if ( isArrayLike( obj ) ) {
-					length = obj.length;
-					for ( ; i < length; i++ ) {
-						if ( callback.call( obj[ i ], i, obj[ i ] ) === false ) {
-							break;
+					if (isArrayLike(obj)) {
+						length = obj.length;
+						for (; i < length; i++) {
+							if (callback.call(obj[i], i, obj[i]) === false) {
+								break;
+							}
 						}
-					}
-				} else {
-					for ( i in obj ) {
-						if ( callback.call( obj[ i ], i, obj[ i ] ) === false ) {
-							break;
-						}
-					}
-				}
-
-				return obj;
-			},
-
-			// results is for internal usage only
-			makeArray: function( arr, results ) {
-				var ret = results || [];
-
-				if ( arr != null ) {
-					if ( isArrayLike( Object( arr ) ) ) {
-						jQuery.merge( ret,
-							typeof arr === "string" ?
-								[ arr ] : arr
-						);
-					} else {
-						push.call( ret, arr );
-					}
-				}
-
-				return ret;
-			},
-
-			inArray: function( elem, arr, i ) {
-				return arr == null ? -1 : indexOf.call( arr, elem, i );
-			},
-
-			// Support: Android <=4.0 only, PhantomJS 1 only
-			// push.apply(_, arraylike) throws on ancient WebKit
-			merge: function( first, second ) {
-				var len = +second.length,
-					j = 0,
-					i = first.length;
-
-				for ( ; j < len; j++ ) {
-					first[ i++ ] = second[ j ];
-				}
-
-				first.length = i;
-
-				return first;
-			},
-
-			grep: function( elems, callback, invert ) {
-				var callbackInverse,
-					matches = [],
-					i = 0,
-					length = elems.length,
-					callbackExpect = !invert;
-
-				// Go through the array, only saving the items
-				// that pass the validator function
-				for ( ; i < length; i++ ) {
-					callbackInverse = !callback( elems[ i ], i );
-					if ( callbackInverse !== callbackExpect ) {
-						matches.push( elems[ i ] );
-					}
-				}
-
-				return matches;
-			},
-
-			// arg is for internal usage only
-			map: function( elems, callback, arg ) {
-				var length, value,
-					i = 0,
-					ret = [];
-
-				// Go through the array, translating each of the items to their new values
-				if ( isArrayLike( elems ) ) {
-					length = elems.length;
-					for ( ; i < length; i++ ) {
-						value = callback( elems[ i ], i, arg );
-
-						if ( value != null ) {
-							ret.push( value );
+					} 
+					
+					else {
+						for (i in obj) {
+							if (callback.call(obj[i], i, obj[i]) === false) {
+								break;
+							}
 						}
 					}
 
-				// Go through every key on the object,
-				} else {
-					for ( i in elems ) {
-						value = callback( elems[ i ], i, arg );
+					return obj;
+				},
 
-						if ( value != null ) {
-							ret.push( value );
+				// results is for internal usage only
+				makeArray: function(arr, results) {
+					var ret = results || [];
+
+					if (arr != null) {
+						if (isArrayLike(Object(arr))) {
+							jQuery.merge(
+								ret, typeof arr === "string" ? [arr]: arr
+							);
+						} 
+						
+						else {
+							push.call(ret, arr);
 						}
 					}
-				}
 
-				// Flatten any nested arrays
-				return flat( ret );
-			},
+					return ret;
+				},
 
-			// A global GUID counter for objects
-			guid: 1,
+				inArray: function(elem, arr, i) {
+					return arr == null ? -1 : indexOf.call(arr, elem, i);
+				},
 
-			// jQuery.support is not used in Core but other projects attach their
-			// properties to it so it needs to exist.
-			support: support
-		} );
+				// Support: Android <=4.0 only, PhantomJS 1 only
+				// push.apply(_, arraylike) throws on ancient WebKit
+				merge: function(first, second) {
+					var len = +second.length,
+						j = 0,
+						i = first.length;
 
-		if ( typeof Symbol === "function" ) {
-			jQuery.fn[ Symbol.iterator ] = arr[ Symbol.iterator ];
+					for (; j < len; j++) {
+						first[i++] = second[j];
+					}
+
+					first.length = i;
+
+					return first;
+				},
+
+				grep: function(elems, callback, invert) {
+					var callbackInverse,
+						matches = [],
+						i = 0,
+						length = elems.length,
+						callbackExpect = !invert;
+
+					// Go through the array, only saving the items
+					// that pass the validator function
+					for (; i < length; i++) {
+						callbackInverse = !callback(elems[i], i);
+
+						if (callbackInverse !== callbackExpect) {
+							matches.push(elems[i]);
+						}
+					}
+
+					return matches;
+				},
+
+				// arg is for internal usage only
+				map: function( elems, callback, arg ) {
+					var length, value,
+						i = 0,
+						ret = [];
+
+					// Go through the array, translating each of the items to their new values
+					if (isArrayLike(elems)) {
+						length = elems.length;
+
+						for (; i < length; i++) {
+							value = callback(elems[i], i, arg);
+
+							if (value != null) {
+								ret.push(value);
+							}
+						}
+					} 
+
+					// Go through every key on the object,
+					else {
+						for (i in elems) {
+							value = callback(elems[i], i, arg);
+
+							if (value != null) {
+								ret.push(value);
+							}
+						}
+					}
+
+					// Flatten any nested arrays
+					return flat(ret);
+				},
+
+				// A global GUID counter for objects
+				guid: 1,
+
+				// jQuery.support is not used in Core but other projects attach their
+				// properties to it so it needs to exist.
+				support: support
+			} 
+		);
+
+		if (typeof Symbol === "function") {
+			jQuery.fn[Symbol.iterator] = arr[Symbol.iterator];
 		}
 
 		// Populate the class2type map
-		jQuery.each( "Boolean Number String Function Array Date RegExp Object Error Symbol".split( " " ),
-			function( _i, name ) {
-				class2type[ "[object " + name + "]" ] = name.toLowerCase();
-			} );
+		jQuery.each(
+			"Boolean Number String Function Array Date RegExp Object Error Symbol".split(" "),
+			function(_i, name) {
+				class2type["[object " + name + "]"] = name.toLowerCase();
+			} 
+		);
 
-		function isArrayLike( obj ) {
-
+		function isArrayLike(obj) {
 			// Support: real iOS 8.2 only (not reproducible in simulator)
 			// `in` check used to prevent JIT error (gh-2145)
 			// hasOwn isn't used here due to false negatives
 			// regarding Nodelist length in IE
-			var length = !!obj && "length" in obj && obj.length,
-				type = toType( obj );
+			var length = !!obj && "length" in obj && obj.length, type = toType(obj);
 
-			if ( isFunction( obj ) || isWindow( obj ) ) {
+			if (isFunction(obj) || isWindow(obj)) {
 				return false;
 			}
 
 			return type === "array" || length === 0 ||
-				typeof length === "number" && length > 0 && ( length - 1 ) in obj;
+				typeof length === "number" && length > 0 && (length - 1) in obj;
 		}
+
 		var Sizzle =
-		/*!
-		* Sizzle CSS Selector Engine v2.3.6
-		* https://sizzlejs.com/
-		*
-		* Copyright JS Foundation and other contributors
-		* Released under the MIT license
-		* https://js.foundation/
-		*
-		* Date: 2021-02-16
-		*/
-		( function( window ) {
-		var i,
-			support,
-			Expr,
-			getText,
-			isXML,
-			tokenize,
-			compile,
-			select,
-			outermostContext,
-			sortInput,
-			hasDuplicate,
+			/*!
+			* Sizzle CSS Selector Engine v2.3.6
+			* https://sizzlejs.com/
+			*
+			* Copyright JS Foundation and other contributors
+			* Released under the MIT license
+			* https://js.foundation/
+			*
+			* Date: 2021-02-16
+			*/
+			(
+				function(window) {
+					var i,
+						support,
+						Expr,
+						getText,
+						isXML,
+						tokenize,
+						compile,
+						select,
+						outermostContext,
+						sortInput,
+						hasDuplicate,
 
-			// Local document vars
-			setDocument,
-			document,
-			docElem,
-			documentIsHTML,
-			rbuggyQSA,
-			rbuggyMatches,
-			matches,
-			contains,
+						// Local document vars
+						setDocument,
+						document,
+						docElem,
+						documentIsHTML,
+						rbuggyQSA,
+						rbuggyMatches,
+						matches,
+						contains,
 
-			// Instance-specific data
-			expando = "sizzle" + 1 * new Date(),
-			preferredDoc = window.document,
-			dirruns = 0,
-			done = 0,
-			classCache = createCache(),
-			tokenCache = createCache(),
-			compilerCache = createCache(),
-			nonnativeSelectorCache = createCache(),
-			sortOrder = function( a, b ) {
-				if ( a === b ) {
-					hasDuplicate = true;
-				}
-				return 0;
-			},
+						// Instance-specific data
+						expando = "sizzle" + 1 * new Date(),
+						preferredDoc = window.document,
+						dirruns = 0,
+						done = 0,
+						classCache = createCache(),
+						tokenCache = createCache(),
+						compilerCache = createCache(),
+						nonnativeSelectorCache = createCache(),
+						sortOrder = function(a, b) {
+							if (a === b) {
+								hasDuplicate = true;
+							}
 
-			// Instance methods
-			hasOwn = ( {} ).hasOwnProperty,
-			arr = [],
-			pop = arr.pop,
-			pushNative = arr.push,
-			push = arr.push,
-			slice = arr.slice,
+							return 0;
+						},
 
-			// Use a stripped-down indexOf as it's faster than native
-			// https://jsperf.com/thor-indexof-vs-for/5
-			indexOf = function( list, elem ) {
-				var i = 0,
-					len = list.length;
-				for ( ; i < len; i++ ) {
-					if ( list[ i ] === elem ) {
-						return i;
+						// Instance methods
+						hasOwn = ({}).hasOwnProperty,
+						arr = [],
+						pop = arr.pop,
+						pushNative = arr.push,
+						push = arr.push,
+						slice = arr.slice,
+
+						// Use a stripped-down indexOf as it's faster than native
+						// https://jsperf.com/thor-indexof-vs-for/5
+						indexOf = function(list, elem) {
+							var i = 0, len = list.length;
+
+							for (; i < len; i++) {
+								if (list[i] === elem) {
+									return i;
+								}
+							}
+
+							return -1;
+						},
+
+						booleans = "checked|selected|async|autofocus|autoplay|controls|defer|disabled|hidden|" +
+							"ismap|loop|multiple|open|readonly|required|scoped",
+
+						// Regular expressions
+
+						// http://www.w3.org/TR/css3-selectors/#whitespace
+						whitespace = "[\\x20\\t\\r\\n\\f]",
+
+						// https://www.w3.org/TR/css-syntax-3/#ident-token-diagram
+						identifier = "(?:\\\\[\\da-fA-F]{1,6}" + whitespace +
+							"?|\\\\[^\\r\\n\\f]|[\\w-]|[^\0-\\x7f])+",
+
+						// Attribute selectors: http://www.w3.org/TR/selectors/#attribute-selectors
+						attributes = "\\[" + whitespace + "*(" + identifier + ")(?:" + whitespace +
+
+							// Operator (capture 2)
+							"*([*^$|!~]?=)" + whitespace +
+
+							// "Attribute values must be CSS identifiers [capture 5]
+							// or strings [capture 3 or capture 4]"
+							"*(?:'((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\"|(" + identifier + "))|)" +
+							whitespace + "*\\]",
+
+						pseudos = ":(" + identifier + ")(?:\\((" +
+
+							// To reduce the number of selectors needing tokenize in the preFilter, prefer arguments:
+							// 1. quoted (capture 3; capture 4 or capture 5)
+							"('((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\")|" +
+
+							// 2. simple (capture 6)
+							"((?:\\\\.|[^\\\\()[\\]]|" + attributes + ")*)|" +
+
+							// 3. anything else (capture 2)
+							".*" +
+							")\\)|)",
+
+						// Leading and non-escaped trailing whitespace, capturing some non-whitespace characters preceding the latter
+						rwhitespace = new RegExp(whitespace + "+", "g"),
+						rtrim = new RegExp("^" + whitespace + "+|((?:^|[^\\\\])(?:\\\\.)*)" +
+							whitespace + "+$", "g"),
+
+						rcomma = new RegExp("^" + whitespace + "*," + whitespace + "*"),
+						rcombinators = new RegExp("^" + whitespace + "*([>+~]|" + whitespace + ")" + whitespace + "*"),
+						rdescend = new RegExp(whitespace + "|>"),
+
+						rpseudo = new RegExp(pseudos),
+						ridentifier = new RegExp("^" + identifier + "$"),
+
+						matchExpr = {
+							"ID": new RegExp("^#(" + identifier + ")"),
+							"CLASS": new RegExp("^\\.(" + identifier + ")"),
+							"TAG": new RegExp("^(" + identifier + "|[*])"),
+							"ATTR": new RegExp("^" + attributes),
+							"PSEUDO": new RegExp("^" + pseudos),
+							"CHILD": new RegExp(
+								"^:(only|first|last|nth|nth-last)-(child|of-type)(?:\\(" +
+								whitespace + "*(even|odd|(([+-]|)(\\d*)n|)" + whitespace + "*(?:([+-]|)" +
+								whitespace + "*(\\d+)|))" + whitespace + "*\\)|)", "i"
+							),
+							"bool": new RegExp("^(?:" + booleans + ")$", "i"),
+
+							// For use in libraries implementing .is()
+							// We use this for POS matching in `select`
+							"needsContext": new RegExp(
+								"^" + whitespace +
+								"*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\(" + whitespace +
+								"*((?:-\\d)?\\d*)" + whitespace + "*\\)|)(?=[^-]|$)", "i" 
+							)
+						},
+
+						rhtml = /HTML$/i,
+						rinputs = /^(?:input|select|textarea|button)$/i,
+						rheader = /^h\d$/i,
+
+						rnative = /^[^{]+\{\s*\[native \w/,
+
+						// Easily-parseable/retrievable ID or TAG or CLASS selectors
+						rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
+
+						rsibling = /[+~]/,
+// Marker
+						// CSS escapes
+						// http://www.w3.org/TR/CSS21/syndata.html#escaped-characters
+						runescape = new RegExp( "\\\\[\\da-fA-F]{1,6}" + whitespace + "?|\\\\([^\\r\\n\\f])", "g" ),
+						funescape = function( escape, nonHex ) {
+							var high = "0x" + escape.slice( 1 ) - 0x10000;
+
+							return nonHex ?
+
+								// Strip the backslash prefix from a non-hex escape sequence
+								nonHex :
+
+								// Replace a hexadecimal escape sequence with the encoded Unicode code point
+								// Support: IE <=11+
+								// For values outside the Basic Multilingual Plane (BMP), manually construct a
+								// surrogate pair
+								high < 0 ?
+									String.fromCharCode( high + 0x10000 ) :
+									String.fromCharCode( high >> 10 | 0xD800, high & 0x3FF | 0xDC00 );
+						},
+
+						// CSS string/identifier serialization
+						// https://drafts.csswg.org/cssom/#common-serializing-idioms
+						rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\0-\x1f\x7f-\uFFFF\w-]/g,
+						fcssescape = function( ch, asCodePoint ) {
+							if ( asCodePoint ) {
+
+								// U+0000 NULL becomes U+FFFD REPLACEMENT CHARACTER
+								if ( ch === "\0" ) {
+									return "\uFFFD";
+								}
+
+								// Control characters and (dependent upon position) numbers get escaped as code points
+								return ch.slice( 0, -1 ) + "\\" +
+									ch.charCodeAt( ch.length - 1 ).toString( 16 ) + " ";
+							}
+
+							// Other potentially-special ASCII characters get backslash-escaped
+							return "\\" + ch;
+						},
+
+						// Used for iframes
+						// See setDocument()
+						// Removing the function wrapper causes a "Permission Denied"
+						// error in IE
+						unloadHandler = function() {
+							setDocument();
+						},
+
+						inDisabledFieldset = addCombinator(
+							function( elem ) {
+								return elem.disabled === true && elem.nodeName.toLowerCase() === "fieldset";
+							},
+							{ dir: "parentNode", next: "legend" }
+						);
+
+					// Optimize for push.apply( _, NodeList )
+					try {
+						push.apply(
+							( arr = slice.call( preferredDoc.childNodes ) ),
+							preferredDoc.childNodes
+						);
+
+						// Support: Android<4.0
+						// Detect silently failing push.apply
+						// eslint-disable-next-line no-unused-expressions
+						arr[ preferredDoc.childNodes.length ].nodeType;
+					} catch ( e ) {
+						push = { apply: arr.length ?
+
+							// Leverage slice if possible
+							function( target, els ) {
+								pushNative.apply( target, slice.call( els ) );
+							} :
+
+							// Support: IE<9
+							// Otherwise append directly
+							function( target, els ) {
+								var j = target.length,
+									i = 0;
+
+								// Can't trust NodeList.length
+								while ( ( target[ j++ ] = els[ i++ ] ) ) {}
+								target.length = j - 1;
+							}
+						};
 					}
-				}
-				return -1;
-			},
 
-			booleans = "checked|selected|async|autofocus|autoplay|controls|defer|disabled|hidden|" +
-				"ismap|loop|multiple|open|readonly|required|scoped",
+					function Sizzle( selector, context, results, seed ) {
+						var m, i, elem, nid, match, groups, newSelector,
+							newContext = context && context.ownerDocument,
 
-			// Regular expressions
+							// nodeType defaults to 9, since context defaults to document
+							nodeType = context ? context.nodeType : 9;
 
-			// http://www.w3.org/TR/css3-selectors/#whitespace
-			whitespace = "[\\x20\\t\\r\\n\\f]",
+						results = results || [];
 
-			// https://www.w3.org/TR/css-syntax-3/#ident-token-diagram
-			identifier = "(?:\\\\[\\da-fA-F]{1,6}" + whitespace +
-				"?|\\\\[^\\r\\n\\f]|[\\w-]|[^\0-\\x7f])+",
+						// Return early from calls with invalid selector or context
+						if ( typeof selector !== "string" || !selector ||
+							nodeType !== 1 && nodeType !== 9 && nodeType !== 11 ) {
 
-			// Attribute selectors: http://www.w3.org/TR/selectors/#attribute-selectors
-			attributes = "\\[" + whitespace + "*(" + identifier + ")(?:" + whitespace +
+							return results;
+						}
 
-				// Operator (capture 2)
-				"*([*^$|!~]?=)" + whitespace +
+						// Try to shortcut find operations (as opposed to filters) in HTML documents
+						if ( !seed ) {
+							setDocument( context );
+							context = context || document;
 
-				// "Attribute values must be CSS identifiers [capture 5]
-				// or strings [capture 3 or capture 4]"
-				"*(?:'((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\"|(" + identifier + "))|)" +
-				whitespace + "*\\]",
+							if ( documentIsHTML ) {
 
-			pseudos = ":(" + identifier + ")(?:\\((" +
+								// If the selector is sufficiently simple, try using a "get*By*" DOM method
+								// (excepting DocumentFragment context, where the methods don't exist)
+								if ( nodeType !== 11 && ( match = rquickExpr.exec( selector ) ) ) {
 
-				// To reduce the number of selectors needing tokenize in the preFilter, prefer arguments:
-				// 1. quoted (capture 3; capture 4 or capture 5)
-				"('((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\")|" +
+									// ID selector
+									if ( ( m = match[ 1 ] ) ) {
 
-				// 2. simple (capture 6)
-				"((?:\\\\.|[^\\\\()[\\]]|" + attributes + ")*)|" +
+										// Document context
+										if ( nodeType === 9 ) {
+											if ( ( elem = context.getElementById( m ) ) ) {
 
-				// 3. anything else (capture 2)
-				".*" +
-				")\\)|)",
+												// Support: IE, Opera, Webkit
+												// TODO: identify versions
+												// getElementById can match elements by name instead of ID
+												if ( elem.id === m ) {
+													results.push( elem );
+													return results;
+												}
+											} else {
+												return results;
+											}
 
-			// Leading and non-escaped trailing whitespace, capturing some non-whitespace characters preceding the latter
-			rwhitespace = new RegExp( whitespace + "+", "g" ),
-			rtrim = new RegExp( "^" + whitespace + "+|((?:^|[^\\\\])(?:\\\\.)*)" +
-				whitespace + "+$", "g" ),
+										// Element context
+										} else {
 
-			rcomma = new RegExp( "^" + whitespace + "*," + whitespace + "*" ),
-			rcombinators = new RegExp( "^" + whitespace + "*([>+~]|" + whitespace + ")" + whitespace +
-				"*" ),
-			rdescend = new RegExp( whitespace + "|>" ),
+											// Support: IE, Opera, Webkit
+											// TODO: identify versions
+											// getElementById can match elements by name instead of ID
+											if ( newContext && ( elem = newContext.getElementById( m ) ) &&
+												contains( context, elem ) &&
+												elem.id === m ) {
 
-			rpseudo = new RegExp( pseudos ),
-			ridentifier = new RegExp( "^" + identifier + "$" ),
+												results.push( elem );
+												return results;
+											}
+										}
 
-			matchExpr = {
-				"ID": new RegExp( "^#(" + identifier + ")" ),
-				"CLASS": new RegExp( "^\\.(" + identifier + ")" ),
-				"TAG": new RegExp( "^(" + identifier + "|[*])" ),
-				"ATTR": new RegExp( "^" + attributes ),
-				"PSEUDO": new RegExp( "^" + pseudos ),
-				"CHILD": new RegExp( "^:(only|first|last|nth|nth-last)-(child|of-type)(?:\\(" +
-					whitespace + "*(even|odd|(([+-]|)(\\d*)n|)" + whitespace + "*(?:([+-]|)" +
-					whitespace + "*(\\d+)|))" + whitespace + "*\\)|)", "i" ),
-				"bool": new RegExp( "^(?:" + booleans + ")$", "i" ),
+									// Type selector
+									} else if ( match[ 2 ] ) {
+										push.apply( results, context.getElementsByTagName( selector ) );
+										return results;
 
-				// For use in libraries implementing .is()
-				// We use this for POS matching in `select`
-				"needsContext": new RegExp( "^" + whitespace +
-					"*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\(" + whitespace +
-					"*((?:-\\d)?\\d*)" + whitespace + "*\\)|)(?=[^-]|$)", "i" )
-			},
+									// Class selector
+									} else if ( ( m = match[ 3 ] ) && support.getElementsByClassName &&
+										context.getElementsByClassName ) {
 
-			rhtml = /HTML$/i,
-			rinputs = /^(?:input|select|textarea|button)$/i,
-			rheader = /^h\d$/i,
-
-			rnative = /^[^{]+\{\s*\[native \w/,
-
-			// Easily-parseable/retrievable ID or TAG or CLASS selectors
-			rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
-
-			rsibling = /[+~]/,
-
-			// CSS escapes
-			// http://www.w3.org/TR/CSS21/syndata.html#escaped-characters
-			runescape = new RegExp( "\\\\[\\da-fA-F]{1,6}" + whitespace + "?|\\\\([^\\r\\n\\f])", "g" ),
-			funescape = function( escape, nonHex ) {
-				var high = "0x" + escape.slice( 1 ) - 0x10000;
-
-				return nonHex ?
-
-					// Strip the backslash prefix from a non-hex escape sequence
-					nonHex :
-
-					// Replace a hexadecimal escape sequence with the encoded Unicode code point
-					// Support: IE <=11+
-					// For values outside the Basic Multilingual Plane (BMP), manually construct a
-					// surrogate pair
-					high < 0 ?
-						String.fromCharCode( high + 0x10000 ) :
-						String.fromCharCode( high >> 10 | 0xD800, high & 0x3FF | 0xDC00 );
-			},
-
-			// CSS string/identifier serialization
-			// https://drafts.csswg.org/cssom/#common-serializing-idioms
-			rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\0-\x1f\x7f-\uFFFF\w-]/g,
-			fcssescape = function( ch, asCodePoint ) {
-				if ( asCodePoint ) {
-
-					// U+0000 NULL becomes U+FFFD REPLACEMENT CHARACTER
-					if ( ch === "\0" ) {
-						return "\uFFFD";
-					}
-
-					// Control characters and (dependent upon position) numbers get escaped as code points
-					return ch.slice( 0, -1 ) + "\\" +
-						ch.charCodeAt( ch.length - 1 ).toString( 16 ) + " ";
-				}
-
-				// Other potentially-special ASCII characters get backslash-escaped
-				return "\\" + ch;
-			},
-
-			// Used for iframes
-			// See setDocument()
-			// Removing the function wrapper causes a "Permission Denied"
-			// error in IE
-			unloadHandler = function() {
-				setDocument();
-			},
-
-			inDisabledFieldset = addCombinator(
-				function( elem ) {
-					return elem.disabled === true && elem.nodeName.toLowerCase() === "fieldset";
-				},
-				{ dir: "parentNode", next: "legend" }
-			);
-
-		// Optimize for push.apply( _, NodeList )
-		try {
-			push.apply(
-				( arr = slice.call( preferredDoc.childNodes ) ),
-				preferredDoc.childNodes
-			);
-
-			// Support: Android<4.0
-			// Detect silently failing push.apply
-			// eslint-disable-next-line no-unused-expressions
-			arr[ preferredDoc.childNodes.length ].nodeType;
-		} catch ( e ) {
-			push = { apply: arr.length ?
-
-				// Leverage slice if possible
-				function( target, els ) {
-					pushNative.apply( target, slice.call( els ) );
-				} :
-
-				// Support: IE<9
-				// Otherwise append directly
-				function( target, els ) {
-					var j = target.length,
-						i = 0;
-
-					// Can't trust NodeList.length
-					while ( ( target[ j++ ] = els[ i++ ] ) ) {}
-					target.length = j - 1;
-				}
-			};
-		}
-
-		function Sizzle( selector, context, results, seed ) {
-			var m, i, elem, nid, match, groups, newSelector,
-				newContext = context && context.ownerDocument,
-
-				// nodeType defaults to 9, since context defaults to document
-				nodeType = context ? context.nodeType : 9;
-
-			results = results || [];
-
-			// Return early from calls with invalid selector or context
-			if ( typeof selector !== "string" || !selector ||
-				nodeType !== 1 && nodeType !== 9 && nodeType !== 11 ) {
-
-				return results;
-			}
-
-			// Try to shortcut find operations (as opposed to filters) in HTML documents
-			if ( !seed ) {
-				setDocument( context );
-				context = context || document;
-
-				if ( documentIsHTML ) {
-
-					// If the selector is sufficiently simple, try using a "get*By*" DOM method
-					// (excepting DocumentFragment context, where the methods don't exist)
-					if ( nodeType !== 11 && ( match = rquickExpr.exec( selector ) ) ) {
-
-						// ID selector
-						if ( ( m = match[ 1 ] ) ) {
-
-							// Document context
-							if ( nodeType === 9 ) {
-								if ( ( elem = context.getElementById( m ) ) ) {
-
-									// Support: IE, Opera, Webkit
-									// TODO: identify versions
-									// getElementById can match elements by name instead of ID
-									if ( elem.id === m ) {
-										results.push( elem );
+										push.apply( results, context.getElementsByClassName( m ) );
 										return results;
 									}
-								} else {
-									return results;
 								}
 
-							// Element context
-							} else {
-
-								// Support: IE, Opera, Webkit
-								// TODO: identify versions
-								// getElementById can match elements by name instead of ID
-								if ( newContext && ( elem = newContext.getElementById( m ) ) &&
-									contains( context, elem ) &&
-									elem.id === m ) {
-
-									results.push( elem );
-									return results;
-								}
-							}
-
-						// Type selector
-						} else if ( match[ 2 ] ) {
-							push.apply( results, context.getElementsByTagName( selector ) );
-							return results;
-
-						// Class selector
-						} else if ( ( m = match[ 3 ] ) && support.getElementsByClassName &&
-							context.getElementsByClassName ) {
-
-							push.apply( results, context.getElementsByClassName( m ) );
-							return results;
-						}
-					}
-
-					// Take advantage of querySelectorAll
-					if ( support.qsa &&
-						!nonnativeSelectorCache[ selector + " " ] &&
-						( !rbuggyQSA || !rbuggyQSA.test( selector ) ) &&
-
-						// Support: IE 8 only
-						// Exclude object elements
-						( nodeType !== 1 || context.nodeName.toLowerCase() !== "object" ) ) {
-
-						newSelector = selector;
-						newContext = context;
-
-						// qSA considers elements outside a scoping root when evaluating child or
-						// descendant combinators, which is not what we want.
-						// In such cases, we work around the behavior by prefixing every selector in the
-						// list with an ID selector referencing the scope context.
-						// The technique has to be used as well when a leading combinator is used
-						// as such selectors are not recognized by querySelectorAll.
-						// Thanks to Andrew Dupont for this technique.
-						if ( nodeType === 1 &&
-							( rdescend.test( selector ) || rcombinators.test( selector ) ) ) {
-
-							// Expand context for sibling selectors
-							newContext = rsibling.test( selector ) && testContext( context.parentNode ) ||
-								context;
-
-							// We can use :scope instead of the ID hack if the browser
-							// supports it & if we're not changing the context.
-							if ( newContext !== context || !support.scope ) {
-
-								// Capture the context ID, setting it first if necessary
-								if ( ( nid = context.getAttribute( "id" ) ) ) {
-									nid = nid.replace( rcssescape, fcssescape );
-								} else {
-									context.setAttribute( "id", ( nid = expando ) );
-								}
-							}
-
-							// Prefix every selector in the list
-							groups = tokenize( selector );
-							i = groups.length;
-							while ( i-- ) {
-								groups[ i ] = ( nid ? "#" + nid : ":scope" ) + " " +
-									toSelector( groups[ i ] );
-							}
-							newSelector = groups.join( "," );
-						}
-
-						try {
-							push.apply( results,
-								newContext.querySelectorAll( newSelector )
-							);
-							return results;
-						} catch ( qsaError ) {
-							nonnativeSelectorCache( selector, true );
-						} finally {
-							if ( nid === expando ) {
-								context.removeAttribute( "id" );
-							}
-						}
-					}
-				}
-			}
-
-			// All others
-			return select( selector.replace( rtrim, "$1" ), context, results, seed );
-		}
-
-		/**
-		* Create key-value caches of limited size
-		* @returns {function(string, object)} Returns the Object data after storing it on itself with
-		*	property name the (space-suffixed) string and (if the cache is larger than Expr.cacheLength)
-		*	deleting the oldest entry
-		*/
-		function createCache() {
-			var keys = [];
-
-			function cache( key, value ) {
-
-				// Use (key + " ") to avoid collision with native prototype properties (see Issue #157)
-				if ( keys.push( key + " " ) > Expr.cacheLength ) {
-
-					// Only keep the most recent entries
-					delete cache[ keys.shift() ];
-				}
-				return ( cache[ key + " " ] = value );
-			}
-			return cache;
-		}
-
-		/**
-		* Mark a function for special use by Sizzle
-		* @param {Function} fn The function to mark
-		*/
-		function markFunction( fn ) {
-			fn[ expando ] = true;
-			return fn;
-		}
-
-		/**
-		* Support testing using an element
-		* @param {Function} fn Passed the created element and returns a boolean result
-		*/
-		function assert( fn ) {
-			var el = document.createElement( "fieldset" );
-
-			try {
-				return !!fn( el );
-			} catch ( e ) {
-				return false;
-			} finally {
-
-				// Remove from its parent by default
-				if ( el.parentNode ) {
-					el.parentNode.removeChild( el );
-				}
-
-				// release memory in IE
-				el = null;
-			}
-		}
-
-		/**
-		* Adds the same handler for all of the specified attrs
-		* @param {String} attrs Pipe-separated list of attributes
-		* @param {Function} handler The method that will be applied
-		*/
-		function addHandle( attrs, handler ) {
-			var arr = attrs.split( "|" ),
-				i = arr.length;
-
-			while ( i-- ) {
-				Expr.attrHandle[ arr[ i ] ] = handler;
-			}
-		}
-
-		/**
-		* Checks document order of two siblings
-		* @param {Element} a
-		* @param {Element} b
-		* @returns {Number} Returns less than 0 if a precedes b, greater than 0 if a follows b
-		*/
-		function siblingCheck( a, b ) {
-			var cur = b && a,
-				diff = cur && a.nodeType === 1 && b.nodeType === 1 &&
-					a.sourceIndex - b.sourceIndex;
-
-			// Use IE sourceIndex if available on both nodes
-			if ( diff ) {
-				return diff;
-			}
-
-			// Check if b follows a
-			if ( cur ) {
-				while ( ( cur = cur.nextSibling ) ) {
-					if ( cur === b ) {
-						return -1;
-					}
-				}
-			}
-
-			return a ? 1 : -1;
-		}
-
-		/**
-		* Returns a function to use in pseudos for input types
-		* @param {String} type
-		*/
-		function createInputPseudo( type ) {
-			return function( elem ) {
-				var name = elem.nodeName.toLowerCase();
-				return name === "input" && elem.type === type;
-			};
-		}
-
-		/**
-		* Returns a function to use in pseudos for buttons
-		* @param {String} type
-		*/
-		function createButtonPseudo( type ) {
-			return function( elem ) {
-				var name = elem.nodeName.toLowerCase();
-				return ( name === "input" || name === "button" ) && elem.type === type;
-			};
-		}
-
-		/**
-		* Returns a function to use in pseudos for :enabled/:disabled
-		* @param {Boolean} disabled true for :disabled; false for :enabled
-		*/
-		function createDisabledPseudo( disabled ) {
-
-			// Known :disabled false positives: fieldset[disabled] > legend:nth-of-type(n+2) :can-disable
-			return function( elem ) {
-
-				// Only certain elements can match :enabled or :disabled
-				// https://html.spec.whatwg.org/multipage/scripting.html#selector-enabled
-				// https://html.spec.whatwg.org/multipage/scripting.html#selector-disabled
-				if ( "form" in elem ) {
-
-					// Check for inherited disabledness on relevant non-disabled elements:
-					// * listed form-associated elements in a disabled fieldset
-					//   https://html.spec.whatwg.org/multipage/forms.html#category-listed
-					//   https://html.spec.whatwg.org/multipage/forms.html#concept-fe-disabled
-					// * option elements in a disabled optgroup
-					//   https://html.spec.whatwg.org/multipage/forms.html#concept-option-disabled
-					// All such elements have a "form" property.
-					if ( elem.parentNode && elem.disabled === false ) {
-
-						// Option elements defer to a parent optgroup if present
-						if ( "label" in elem ) {
-							if ( "label" in elem.parentNode ) {
-								return elem.parentNode.disabled === disabled;
-							} else {
-								return elem.disabled === disabled;
-							}
-						}
-
-						// Support: IE 6 - 11
-						// Use the isDisabled shortcut property to check for disabled fieldset ancestors
-						return elem.isDisabled === disabled ||
-
-							// Where there is no isDisabled, check manually
-							/* jshint -W018 */
-							elem.isDisabled !== !disabled &&
-							inDisabledFieldset( elem ) === disabled;
-					}
-
-					return elem.disabled === disabled;
-
-				// Try to winnow out elements that can't be disabled before trusting the disabled property.
-				// Some victims get caught in our net (label, legend, menu, track), but it shouldn't
-				// even exist on them, let alone have a boolean value.
-				} else if ( "label" in elem ) {
-					return elem.disabled === disabled;
-				}
-
-				// Remaining elements are neither :enabled nor :disabled
-				return false;
-			};
-		}
-
-		/**
-		* Returns a function to use in pseudos for positionals
-		* @param {Function} fn
-		*/
-		function createPositionalPseudo( fn ) {
-			return markFunction( function( argument ) {
-				argument = +argument;
-				return markFunction( function( seed, matches ) {
-					var j,
-						matchIndexes = fn( [], seed.length, argument ),
-						i = matchIndexes.length;
-
-					// Match elements found at the specified indexes
-					while ( i-- ) {
-						if ( seed[ ( j = matchIndexes[ i ] ) ] ) {
-							seed[ j ] = !( matches[ j ] = seed[ j ] );
-						}
-					}
-				} );
-			} );
-		}
-
-		/**
-		* Checks a node for validity as a Sizzle context
-		* @param {Element|Object=} context
-		* @returns {Element|Object|Boolean} The input node if acceptable, otherwise a falsy value
-		*/
-		function testContext( context ) {
-			return context && typeof context.getElementsByTagName !== "undefined" && context;
-		}
-
-		// Expose support vars for convenience
-		support = Sizzle.support = {};
-
-		/**
-		* Detects XML nodes
-		* @param {Element|Object} elem An element or a document
-		* @returns {Boolean} True iff elem is a non-HTML XML node
-		*/
-		isXML = Sizzle.isXML = function( elem ) {
-			var namespace = elem && elem.namespaceURI,
-				docElem = elem && ( elem.ownerDocument || elem ).documentElement;
-
-			// Support: IE <=8
-			// Assume HTML when documentElement doesn't yet exist, such as inside loading iframes
-			// https://bugs.jquery.com/ticket/4833
-			return !rhtml.test( namespace || docElem && docElem.nodeName || "HTML" );
-		};
-
-		/**
-		* Sets document-related variables once based on the current document
-		* @param {Element|Object} [doc] An element or document object to use to set the document
-		* @returns {Object} Returns the current document
-		*/
-		setDocument = Sizzle.setDocument = function( node ) {
-			var hasCompare, subWindow,
-				doc = node ? node.ownerDocument || node : preferredDoc;
-
-			// Return early if doc is invalid or already selected
-			// Support: IE 11+, Edge 17 - 18+
-			// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-			// two documents; shallow comparisons work.
-			// eslint-disable-next-line eqeqeq
-			if ( doc == document || doc.nodeType !== 9 || !doc.documentElement ) {
-				return document;
-			}
-
-			// Update global variables
-			document = doc;
-			docElem = document.documentElement;
-			documentIsHTML = !isXML( document );
-
-			// Support: IE 9 - 11+, Edge 12 - 18+
-			// Accessing iframe documents after unload throws "permission denied" errors (jQuery #13936)
-			// Support: IE 11+, Edge 17 - 18+
-			// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-			// two documents; shallow comparisons work.
-			// eslint-disable-next-line eqeqeq
-			if ( preferredDoc != document &&
-				( subWindow = document.defaultView ) && subWindow.top !== subWindow ) {
-
-				// Support: IE 11, Edge
-				if ( subWindow.addEventListener ) {
-					subWindow.addEventListener( "unload", unloadHandler, false );
-
-				// Support: IE 9 - 10 only
-				} else if ( subWindow.attachEvent ) {
-					subWindow.attachEvent( "onunload", unloadHandler );
-				}
-			}
-
-			// Support: IE 8 - 11+, Edge 12 - 18+, Chrome <=16 - 25 only, Firefox <=3.6 - 31 only,
-			// Safari 4 - 5 only, Opera <=11.6 - 12.x only
-			// IE/Edge & older browsers don't support the :scope pseudo-class.
-			// Support: Safari 6.0 only
-			// Safari 6.0 supports :scope but it's an alias of :root there.
-			support.scope = assert( function( el ) {
-				docElem.appendChild( el ).appendChild( document.createElement( "div" ) );
-				return typeof el.querySelectorAll !== "undefined" &&
-					!el.querySelectorAll( ":scope fieldset div" ).length;
-			} );
-
-			/* Attributes
-			---------------------------------------------------------------------- */
-
-			// Support: IE<8
-			// Verify that getAttribute really returns attributes and not properties
-			// (excepting IE8 booleans)
-			support.attributes = assert( function( el ) {
-				el.className = "i";
-				return !el.getAttribute( "className" );
-			} );
-
-			/* getElement(s)By*
-			---------------------------------------------------------------------- */
-
-			// Check if getElementsByTagName("*") returns only elements
-			support.getElementsByTagName = assert( function( el ) {
-				el.appendChild( document.createComment( "" ) );
-				return !el.getElementsByTagName( "*" ).length;
-			} );
-
-			// Support: IE<9
-			support.getElementsByClassName = rnative.test( document.getElementsByClassName );
-
-			// Support: IE<10
-			// Check if getElementById returns elements by name
-			// The broken getElementById methods don't pick up programmatically-set names,
-			// so use a roundabout getElementsByName test
-			support.getById = assert( function( el ) {
-				docElem.appendChild( el ).id = expando;
-				return !document.getElementsByName || !document.getElementsByName( expando ).length;
-			} );
-
-			// ID filter and find
-			if ( support.getById ) {
-				Expr.filter[ "ID" ] = function( id ) {
-					var attrId = id.replace( runescape, funescape );
-					return function( elem ) {
-						return elem.getAttribute( "id" ) === attrId;
-					};
-				};
-				Expr.find[ "ID" ] = function( id, context ) {
-					if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
-						var elem = context.getElementById( id );
-						return elem ? [ elem ] : [];
-					}
-				};
-			} else {
-				Expr.filter[ "ID" ] =  function( id ) {
-					var attrId = id.replace( runescape, funescape );
-					return function( elem ) {
-						var node = typeof elem.getAttributeNode !== "undefined" &&
-							elem.getAttributeNode( "id" );
-						return node && node.value === attrId;
-					};
-				};
-
-				// Support: IE 6 - 7 only
-				// getElementById is not reliable as a find shortcut
-				Expr.find[ "ID" ] = function( id, context ) {
-					if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
-						var node, i, elems,
-							elem = context.getElementById( id );
-
-						if ( elem ) {
-
-							// Verify the id attribute
-							node = elem.getAttributeNode( "id" );
-							if ( node && node.value === id ) {
-								return [ elem ];
-							}
-
-							// Fall back on getElementsByName
-							elems = context.getElementsByName( id );
-							i = 0;
-							while ( ( elem = elems[ i++ ] ) ) {
-								node = elem.getAttributeNode( "id" );
-								if ( node && node.value === id ) {
-									return [ elem ];
-								}
-							}
-						}
-
-						return [];
-					}
-				};
-			}
-
-			// Tag
-			Expr.find[ "TAG" ] = support.getElementsByTagName ?
-				function( tag, context ) {
-					if ( typeof context.getElementsByTagName !== "undefined" ) {
-						return context.getElementsByTagName( tag );
-
-					// DocumentFragment nodes don't have gEBTN
-					} else if ( support.qsa ) {
-						return context.querySelectorAll( tag );
-					}
-				} :
-
-				function( tag, context ) {
-					var elem,
-						tmp = [],
-						i = 0,
-
-						// By happy coincidence, a (broken) gEBTN appears on DocumentFragment nodes too
-						results = context.getElementsByTagName( tag );
-
-					// Filter out possible comments
-					if ( tag === "*" ) {
-						while ( ( elem = results[ i++ ] ) ) {
-							if ( elem.nodeType === 1 ) {
-								tmp.push( elem );
-							}
-						}
-
-						return tmp;
-					}
-					return results;
-				};
-
-			// Class
-			Expr.find[ "CLASS" ] = support.getElementsByClassName && function( className, context ) {
-				if ( typeof context.getElementsByClassName !== "undefined" && documentIsHTML ) {
-					return context.getElementsByClassName( className );
-				}
-			};
-
-			/* QSA/matchesSelector
-			---------------------------------------------------------------------- */
-
-			// QSA and matchesSelector support
-
-			// matchesSelector(:active) reports false when true (IE9/Opera 11.5)
-			rbuggyMatches = [];
-
-			// qSa(:focus) reports false when true (Chrome 21)
-			// We allow this because of a bug in IE8/9 that throws an error
-			// whenever `document.activeElement` is accessed on an iframe
-			// So, we allow :focus to pass through QSA all the time to avoid the IE error
-			// See https://bugs.jquery.com/ticket/13378
-			rbuggyQSA = [];
-
-			if ( ( support.qsa = rnative.test( document.querySelectorAll ) ) ) {
-
-				// Build QSA regex
-				// Regex strategy adopted from Diego Perini
-				assert( function( el ) {
-
-					var input;
-
-					// Select is set to empty string on purpose
-					// This is to test IE's treatment of not explicitly
-					// setting a boolean content attribute,
-					// since its presence should be enough
-					// https://bugs.jquery.com/ticket/12359
-					docElem.appendChild( el ).innerHTML = "<a id='" + expando + "'></a>" +
-						"<select id='" + expando + "-\r\\' msallowcapture=''>" +
-						"<option selected=''></option></select>";
-
-					// Support: IE8, Opera 11-12.16
-					// Nothing should be selected when empty strings follow ^= or $= or *=
-					// The test attribute must be unknown in Opera but "safe" for WinRT
-					// https://msdn.microsoft.com/en-us/library/ie/hh465388.aspx#attribute_section
-					if ( el.querySelectorAll( "[msallowcapture^='']" ).length ) {
-						rbuggyQSA.push( "[*^$]=" + whitespace + "*(?:''|\"\")" );
-					}
-
-					// Support: IE8
-					// Boolean attributes and "value" are not treated correctly
-					if ( !el.querySelectorAll( "[selected]" ).length ) {
-						rbuggyQSA.push( "\\[" + whitespace + "*(?:value|" + booleans + ")" );
-					}
-
-					// Support: Chrome<29, Android<4.4, Safari<7.0+, iOS<7.0+, PhantomJS<1.9.8+
-					if ( !el.querySelectorAll( "[id~=" + expando + "-]" ).length ) {
-						rbuggyQSA.push( "~=" );
-					}
-
-					// Support: IE 11+, Edge 15 - 18+
-					// IE 11/Edge don't find elements on a `[name='']` query in some cases.
-					// Adding a temporary attribute to the document before the selection works
-					// around the issue.
-					// Interestingly, IE 10 & older don't seem to have the issue.
-					input = document.createElement( "input" );
-					input.setAttribute( "name", "" );
-					el.appendChild( input );
-					if ( !el.querySelectorAll( "[name='']" ).length ) {
-						rbuggyQSA.push( "\\[" + whitespace + "*name" + whitespace + "*=" +
-							whitespace + "*(?:''|\"\")" );
-					}
-
-					// Webkit/Opera - :checked should return selected option elements
-					// http://www.w3.org/TR/2011/REC-css3-selectors-20110929/#checked
-					// IE8 throws error here and will not see later tests
-					if ( !el.querySelectorAll( ":checked" ).length ) {
-						rbuggyQSA.push( ":checked" );
-					}
-
-					// Support: Safari 8+, iOS 8+
-					// https://bugs.webkit.org/show_bug.cgi?id=136851
-					// In-page `selector#id sibling-combinator selector` fails
-					if ( !el.querySelectorAll( "a#" + expando + "+*" ).length ) {
-						rbuggyQSA.push( ".#.+[+~]" );
-					}
-
-					// Support: Firefox <=3.6 - 5 only
-					// Old Firefox doesn't throw on a badly-escaped identifier.
-					el.querySelectorAll( "\\\f" );
-					rbuggyQSA.push( "[\\r\\n\\f]" );
-				} );
-
-				assert( function( el ) {
-					el.innerHTML = "<a href='' disabled='disabled'></a>" +
-						"<select disabled='disabled'><option/></select>";
-
-					// Support: Windows 8 Native Apps
-					// The type and name attributes are restricted during .innerHTML assignment
-					var input = document.createElement( "input" );
-					input.setAttribute( "type", "hidden" );
-					el.appendChild( input ).setAttribute( "name", "D" );
-
-					// Support: IE8
-					// Enforce case-sensitivity of name attribute
-					if ( el.querySelectorAll( "[name=d]" ).length ) {
-						rbuggyQSA.push( "name" + whitespace + "*[*^$|!~]?=" );
-					}
-
-					// FF 3.5 - :enabled/:disabled and hidden elements (hidden elements are still enabled)
-					// IE8 throws error here and will not see later tests
-					if ( el.querySelectorAll( ":enabled" ).length !== 2 ) {
-						rbuggyQSA.push( ":enabled", ":disabled" );
-					}
-
-					// Support: IE9-11+
-					// IE's :disabled selector does not pick up the children of disabled fieldsets
-					docElem.appendChild( el ).disabled = true;
-					if ( el.querySelectorAll( ":disabled" ).length !== 2 ) {
-						rbuggyQSA.push( ":enabled", ":disabled" );
-					}
-
-					// Support: Opera 10 - 11 only
-					// Opera 10-11 does not throw on post-comma invalid pseudos
-					el.querySelectorAll( "*,:x" );
-					rbuggyQSA.push( ",.*:" );
-				} );
-			}
-
-			if ( ( support.matchesSelector = rnative.test( ( matches = docElem.matches ||
-				docElem.webkitMatchesSelector ||
-				docElem.mozMatchesSelector ||
-				docElem.oMatchesSelector ||
-				docElem.msMatchesSelector ) ) ) ) {
-
-				assert( function( el ) {
-
-					// Check to see if it's possible to do matchesSelector
-					// on a disconnected node (IE 9)
-					support.disconnectedMatch = matches.call( el, "*" );
-
-					// This should fail with an exception
-					// Gecko does not error, returns false instead
-					matches.call( el, "[s!='']:x" );
-					rbuggyMatches.push( "!=", pseudos );
-				} );
-			}
-
-			rbuggyQSA = rbuggyQSA.length && new RegExp( rbuggyQSA.join( "|" ) );
-			rbuggyMatches = rbuggyMatches.length && new RegExp( rbuggyMatches.join( "|" ) );
-
-			/* Contains
-			---------------------------------------------------------------------- */
-			hasCompare = rnative.test( docElem.compareDocumentPosition );
-
-			// Element contains another
-			// Purposefully self-exclusive
-			// As in, an element does not contain itself
-			contains = hasCompare || rnative.test( docElem.contains ) ?
-				function( a, b ) {
-					var adown = a.nodeType === 9 ? a.documentElement : a,
-						bup = b && b.parentNode;
-					return a === bup || !!( bup && bup.nodeType === 1 && (
-						adown.contains ?
-							adown.contains( bup ) :
-							a.compareDocumentPosition && a.compareDocumentPosition( bup ) & 16
-					) );
-				} :
-				function( a, b ) {
-					if ( b ) {
-						while ( ( b = b.parentNode ) ) {
-							if ( b === a ) {
-								return true;
-							}
-						}
-					}
-					return false;
-				};
-
-			/* Sorting
-			---------------------------------------------------------------------- */
-
-			// Document order sorting
-			sortOrder = hasCompare ?
-			function( a, b ) {
-
-				// Flag for duplicate removal
-				if ( a === b ) {
-					hasDuplicate = true;
-					return 0;
-				}
-
-				// Sort on method existence if only one input has compareDocumentPosition
-				var compare = !a.compareDocumentPosition - !b.compareDocumentPosition;
-				if ( compare ) {
-					return compare;
-				}
-
-				// Calculate position if both inputs belong to the same document
-				// Support: IE 11+, Edge 17 - 18+
-				// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-				// two documents; shallow comparisons work.
-				// eslint-disable-next-line eqeqeq
-				compare = ( a.ownerDocument || a ) == ( b.ownerDocument || b ) ?
-					a.compareDocumentPosition( b ) :
-
-					// Otherwise we know they are disconnected
-					1;
-
-				// Disconnected nodes
-				if ( compare & 1 ||
-					( !support.sortDetached && b.compareDocumentPosition( a ) === compare ) ) {
-
-					// Choose the first element that is related to our preferred document
-					// Support: IE 11+, Edge 17 - 18+
-					// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-					// two documents; shallow comparisons work.
-					// eslint-disable-next-line eqeqeq
-					if ( a == document || a.ownerDocument == preferredDoc &&
-						contains( preferredDoc, a ) ) {
-						return -1;
-					}
-
-					// Support: IE 11+, Edge 17 - 18+
-					// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-					// two documents; shallow comparisons work.
-					// eslint-disable-next-line eqeqeq
-					if ( b == document || b.ownerDocument == preferredDoc &&
-						contains( preferredDoc, b ) ) {
-						return 1;
-					}
-
-					// Maintain original order
-					return sortInput ?
-						( indexOf( sortInput, a ) - indexOf( sortInput, b ) ) :
-						0;
-				}
-
-				return compare & 4 ? -1 : 1;
-			} :
-			function( a, b ) {
-
-				// Exit early if the nodes are identical
-				if ( a === b ) {
-					hasDuplicate = true;
-					return 0;
-				}
-
-				var cur,
-					i = 0,
-					aup = a.parentNode,
-					bup = b.parentNode,
-					ap = [ a ],
-					bp = [ b ];
-
-				// Parentless nodes are either documents or disconnected
-				if ( !aup || !bup ) {
-
-					// Support: IE 11+, Edge 17 - 18+
-					// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-					// two documents; shallow comparisons work.
-					/* eslint-disable eqeqeq */
-					return a == document ? -1 :
-						b == document ? 1 :
-						/* eslint-enable eqeqeq */
-						aup ? -1 :
-						bup ? 1 :
-						sortInput ?
-						( indexOf( sortInput, a ) - indexOf( sortInput, b ) ) :
-						0;
-
-				// If the nodes are siblings, we can do a quick check
-				} else if ( aup === bup ) {
-					return siblingCheck( a, b );
-				}
-
-				// Otherwise we need full lists of their ancestors for comparison
-				cur = a;
-				while ( ( cur = cur.parentNode ) ) {
-					ap.unshift( cur );
-				}
-				cur = b;
-				while ( ( cur = cur.parentNode ) ) {
-					bp.unshift( cur );
-				}
-
-				// Walk down the tree looking for a discrepancy
-				while ( ap[ i ] === bp[ i ] ) {
-					i++;
-				}
-
-				return i ?
-
-					// Do a sibling check if the nodes have a common ancestor
-					siblingCheck( ap[ i ], bp[ i ] ) :
-
-					// Otherwise nodes in our document sort first
-					// Support: IE 11+, Edge 17 - 18+
-					// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-					// two documents; shallow comparisons work.
-					/* eslint-disable eqeqeq */
-					ap[ i ] == preferredDoc ? -1 :
-					bp[ i ] == preferredDoc ? 1 :
-					/* eslint-enable eqeqeq */
-					0;
-			};
-
-			return document;
-		};
-
-		Sizzle.matches = function( expr, elements ) {
-			return Sizzle( expr, null, null, elements );
-		};
-
-		Sizzle.matchesSelector = function( elem, expr ) {
-			setDocument( elem );
-
-			if ( support.matchesSelector && documentIsHTML &&
-				!nonnativeSelectorCache[ expr + " " ] &&
-				( !rbuggyMatches || !rbuggyMatches.test( expr ) ) &&
-				( !rbuggyQSA     || !rbuggyQSA.test( expr ) ) ) {
-
-				try {
-					var ret = matches.call( elem, expr );
-
-					// IE 9's matchesSelector returns false on disconnected nodes
-					if ( ret || support.disconnectedMatch ||
-
-						// As well, disconnected nodes are said to be in a document
-						// fragment in IE 9
-						elem.document && elem.document.nodeType !== 11 ) {
-						return ret;
-					}
-				} catch ( e ) {
-					nonnativeSelectorCache( expr, true );
-				}
-			}
-
-			return Sizzle( expr, document, null, [ elem ] ).length > 0;
-		};
-
-		Sizzle.contains = function( context, elem ) {
-
-			// Set document vars if needed
-			// Support: IE 11+, Edge 17 - 18+
-			// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-			// two documents; shallow comparisons work.
-			// eslint-disable-next-line eqeqeq
-			if ( ( context.ownerDocument || context ) != document ) {
-				setDocument( context );
-			}
-			return contains( context, elem );
-		};
-
-		Sizzle.attr = function( elem, name ) {
-
-			// Set document vars if needed
-			// Support: IE 11+, Edge 17 - 18+
-			// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-			// two documents; shallow comparisons work.
-			// eslint-disable-next-line eqeqeq
-			if ( ( elem.ownerDocument || elem ) != document ) {
-				setDocument( elem );
-			}
-
-			var fn = Expr.attrHandle[ name.toLowerCase() ],
-
-				// Don't get fooled by Object.prototype properties (jQuery #13807)
-				val = fn && hasOwn.call( Expr.attrHandle, name.toLowerCase() ) ?
-					fn( elem, name, !documentIsHTML ) :
-					undefined;
-
-			return val !== undefined ?
-				val :
-				support.attributes || !documentIsHTML ?
-					elem.getAttribute( name ) :
-					( val = elem.getAttributeNode( name ) ) && val.specified ?
-						val.value :
-						null;
-		};
-
-		Sizzle.escape = function( sel ) {
-			return ( sel + "" ).replace( rcssescape, fcssescape );
-		};
-
-		Sizzle.error = function( msg ) {
-			throw new Error( "Syntax error, unrecognized expression: " + msg );
-		};
-
-		/**
-		* Document sorting and removing duplicates
-		* @param {ArrayLike} results
-		*/
-		Sizzle.uniqueSort = function( results ) {
-			var elem,
-				duplicates = [],
-				j = 0,
-				i = 0;
-
-			// Unless we *know* we can detect duplicates, assume their presence
-			hasDuplicate = !support.detectDuplicates;
-			sortInput = !support.sortStable && results.slice( 0 );
-			results.sort( sortOrder );
-
-			if ( hasDuplicate ) {
-				while ( ( elem = results[ i++ ] ) ) {
-					if ( elem === results[ i ] ) {
-						j = duplicates.push( i );
-					}
-				}
-				while ( j-- ) {
-					results.splice( duplicates[ j ], 1 );
-				}
-			}
-
-			// Clear input after sorting to release objects
-			// See https://github.com/jquery/sizzle/pull/225
-			sortInput = null;
-
-			return results;
-		};
-
-		/**
-		* Utility function for retrieving the text value of an array of DOM nodes
-		* @param {Array|Element} elem
-		*/
-		getText = Sizzle.getText = function( elem ) {
-			var node,
-				ret = "",
-				i = 0,
-				nodeType = elem.nodeType;
-
-			if ( !nodeType ) {
-
-				// If no nodeType, this is expected to be an array
-				while ( ( node = elem[ i++ ] ) ) {
-
-					// Do not traverse comment nodes
-					ret += getText( node );
-				}
-			} else if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
-
-				// Use textContent for elements
-				// innerText usage removed for consistency of new lines (jQuery #11153)
-				if ( typeof elem.textContent === "string" ) {
-					return elem.textContent;
-				} else {
-
-					// Traverse its children
-					for ( elem = elem.firstChild; elem; elem = elem.nextSibling ) {
-						ret += getText( elem );
-					}
-				}
-			} else if ( nodeType === 3 || nodeType === 4 ) {
-				return elem.nodeValue;
-			}
-
-			// Do not include comment or processing instruction nodes
-
-			return ret;
-		};
-
-		Expr = Sizzle.selectors = {
-
-			// Can be adjusted by the user
-			cacheLength: 50,
-
-			createPseudo: markFunction,
-
-			match: matchExpr,
-
-			attrHandle: {},
-
-			find: {},
-
-			relative: {
-				">": { dir: "parentNode", first: true },
-				" ": { dir: "parentNode" },
-				"+": { dir: "previousSibling", first: true },
-				"~": { dir: "previousSibling" }
-			},
-
-			preFilter: {
-				"ATTR": function( match ) {
-					match[ 1 ] = match[ 1 ].replace( runescape, funescape );
-
-					// Move the given value to match[3] whether quoted or unquoted
-					match[ 3 ] = ( match[ 3 ] || match[ 4 ] ||
-						match[ 5 ] || "" ).replace( runescape, funescape );
-
-					if ( match[ 2 ] === "~=" ) {
-						match[ 3 ] = " " + match[ 3 ] + " ";
-					}
-
-					return match.slice( 0, 4 );
-				},
-
-				"CHILD": function( match ) {
-
-					/* matches from matchExpr["CHILD"]
-						1 type (only|nth|...)
-						2 what (child|of-type)
-						3 argument (even|odd|\d*|\d*n([+-]\d+)?|...)
-						4 xn-component of xn+y argument ([+-]?\d*n|)
-						5 sign of xn-component
-						6 x of xn-component
-						7 sign of y-component
-						8 y of y-component
-					*/
-					match[ 1 ] = match[ 1 ].toLowerCase();
-
-					if ( match[ 1 ].slice( 0, 3 ) === "nth" ) {
-
-						// nth-* requires argument
-						if ( !match[ 3 ] ) {
-							Sizzle.error( match[ 0 ] );
-						}
-
-						// numeric x and y parameters for Expr.filter.CHILD
-						// remember that false/true cast respectively to 0/1
-						match[ 4 ] = +( match[ 4 ] ?
-							match[ 5 ] + ( match[ 6 ] || 1 ) :
-							2 * ( match[ 3 ] === "even" || match[ 3 ] === "odd" ) );
-						match[ 5 ] = +( ( match[ 7 ] + match[ 8 ] ) || match[ 3 ] === "odd" );
-
-						// other types prohibit arguments
-					} else if ( match[ 3 ] ) {
-						Sizzle.error( match[ 0 ] );
-					}
-
-					return match;
-				},
-
-				"PSEUDO": function( match ) {
-					var excess,
-						unquoted = !match[ 6 ] && match[ 2 ];
-
-					if ( matchExpr[ "CHILD" ].test( match[ 0 ] ) ) {
-						return null;
-					}
-
-					// Accept quoted arguments as-is
-					if ( match[ 3 ] ) {
-						match[ 2 ] = match[ 4 ] || match[ 5 ] || "";
-
-					// Strip excess characters from unquoted arguments
-					} else if ( unquoted && rpseudo.test( unquoted ) &&
-
-						// Get excess from tokenize (recursively)
-						( excess = tokenize( unquoted, true ) ) &&
-
-						// advance to the next closing parenthesis
-						( excess = unquoted.indexOf( ")", unquoted.length - excess ) - unquoted.length ) ) {
-
-						// excess is a negative index
-						match[ 0 ] = match[ 0 ].slice( 0, excess );
-						match[ 2 ] = unquoted.slice( 0, excess );
-					}
-
-					// Return only captures needed by the pseudo filter method (type and argument)
-					return match.slice( 0, 3 );
-				}
-			},
-
-			filter: {
-
-				"TAG": function( nodeNameSelector ) {
-					var nodeName = nodeNameSelector.replace( runescape, funescape ).toLowerCase();
-					return nodeNameSelector === "*" ?
-						function() {
-							return true;
-						} :
-						function( elem ) {
-							return elem.nodeName && elem.nodeName.toLowerCase() === nodeName;
-						};
-				},
-
-				"CLASS": function( className ) {
-					var pattern = classCache[ className + " " ];
-
-					return pattern ||
-						( pattern = new RegExp( "(^|" + whitespace +
-							")" + className + "(" + whitespace + "|$)" ) ) && classCache(
-								className, function( elem ) {
-									return pattern.test(
-										typeof elem.className === "string" && elem.className ||
-										typeof elem.getAttribute !== "undefined" &&
-											elem.getAttribute( "class" ) ||
-										""
-									);
-						} );
-				},
-
-				"ATTR": function( name, operator, check ) {
-					return function( elem ) {
-						var result = Sizzle.attr( elem, name );
-
-						if ( result == null ) {
-							return operator === "!=";
-						}
-						if ( !operator ) {
-							return true;
-						}
-
-						result += "";
-
-						/* eslint-disable max-len */
-
-						return operator === "=" ? result === check :
-							operator === "!=" ? result !== check :
-							operator === "^=" ? check && result.indexOf( check ) === 0 :
-							operator === "*=" ? check && result.indexOf( check ) > -1 :
-							operator === "$=" ? check && result.slice( -check.length ) === check :
-							operator === "~=" ? ( " " + result.replace( rwhitespace, " " ) + " " ).indexOf( check ) > -1 :
-							operator === "|=" ? result === check || result.slice( 0, check.length + 1 ) === check + "-" :
-							false;
-						/* eslint-enable max-len */
-
-					};
-				},
-
-				"CHILD": function( type, what, _argument, first, last ) {
-					var simple = type.slice( 0, 3 ) !== "nth",
-						forward = type.slice( -4 ) !== "last",
-						ofType = what === "of-type";
-
-					return first === 1 && last === 0 ?
-
-						// Shortcut for :nth-*(n)
-						function( elem ) {
-							return !!elem.parentNode;
-						} :
-
-						function( elem, _context, xml ) {
-							var cache, uniqueCache, outerCache, node, nodeIndex, start,
-								dir = simple !== forward ? "nextSibling" : "previousSibling",
-								parent = elem.parentNode,
-								name = ofType && elem.nodeName.toLowerCase(),
-								useCache = !xml && !ofType,
-								diff = false;
-
-							if ( parent ) {
-
-								// :(first|last|only)-(child|of-type)
-								if ( simple ) {
-									while ( dir ) {
-										node = elem;
-										while ( ( node = node[ dir ] ) ) {
-											if ( ofType ?
-												node.nodeName.toLowerCase() === name :
-												node.nodeType === 1 ) {
-
-												return false;
+								// Take advantage of querySelectorAll
+								if ( support.qsa &&
+									!nonnativeSelectorCache[ selector + " " ] &&
+									( !rbuggyQSA || !rbuggyQSA.test( selector ) ) &&
+
+									// Support: IE 8 only
+									// Exclude object elements
+									( nodeType !== 1 || context.nodeName.toLowerCase() !== "object" ) ) {
+
+									newSelector = selector;
+									newContext = context;
+
+									// qSA considers elements outside a scoping root when evaluating child or
+									// descendant combinators, which is not what we want.
+									// In such cases, we work around the behavior by prefixing every selector in the
+									// list with an ID selector referencing the scope context.
+									// The technique has to be used as well when a leading combinator is used
+									// as such selectors are not recognized by querySelectorAll.
+									// Thanks to Andrew Dupont for this technique.
+									if ( nodeType === 1 &&
+										( rdescend.test( selector ) || rcombinators.test( selector ) ) ) {
+
+										// Expand context for sibling selectors
+										newContext = rsibling.test( selector ) && testContext( context.parentNode ) ||
+											context;
+
+										// We can use :scope instead of the ID hack if the browser
+										// supports it & if we're not changing the context.
+										if ( newContext !== context || !support.scope ) {
+
+											// Capture the context ID, setting it first if necessary
+											if ( ( nid = context.getAttribute( "id" ) ) ) {
+												nid = nid.replace( rcssescape, fcssescape );
+											} else {
+												context.setAttribute( "id", ( nid = expando ) );
 											}
 										}
 
-										// Reverse direction for :only-* (if we haven't yet done so)
-										start = dir = type === "only" && !start && "nextSibling";
-									}
-									return true;
-								}
-
-								start = [ forward ? parent.firstChild : parent.lastChild ];
-
-								// non-xml :nth-child(...) stores cache data on `parent`
-								if ( forward && useCache ) {
-
-									// Seek `elem` from a previously-cached index
-
-									// ...in a gzip-friendly way
-									node = parent;
-									outerCache = node[ expando ] || ( node[ expando ] = {} );
-
-									// Support: IE <9 only
-									// Defend against cloned attroperties (jQuery gh-1709)
-									uniqueCache = outerCache[ node.uniqueID ] ||
-										( outerCache[ node.uniqueID ] = {} );
-
-									cache = uniqueCache[ type ] || [];
-									nodeIndex = cache[ 0 ] === dirruns && cache[ 1 ];
-									diff = nodeIndex && cache[ 2 ];
-									node = nodeIndex && parent.childNodes[ nodeIndex ];
-
-									while ( ( node = ++nodeIndex && node && node[ dir ] ||
-
-										// Fallback to seeking `elem` from the start
-										( diff = nodeIndex = 0 ) || start.pop() ) ) {
-
-										// When found, cache indexes on `parent` and break
-										if ( node.nodeType === 1 && ++diff && node === elem ) {
-											uniqueCache[ type ] = [ dirruns, nodeIndex, diff ];
-											break;
+										// Prefix every selector in the list
+										groups = tokenize( selector );
+										i = groups.length;
+										while ( i-- ) {
+											groups[ i ] = ( nid ? "#" + nid : ":scope" ) + " " +
+												toSelector( groups[ i ] );
 										}
+										newSelector = groups.join( "," );
 									}
 
-								} else {
-
-									// Use previously-cached element index if available
-									if ( useCache ) {
-
-										// ...in a gzip-friendly way
-										node = elem;
-										outerCache = node[ expando ] || ( node[ expando ] = {} );
-
-										// Support: IE <9 only
-										// Defend against cloned attroperties (jQuery gh-1709)
-										uniqueCache = outerCache[ node.uniqueID ] ||
-											( outerCache[ node.uniqueID ] = {} );
-
-										cache = uniqueCache[ type ] || [];
-										nodeIndex = cache[ 0 ] === dirruns && cache[ 1 ];
-										diff = nodeIndex;
-									}
-
-									// xml :nth-child(...)
-									// or :nth-last-child(...) or :nth(-last)?-of-type(...)
-									if ( diff === false ) {
-
-										// Use the same loop as above to seek `elem` from the start
-										while ( ( node = ++nodeIndex && node && node[ dir ] ||
-											( diff = nodeIndex = 0 ) || start.pop() ) ) {
-
-											if ( ( ofType ?
-												node.nodeName.toLowerCase() === name :
-												node.nodeType === 1 ) &&
-												++diff ) {
-
-												// Cache the index of each encountered element
-												if ( useCache ) {
-													outerCache = node[ expando ] ||
-														( node[ expando ] = {} );
-
-													// Support: IE <9 only
-													// Defend against cloned attroperties (jQuery gh-1709)
-													uniqueCache = outerCache[ node.uniqueID ] ||
-														( outerCache[ node.uniqueID ] = {} );
-
-													uniqueCache[ type ] = [ dirruns, diff ];
-												}
-
-												if ( node === elem ) {
-													break;
-												}
-											}
+									try {
+										push.apply( results,
+											newContext.querySelectorAll( newSelector )
+										);
+										return results;
+									} catch ( qsaError ) {
+										nonnativeSelectorCache( selector, true );
+									} finally {
+										if ( nid === expando ) {
+											context.removeAttribute( "id" );
 										}
 									}
 								}
-
-								// Incorporate the offset, then check against cycle size
-								diff -= last;
-								return diff === first || ( diff % first === 0 && diff / first >= 0 );
 							}
-						};
-				},
+						}
 
-				"PSEUDO": function( pseudo, argument ) {
-
-					// pseudo-class names are case-insensitive
-					// http://www.w3.org/TR/selectors/#pseudo-classes
-					// Prioritize by case sensitivity in case custom pseudos are added with uppercase letters
-					// Remember that setFilters inherits from pseudos
-					var args,
-						fn = Expr.pseudos[ pseudo ] || Expr.setFilters[ pseudo.toLowerCase() ] ||
-							Sizzle.error( "unsupported pseudo: " + pseudo );
-
-					// The user may use createPseudo to indicate that
-					// arguments are needed to create the filter function
-					// just as Sizzle does
-					if ( fn[ expando ] ) {
-						return fn( argument );
+						// All others
+						return select( selector.replace( rtrim, "$1" ), context, results, seed );
 					}
 
-					// But maintain support for old signatures
-					if ( fn.length > 1 ) {
-						args = [ pseudo, pseudo, "", argument ];
-						return Expr.setFilters.hasOwnProperty( pseudo.toLowerCase() ) ?
-							markFunction( function( seed, matches ) {
-								var idx,
-									matched = fn( seed, argument ),
-									i = matched.length;
-								while ( i-- ) {
-									idx = indexOf( seed, matched[ i ] );
-									seed[ idx ] = !( matches[ idx ] = matched[ i ] );
-								}
-							} ) :
-							function( elem ) {
-								return fn( elem, 0, args );
-							};
-					}
+				/**
+				* Create key-value caches of limited size
+				* @returns {function(string, object)} Returns the Object data after storing it on itself with
+				*	property name the (space-suffixed) string and (if the cache is larger than Expr.cacheLength)
+				*	deleting the oldest entry
+				*/
+				function createCache() {
+					var keys = [];
 
+					function cache( key, value ) {
+
+						// Use (key + " ") to avoid collision with native prototype properties (see Issue #157)
+						if ( keys.push( key + " " ) > Expr.cacheLength ) {
+
+							// Only keep the most recent entries
+							delete cache[ keys.shift() ];
+						}
+						return ( cache[ key + " " ] = value );
+					}
+					return cache;
+				}
+
+				/**
+				* Mark a function for special use by Sizzle
+				* @param {Function} fn The function to mark
+				*/
+				function markFunction( fn ) {
+					fn[ expando ] = true;
 					return fn;
 				}
-			},
 
-			pseudos: {
+				/**
+				* Support testing using an element
+				* @param {Function} fn Passed the created element and returns a boolean result
+				*/
+				function assert( fn ) {
+					var el = document.createElement( "fieldset" );
 
-				// Potentially complex pseudos
-				"not": markFunction( function( selector ) {
+					try {
+						return !!fn( el );
+					} catch ( e ) {
+						return false;
+					} finally {
 
-					// Trim the selector passed to compile
-					// to avoid treating leading and trailing
-					// spaces as combinators
-					var input = [],
-						results = [],
-						matcher = compile( selector.replace( rtrim, "$1" ) );
+						// Remove from its parent by default
+						if ( el.parentNode ) {
+							el.parentNode.removeChild( el );
+						}
 
-					return matcher[ expando ] ?
-						markFunction( function( seed, matches, _context, xml ) {
-							var elem,
-								unmatched = matcher( seed, null, xml, [] ),
-								i = seed.length;
-
-							// Match elements unmatched by `matcher`
-							while ( i-- ) {
-								if ( ( elem = unmatched[ i ] ) ) {
-									seed[ i ] = !( matches[ i ] = elem );
-								}
-							}
-						} ) :
-						function( elem, _context, xml ) {
-							input[ 0 ] = elem;
-							matcher( input, null, xml, results );
-
-							// Don't keep the element (issue #299)
-							input[ 0 ] = null;
-							return !results.pop();
-						};
-				} ),
-
-				"has": markFunction( function( selector ) {
-					return function( elem ) {
-						return Sizzle( selector, elem ).length > 0;
-					};
-				} ),
-
-				"contains": markFunction( function( text ) {
-					text = text.replace( runescape, funescape );
-					return function( elem ) {
-						return ( elem.textContent || getText( elem ) ).indexOf( text ) > -1;
-					};
-				} ),
-
-				// "Whether an element is represented by a :lang() selector
-				// is based solely on the element's language value
-				// being equal to the identifier C,
-				// or beginning with the identifier C immediately followed by "-".
-				// The matching of C against the element's language value is performed case-insensitively.
-				// The identifier C does not have to be a valid language name."
-				// http://www.w3.org/TR/selectors/#lang-pseudo
-				"lang": markFunction( function( lang ) {
-
-					// lang value must be a valid identifier
-					if ( !ridentifier.test( lang || "" ) ) {
-						Sizzle.error( "unsupported lang: " + lang );
+						// release memory in IE
+						el = null;
 					}
-					lang = lang.replace( runescape, funescape ).toLowerCase();
-					return function( elem ) {
-						var elemLang;
-						do {
-							if ( ( elemLang = documentIsHTML ?
-								elem.lang :
-								elem.getAttribute( "xml:lang" ) || elem.getAttribute( "lang" ) ) ) {
+				}
 
-								elemLang = elemLang.toLowerCase();
-								return elemLang === lang || elemLang.indexOf( lang + "-" ) === 0;
+				/**
+				* Adds the same handler for all of the specified attrs
+				* @param {String} attrs Pipe-separated list of attributes
+				* @param {Function} handler The method that will be applied
+				*/
+				function addHandle( attrs, handler ) {
+					var arr = attrs.split( "|" ),
+						i = arr.length;
+
+					while ( i-- ) {
+						Expr.attrHandle[ arr[ i ] ] = handler;
+					}
+				}
+
+				/**
+				* Checks document order of two siblings
+				* @param {Element} a
+				* @param {Element} b
+				* @returns {Number} Returns less than 0 if a precedes b, greater than 0 if a follows b
+				*/
+				function siblingCheck( a, b ) {
+					var cur = b && a,
+						diff = cur && a.nodeType === 1 && b.nodeType === 1 &&
+							a.sourceIndex - b.sourceIndex;
+
+					// Use IE sourceIndex if available on both nodes
+					if ( diff ) {
+						return diff;
+					}
+
+					// Check if b follows a
+					if ( cur ) {
+						while ( ( cur = cur.nextSibling ) ) {
+							if ( cur === b ) {
+								return -1;
 							}
-						} while ( ( elem = elem.parentNode ) && elem.nodeType === 1 );
+						}
+					}
+
+					return a ? 1 : -1;
+				}
+
+				/**
+				* Returns a function to use in pseudos for input types
+				* @param {String} type
+				*/
+				function createInputPseudo( type ) {
+					return function( elem ) {
+						var name = elem.nodeName.toLowerCase();
+						return name === "input" && elem.type === type;
+					};
+				}
+
+				/**
+				* Returns a function to use in pseudos for buttons
+				* @param {String} type
+				*/
+				function createButtonPseudo( type ) {
+					return function( elem ) {
+						var name = elem.nodeName.toLowerCase();
+						return ( name === "input" || name === "button" ) && elem.type === type;
+					};
+				}
+
+				/**
+				* Returns a function to use in pseudos for :enabled/:disabled
+				* @param {Boolean} disabled true for :disabled; false for :enabled
+				*/
+				function createDisabledPseudo( disabled ) {
+
+					// Known :disabled false positives: fieldset[disabled] > legend:nth-of-type(n+2) :can-disable
+					return function( elem ) {
+
+						// Only certain elements can match :enabled or :disabled
+						// https://html.spec.whatwg.org/multipage/scripting.html#selector-enabled
+						// https://html.spec.whatwg.org/multipage/scripting.html#selector-disabled
+						if ( "form" in elem ) {
+
+							// Check for inherited disabledness on relevant non-disabled elements:
+							// * listed form-associated elements in a disabled fieldset
+							//   https://html.spec.whatwg.org/multipage/forms.html#category-listed
+							//   https://html.spec.whatwg.org/multipage/forms.html#concept-fe-disabled
+							// * option elements in a disabled optgroup
+							//   https://html.spec.whatwg.org/multipage/forms.html#concept-option-disabled
+							// All such elements have a "form" property.
+							if ( elem.parentNode && elem.disabled === false ) {
+
+								// Option elements defer to a parent optgroup if present
+								if ( "label" in elem ) {
+									if ( "label" in elem.parentNode ) {
+										return elem.parentNode.disabled === disabled;
+									} else {
+										return elem.disabled === disabled;
+									}
+								}
+
+								// Support: IE 6 - 11
+								// Use the isDisabled shortcut property to check for disabled fieldset ancestors
+								return elem.isDisabled === disabled ||
+
+									// Where there is no isDisabled, check manually
+									/* jshint -W018 */
+									elem.isDisabled !== !disabled &&
+									inDisabledFieldset( elem ) === disabled;
+							}
+
+							return elem.disabled === disabled;
+
+						// Try to winnow out elements that can't be disabled before trusting the disabled property.
+						// Some victims get caught in our net (label, legend, menu, track), but it shouldn't
+						// even exist on them, let alone have a boolean value.
+						} else if ( "label" in elem ) {
+							return elem.disabled === disabled;
+						}
+
+						// Remaining elements are neither :enabled nor :disabled
 						return false;
 					};
-				} ),
-
-				// Miscellaneous
-				"target": function( elem ) {
-					var hash = window.location && window.location.hash;
-					return hash && hash.slice( 1 ) === elem.id;
-				},
-
-				"root": function( elem ) {
-					return elem === docElem;
-				},
-
-				"focus": function( elem ) {
-					return elem === document.activeElement &&
-						( !document.hasFocus || document.hasFocus() ) &&
-						!!( elem.type || elem.href || ~elem.tabIndex );
-				},
-
-				// Boolean properties
-				"enabled": createDisabledPseudo( false ),
-				"disabled": createDisabledPseudo( true ),
-
-				"checked": function( elem ) {
-
-					// In CSS3, :checked should return both checked and selected elements
-					// http://www.w3.org/TR/2011/REC-css3-selectors-20110929/#checked
-					var nodeName = elem.nodeName.toLowerCase();
-					return ( nodeName === "input" && !!elem.checked ) ||
-						( nodeName === "option" && !!elem.selected );
-				},
-
-				"selected": function( elem ) {
-
-					// Accessing this property makes selected-by-default
-					// options in Safari work properly
-					if ( elem.parentNode ) {
-						// eslint-disable-next-line no-unused-expressions
-						elem.parentNode.selectedIndex;
-					}
-
-					return elem.selected === true;
-				},
-
-				// Contents
-				"empty": function( elem ) {
-
-					// http://www.w3.org/TR/selectors/#empty-pseudo
-					// :empty is negated by element (1) or content nodes (text: 3; cdata: 4; entity ref: 5),
-					//   but not by others (comment: 8; processing instruction: 7; etc.)
-					// nodeType < 6 works because attributes (2) do not appear as children
-					for ( elem = elem.firstChild; elem; elem = elem.nextSibling ) {
-						if ( elem.nodeType < 6 ) {
-							return false;
-						}
-					}
-					return true;
-				},
-
-				"parent": function( elem ) {
-					return !Expr.pseudos[ "empty" ]( elem );
-				},
-
-				// Element/input types
-				"header": function( elem ) {
-					return rheader.test( elem.nodeName );
-				},
-
-				"input": function( elem ) {
-					return rinputs.test( elem.nodeName );
-				},
-
-				"button": function( elem ) {
-					var name = elem.nodeName.toLowerCase();
-					return name === "input" && elem.type === "button" || name === "button";
-				},
-
-				"text": function( elem ) {
-					var attr;
-					return elem.nodeName.toLowerCase() === "input" &&
-						elem.type === "text" &&
-
-						// Support: IE<8
-						// New HTML5 attribute values (e.g., "search") appear with elem.type === "text"
-						( ( attr = elem.getAttribute( "type" ) ) == null ||
-							attr.toLowerCase() === "text" );
-				},
-
-				// Position-in-collection
-				"first": createPositionalPseudo( function() {
-					return [ 0 ];
-				} ),
-
-				"last": createPositionalPseudo( function( _matchIndexes, length ) {
-					return [ length - 1 ];
-				} ),
-
-				"eq": createPositionalPseudo( function( _matchIndexes, length, argument ) {
-					return [ argument < 0 ? argument + length : argument ];
-				} ),
-
-				"even": createPositionalPseudo( function( matchIndexes, length ) {
-					var i = 0;
-					for ( ; i < length; i += 2 ) {
-						matchIndexes.push( i );
-					}
-					return matchIndexes;
-				} ),
-
-				"odd": createPositionalPseudo( function( matchIndexes, length ) {
-					var i = 1;
-					for ( ; i < length; i += 2 ) {
-						matchIndexes.push( i );
-					}
-					return matchIndexes;
-				} ),
-
-				"lt": createPositionalPseudo( function( matchIndexes, length, argument ) {
-					var i = argument < 0 ?
-						argument + length :
-						argument > length ?
-							length :
-							argument;
-					for ( ; --i >= 0; ) {
-						matchIndexes.push( i );
-					}
-					return matchIndexes;
-				} ),
-
-				"gt": createPositionalPseudo( function( matchIndexes, length, argument ) {
-					var i = argument < 0 ? argument + length : argument;
-					for ( ; ++i < length; ) {
-						matchIndexes.push( i );
-					}
-					return matchIndexes;
-				} )
-			}
-		};
-
-		Expr.pseudos[ "nth" ] = Expr.pseudos[ "eq" ];
-
-		// Add button/input type pseudos
-		for ( i in { radio: true, checkbox: true, file: true, password: true, image: true } ) {
-			Expr.pseudos[ i ] = createInputPseudo( i );
-		}
-		for ( i in { submit: true, reset: true } ) {
-			Expr.pseudos[ i ] = createButtonPseudo( i );
-		}
-
-		// Easy API for creating new setFilters
-		function setFilters() {}
-		setFilters.prototype = Expr.filters = Expr.pseudos;
-		Expr.setFilters = new setFilters();
-
-		tokenize = Sizzle.tokenize = function( selector, parseOnly ) {
-			var matched, match, tokens, type,
-				soFar, groups, preFilters,
-				cached = tokenCache[ selector + " " ];
-
-			if ( cached ) {
-				return parseOnly ? 0 : cached.slice( 0 );
-			}
-
-			soFar = selector;
-			groups = [];
-			preFilters = Expr.preFilter;
-
-			while ( soFar ) {
-
-				// Comma and first run
-				if ( !matched || ( match = rcomma.exec( soFar ) ) ) {
-					if ( match ) {
-
-						// Don't consume trailing commas as valid
-						soFar = soFar.slice( match[ 0 ].length ) || soFar;
-					}
-					groups.push( ( tokens = [] ) );
 				}
 
-				matched = false;
+				/**
+				* Returns a function to use in pseudos for positionals
+				* @param {Function} fn
+				*/
+				function createPositionalPseudo( fn ) {
+					return markFunction( function( argument ) {
+						argument = +argument;
+						return markFunction( function( seed, matches ) {
+							var j,
+								matchIndexes = fn( [], seed.length, argument ),
+								i = matchIndexes.length;
 
-				// Combinators
-				if ( ( match = rcombinators.exec( soFar ) ) ) {
-					matched = match.shift();
-					tokens.push( {
-						value: matched,
-
-						// Cast descendant combinators to space
-						type: match[ 0 ].replace( rtrim, " " )
-					} );
-					soFar = soFar.slice( matched.length );
-				}
-
-				// Filters
-				for ( type in Expr.filter ) {
-					if ( ( match = matchExpr[ type ].exec( soFar ) ) && ( !preFilters[ type ] ||
-						( match = preFilters[ type ]( match ) ) ) ) {
-						matched = match.shift();
-						tokens.push( {
-							value: matched,
-							type: type,
-							matches: match
-						} );
-						soFar = soFar.slice( matched.length );
-					}
-				}
-
-				if ( !matched ) {
-					break;
-				}
-			}
-
-			// Return the length of the invalid excess
-			// if we're just parsing
-			// Otherwise, throw an error or return tokens
-			return parseOnly ?
-				soFar.length :
-				soFar ?
-					Sizzle.error( selector ) :
-
-					// Cache the tokens
-					tokenCache( selector, groups ).slice( 0 );
-		};
-
-		function toSelector( tokens ) {
-			var i = 0,
-				len = tokens.length,
-				selector = "";
-			for ( ; i < len; i++ ) {
-				selector += tokens[ i ].value;
-			}
-			return selector;
-		}
-
-		function addCombinator( matcher, combinator, base ) {
-			var dir = combinator.dir,
-				skip = combinator.next,
-				key = skip || dir,
-				checkNonElements = base && key === "parentNode",
-				doneName = done++;
-
-			return combinator.first ?
-
-				// Check against closest ancestor/preceding element
-				function( elem, context, xml ) {
-					while ( ( elem = elem[ dir ] ) ) {
-						if ( elem.nodeType === 1 || checkNonElements ) {
-							return matcher( elem, context, xml );
-						}
-					}
-					return false;
-				} :
-
-				// Check against all ancestor/preceding elements
-				function( elem, context, xml ) {
-					var oldCache, uniqueCache, outerCache,
-						newCache = [ dirruns, doneName ];
-
-					// We can't set arbitrary data on XML nodes, so they don't benefit from combinator caching
-					if ( xml ) {
-						while ( ( elem = elem[ dir ] ) ) {
-							if ( elem.nodeType === 1 || checkNonElements ) {
-								if ( matcher( elem, context, xml ) ) {
-									return true;
+							// Match elements found at the specified indexes
+							while ( i-- ) {
+								if ( seed[ ( j = matchIndexes[ i ] ) ] ) {
+									seed[ j ] = !( matches[ j ] = seed[ j ] );
 								}
 							}
+						} );
+					} );
+				}
+
+				/**
+				* Checks a node for validity as a Sizzle context
+				* @param {Element|Object=} context
+				* @returns {Element|Object|Boolean} The input node if acceptable, otherwise a falsy value
+				*/
+				function testContext( context ) {
+					return context && typeof context.getElementsByTagName !== "undefined" && context;
+				}
+
+				// Expose support vars for convenience
+				support = Sizzle.support = {};
+
+				/**
+				* Detects XML nodes
+				* @param {Element|Object} elem An element or a document
+				* @returns {Boolean} True iff elem is a non-HTML XML node
+				*/
+				isXML = Sizzle.isXML = function( elem ) {
+					var namespace = elem && elem.namespaceURI,
+						docElem = elem && ( elem.ownerDocument || elem ).documentElement;
+
+					// Support: IE <=8
+					// Assume HTML when documentElement doesn't yet exist, such as inside loading iframes
+					// https://bugs.jquery.com/ticket/4833
+					return !rhtml.test( namespace || docElem && docElem.nodeName || "HTML" );
+				};
+
+				/**
+				* Sets document-related variables once based on the current document
+				* @param {Element|Object} [doc] An element or document object to use to set the document
+				* @returns {Object} Returns the current document
+				*/
+				setDocument = Sizzle.setDocument = function( node ) {
+					var hasCompare, subWindow,
+						doc = node ? node.ownerDocument || node : preferredDoc;
+
+					// Return early if doc is invalid or already selected
+					// Support: IE 11+, Edge 17 - 18+
+					// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+					// two documents; shallow comparisons work.
+					// eslint-disable-next-line eqeqeq
+					if ( doc == document || doc.nodeType !== 9 || !doc.documentElement ) {
+						return document;
+					}
+
+					// Update global variables
+					document = doc;
+					docElem = document.documentElement;
+					documentIsHTML = !isXML( document );
+
+					// Support: IE 9 - 11+, Edge 12 - 18+
+					// Accessing iframe documents after unload throws "permission denied" errors (jQuery #13936)
+					// Support: IE 11+, Edge 17 - 18+
+					// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+					// two documents; shallow comparisons work.
+					// eslint-disable-next-line eqeqeq
+					if ( preferredDoc != document &&
+						( subWindow = document.defaultView ) && subWindow.top !== subWindow ) {
+
+						// Support: IE 11, Edge
+						if ( subWindow.addEventListener ) {
+							subWindow.addEventListener( "unload", unloadHandler, false );
+
+						// Support: IE 9 - 10 only
+						} else if ( subWindow.attachEvent ) {
+							subWindow.attachEvent( "onunload", unloadHandler );
 						}
+					}
+
+					// Support: IE 8 - 11+, Edge 12 - 18+, Chrome <=16 - 25 only, Firefox <=3.6 - 31 only,
+					// Safari 4 - 5 only, Opera <=11.6 - 12.x only
+					// IE/Edge & older browsers don't support the :scope pseudo-class.
+					// Support: Safari 6.0 only
+					// Safari 6.0 supports :scope but it's an alias of :root there.
+					support.scope = assert( function( el ) {
+						docElem.appendChild( el ).appendChild( document.createElement( "div" ) );
+						return typeof el.querySelectorAll !== "undefined" &&
+							!el.querySelectorAll( ":scope fieldset div" ).length;
+					} );
+
+					/* Attributes
+					---------------------------------------------------------------------- */
+
+					// Support: IE<8
+					// Verify that getAttribute really returns attributes and not properties
+					// (excepting IE8 booleans)
+					support.attributes = assert( function( el ) {
+						el.className = "i";
+						return !el.getAttribute( "className" );
+					} );
+
+					/* getElement(s)By*
+					---------------------------------------------------------------------- */
+
+					// Check if getElementsByTagName("*") returns only elements
+					support.getElementsByTagName = assert( function( el ) {
+						el.appendChild( document.createComment( "" ) );
+						return !el.getElementsByTagName( "*" ).length;
+					} );
+
+					// Support: IE<9
+					support.getElementsByClassName = rnative.test( document.getElementsByClassName );
+
+					// Support: IE<10
+					// Check if getElementById returns elements by name
+					// The broken getElementById methods don't pick up programmatically-set names,
+					// so use a roundabout getElementsByName test
+					support.getById = assert( function( el ) {
+						docElem.appendChild( el ).id = expando;
+						return !document.getElementsByName || !document.getElementsByName( expando ).length;
+					} );
+
+					// ID filter and find
+					if ( support.getById ) {
+						Expr.filter[ "ID" ] = function( id ) {
+							var attrId = id.replace( runescape, funescape );
+							return function( elem ) {
+								return elem.getAttribute( "id" ) === attrId;
+							};
+						};
+						Expr.find[ "ID" ] = function( id, context ) {
+							if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
+								var elem = context.getElementById( id );
+								return elem ? [ elem ] : [];
+							}
+						};
 					} else {
-						while ( ( elem = elem[ dir ] ) ) {
-							if ( elem.nodeType === 1 || checkNonElements ) {
-								outerCache = elem[ expando ] || ( elem[ expando ] = {} );
+						Expr.filter[ "ID" ] =  function( id ) {
+							var attrId = id.replace( runescape, funescape );
+							return function( elem ) {
+								var node = typeof elem.getAttributeNode !== "undefined" &&
+									elem.getAttributeNode( "id" );
+								return node && node.value === attrId;
+							};
+						};
 
-								// Support: IE <9 only
-								// Defend against cloned attroperties (jQuery gh-1709)
-								uniqueCache = outerCache[ elem.uniqueID ] ||
-									( outerCache[ elem.uniqueID ] = {} );
+						// Support: IE 6 - 7 only
+						// getElementById is not reliable as a find shortcut
+						Expr.find[ "ID" ] = function( id, context ) {
+							if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
+								var node, i, elems,
+									elem = context.getElementById( id );
 
-								if ( skip && skip === elem.nodeName.toLowerCase() ) {
-									elem = elem[ dir ] || elem;
-								} else if ( ( oldCache = uniqueCache[ key ] ) &&
-									oldCache[ 0 ] === dirruns && oldCache[ 1 ] === doneName ) {
+								if ( elem ) {
 
-									// Assign to newCache so results back-propagate to previous elements
-									return ( newCache[ 2 ] = oldCache[ 2 ] );
-								} else {
+									// Verify the id attribute
+									node = elem.getAttributeNode( "id" );
+									if ( node && node.value === id ) {
+										return [ elem ];
+									}
 
-									// Reuse newcache so results back-propagate to previous elements
-									uniqueCache[ key ] = newCache;
+									// Fall back on getElementsByName
+									elems = context.getElementsByName( id );
+									i = 0;
+									while ( ( elem = elems[ i++ ] ) ) {
+										node = elem.getAttributeNode( "id" );
+										if ( node && node.value === id ) {
+											return [ elem ];
+										}
+									}
+								}
 
-									// A match means we're done; a fail means we have to keep checking
-									if ( ( newCache[ 2 ] = matcher( elem, context, xml ) ) ) {
+								return [];
+							}
+						};
+					}
+
+					// Tag
+					Expr.find[ "TAG" ] = support.getElementsByTagName ?
+						function( tag, context ) {
+							if ( typeof context.getElementsByTagName !== "undefined" ) {
+								return context.getElementsByTagName( tag );
+
+							// DocumentFragment nodes don't have gEBTN
+							} else if ( support.qsa ) {
+								return context.querySelectorAll( tag );
+							}
+						} :
+
+						function( tag, context ) {
+							var elem,
+								tmp = [],
+								i = 0,
+
+								// By happy coincidence, a (broken) gEBTN appears on DocumentFragment nodes too
+								results = context.getElementsByTagName( tag );
+
+							// Filter out possible comments
+							if ( tag === "*" ) {
+								while ( ( elem = results[ i++ ] ) ) {
+									if ( elem.nodeType === 1 ) {
+										tmp.push( elem );
+									}
+								}
+
+								return tmp;
+							}
+							return results;
+						};
+
+					// Class
+					Expr.find[ "CLASS" ] = support.getElementsByClassName && function( className, context ) {
+						if ( typeof context.getElementsByClassName !== "undefined" && documentIsHTML ) {
+							return context.getElementsByClassName( className );
+						}
+					};
+
+					/* QSA/matchesSelector
+					---------------------------------------------------------------------- */
+
+					// QSA and matchesSelector support
+
+					// matchesSelector(:active) reports false when true (IE9/Opera 11.5)
+					rbuggyMatches = [];
+
+					// qSa(:focus) reports false when true (Chrome 21)
+					// We allow this because of a bug in IE8/9 that throws an error
+					// whenever `document.activeElement` is accessed on an iframe
+					// So, we allow :focus to pass through QSA all the time to avoid the IE error
+					// See https://bugs.jquery.com/ticket/13378
+					rbuggyQSA = [];
+
+					if ( ( support.qsa = rnative.test( document.querySelectorAll ) ) ) {
+
+						// Build QSA regex
+						// Regex strategy adopted from Diego Perini
+						assert( function( el ) {
+
+							var input;
+
+							// Select is set to empty string on purpose
+							// This is to test IE's treatment of not explicitly
+							// setting a boolean content attribute,
+							// since its presence should be enough
+							// https://bugs.jquery.com/ticket/12359
+							docElem.appendChild( el ).innerHTML = "<a id='" + expando + "'></a>" +
+								"<select id='" + expando + "-\r\\' msallowcapture=''>" +
+								"<option selected=''></option></select>";
+
+							// Support: IE8, Opera 11-12.16
+							// Nothing should be selected when empty strings follow ^= or $= or *=
+							// The test attribute must be unknown in Opera but "safe" for WinRT
+							// https://msdn.microsoft.com/en-us/library/ie/hh465388.aspx#attribute_section
+							if ( el.querySelectorAll( "[msallowcapture^='']" ).length ) {
+								rbuggyQSA.push( "[*^$]=" + whitespace + "*(?:''|\"\")" );
+							}
+
+							// Support: IE8
+							// Boolean attributes and "value" are not treated correctly
+							if ( !el.querySelectorAll( "[selected]" ).length ) {
+								rbuggyQSA.push( "\\[" + whitespace + "*(?:value|" + booleans + ")" );
+							}
+
+							// Support: Chrome<29, Android<4.4, Safari<7.0+, iOS<7.0+, PhantomJS<1.9.8+
+							if ( !el.querySelectorAll( "[id~=" + expando + "-]" ).length ) {
+								rbuggyQSA.push( "~=" );
+							}
+
+							// Support: IE 11+, Edge 15 - 18+
+							// IE 11/Edge don't find elements on a `[name='']` query in some cases.
+							// Adding a temporary attribute to the document before the selection works
+							// around the issue.
+							// Interestingly, IE 10 & older don't seem to have the issue.
+							input = document.createElement( "input" );
+							input.setAttribute( "name", "" );
+							el.appendChild( input );
+							if ( !el.querySelectorAll( "[name='']" ).length ) {
+								rbuggyQSA.push( "\\[" + whitespace + "*name" + whitespace + "*=" +
+									whitespace + "*(?:''|\"\")" );
+							}
+
+							// Webkit/Opera - :checked should return selected option elements
+							// http://www.w3.org/TR/2011/REC-css3-selectors-20110929/#checked
+							// IE8 throws error here and will not see later tests
+							if ( !el.querySelectorAll( ":checked" ).length ) {
+								rbuggyQSA.push( ":checked" );
+							}
+
+							// Support: Safari 8+, iOS 8+
+							// https://bugs.webkit.org/show_bug.cgi?id=136851
+							// In-page `selector#id sibling-combinator selector` fails
+							if ( !el.querySelectorAll( "a#" + expando + "+*" ).length ) {
+								rbuggyQSA.push( ".#.+[+~]" );
+							}
+
+							// Support: Firefox <=3.6 - 5 only
+							// Old Firefox doesn't throw on a badly-escaped identifier.
+							el.querySelectorAll( "\\\f" );
+							rbuggyQSA.push( "[\\r\\n\\f]" );
+						} );
+
+						assert( function( el ) {
+							el.innerHTML = "<a href='' disabled='disabled'></a>" +
+								"<select disabled='disabled'><option/></select>";
+
+							// Support: Windows 8 Native Apps
+							// The type and name attributes are restricted during .innerHTML assignment
+							var input = document.createElement( "input" );
+							input.setAttribute( "type", "hidden" );
+							el.appendChild( input ).setAttribute( "name", "D" );
+
+							// Support: IE8
+							// Enforce case-sensitivity of name attribute
+							if ( el.querySelectorAll( "[name=d]" ).length ) {
+								rbuggyQSA.push( "name" + whitespace + "*[*^$|!~]?=" );
+							}
+
+							// FF 3.5 - :enabled/:disabled and hidden elements (hidden elements are still enabled)
+							// IE8 throws error here and will not see later tests
+							if ( el.querySelectorAll( ":enabled" ).length !== 2 ) {
+								rbuggyQSA.push( ":enabled", ":disabled" );
+							}
+
+							// Support: IE9-11+
+							// IE's :disabled selector does not pick up the children of disabled fieldsets
+							docElem.appendChild( el ).disabled = true;
+							if ( el.querySelectorAll( ":disabled" ).length !== 2 ) {
+								rbuggyQSA.push( ":enabled", ":disabled" );
+							}
+
+							// Support: Opera 10 - 11 only
+							// Opera 10-11 does not throw on post-comma invalid pseudos
+							el.querySelectorAll( "*,:x" );
+							rbuggyQSA.push( ",.*:" );
+						} );
+					}
+
+					if ( ( support.matchesSelector = rnative.test( ( matches = docElem.matches ||
+						docElem.webkitMatchesSelector ||
+						docElem.mozMatchesSelector ||
+						docElem.oMatchesSelector ||
+						docElem.msMatchesSelector ) ) ) ) {
+
+						assert( function( el ) {
+
+							// Check to see if it's possible to do matchesSelector
+							// on a disconnected node (IE 9)
+							support.disconnectedMatch = matches.call( el, "*" );
+
+							// This should fail with an exception
+							// Gecko does not error, returns false instead
+							matches.call( el, "[s!='']:x" );
+							rbuggyMatches.push( "!=", pseudos );
+						} );
+					}
+
+					rbuggyQSA = rbuggyQSA.length && new RegExp( rbuggyQSA.join( "|" ) );
+					rbuggyMatches = rbuggyMatches.length && new RegExp( rbuggyMatches.join( "|" ) );
+
+					/* Contains
+					---------------------------------------------------------------------- */
+					hasCompare = rnative.test( docElem.compareDocumentPosition );
+
+					// Element contains another
+					// Purposefully self-exclusive
+					// As in, an element does not contain itself
+					contains = hasCompare || rnative.test( docElem.contains ) ?
+						function( a, b ) {
+							var adown = a.nodeType === 9 ? a.documentElement : a,
+								bup = b && b.parentNode;
+							return a === bup || !!( bup && bup.nodeType === 1 && (
+								adown.contains ?
+									adown.contains( bup ) :
+									a.compareDocumentPosition && a.compareDocumentPosition( bup ) & 16
+							) );
+						} :
+						function( a, b ) {
+							if ( b ) {
+								while ( ( b = b.parentNode ) ) {
+									if ( b === a ) {
 										return true;
 									}
 								}
 							}
-						}
-					}
-					return false;
-				};
-		}
-
-		function elementMatcher( matchers ) {
-			return matchers.length > 1 ?
-				function( elem, context, xml ) {
-					var i = matchers.length;
-					while ( i-- ) {
-						if ( !matchers[ i ]( elem, context, xml ) ) {
 							return false;
-						}
-					}
-					return true;
-				} :
-				matchers[ 0 ];
-		}
+						};
 
-		function multipleContexts( selector, contexts, results ) {
-			var i = 0,
-				len = contexts.length;
-			for ( ; i < len; i++ ) {
-				Sizzle( selector, contexts[ i ], results );
-			}
-			return results;
-		}
+					/* Sorting
+					---------------------------------------------------------------------- */
 
-		function condense( unmatched, map, filter, context, xml ) {
-			var elem,
-				newUnmatched = [],
-				i = 0,
-				len = unmatched.length,
-				mapped = map != null;
+					// Document order sorting
+					sortOrder = hasCompare ?
+					function( a, b ) {
 
-			for ( ; i < len; i++ ) {
-				if ( ( elem = unmatched[ i ] ) ) {
-					if ( !filter || filter( elem, context, xml ) ) {
-						newUnmatched.push( elem );
-						if ( mapped ) {
-							map.push( i );
-						}
-					}
-				}
-			}
-
-			return newUnmatched;
-		}
-
-		function setMatcher( preFilter, selector, matcher, postFilter, postFinder, postSelector ) {
-			if ( postFilter && !postFilter[ expando ] ) {
-				postFilter = setMatcher( postFilter );
-			}
-			if ( postFinder && !postFinder[ expando ] ) {
-				postFinder = setMatcher( postFinder, postSelector );
-			}
-			return markFunction( function( seed, results, context, xml ) {
-				var temp, i, elem,
-					preMap = [],
-					postMap = [],
-					preexisting = results.length,
-
-					// Get initial elements from seed or context
-					elems = seed || multipleContexts(
-						selector || "*",
-						context.nodeType ? [ context ] : context,
-						[]
-					),
-
-					// Prefilter to get matcher input, preserving a map for seed-results synchronization
-					matcherIn = preFilter && ( seed || !selector ) ?
-						condense( elems, preMap, preFilter, context, xml ) :
-						elems,
-
-					matcherOut = matcher ?
-
-						// If we have a postFinder, or filtered seed, or non-seed postFilter or preexisting results,
-						postFinder || ( seed ? preFilter : preexisting || postFilter ) ?
-
-							// ...intermediate processing is necessary
-							[] :
-
-							// ...otherwise use results directly
-							results :
-						matcherIn;
-
-				// Find primary matches
-				if ( matcher ) {
-					matcher( matcherIn, matcherOut, context, xml );
-				}
-
-				// Apply postFilter
-				if ( postFilter ) {
-					temp = condense( matcherOut, postMap );
-					postFilter( temp, [], context, xml );
-
-					// Un-match failing elements by moving them back to matcherIn
-					i = temp.length;
-					while ( i-- ) {
-						if ( ( elem = temp[ i ] ) ) {
-							matcherOut[ postMap[ i ] ] = !( matcherIn[ postMap[ i ] ] = elem );
-						}
-					}
-				}
-
-				if ( seed ) {
-					if ( postFinder || preFilter ) {
-						if ( postFinder ) {
-
-							// Get the final matcherOut by condensing this intermediate into postFinder contexts
-							temp = [];
-							i = matcherOut.length;
-							while ( i-- ) {
-								if ( ( elem = matcherOut[ i ] ) ) {
-
-									// Restore matcherIn since elem is not yet a final match
-									temp.push( ( matcherIn[ i ] = elem ) );
-								}
-							}
-							postFinder( null, ( matcherOut = [] ), temp, xml );
+						// Flag for duplicate removal
+						if ( a === b ) {
+							hasDuplicate = true;
+							return 0;
 						}
 
-						// Move matched elements from seed to results to keep them synchronized
-						i = matcherOut.length;
-						while ( i-- ) {
-							if ( ( elem = matcherOut[ i ] ) &&
-								( temp = postFinder ? indexOf( seed, elem ) : preMap[ i ] ) > -1 ) {
-
-								seed[ temp ] = !( results[ temp ] = elem );
-							}
+						// Sort on method existence if only one input has compareDocumentPosition
+						var compare = !a.compareDocumentPosition - !b.compareDocumentPosition;
+						if ( compare ) {
+							return compare;
 						}
-					}
 
-				// Add elements to results, through postFinder if defined
-				} else {
-					matcherOut = condense(
-						matcherOut === results ?
-							matcherOut.splice( preexisting, matcherOut.length ) :
-							matcherOut
-					);
-					if ( postFinder ) {
-						postFinder( null, results, matcherOut, xml );
-					} else {
-						push.apply( results, matcherOut );
-					}
-				}
-			} );
-		}
-
-		function matcherFromTokens( tokens ) {
-			var checkContext, matcher, j,
-				len = tokens.length,
-				leadingRelative = Expr.relative[ tokens[ 0 ].type ],
-				implicitRelative = leadingRelative || Expr.relative[ " " ],
-				i = leadingRelative ? 1 : 0,
-
-				// The foundational matcher ensures that elements are reachable from top-level context(s)
-				matchContext = addCombinator( function( elem ) {
-					return elem === checkContext;
-				}, implicitRelative, true ),
-				matchAnyContext = addCombinator( function( elem ) {
-					return indexOf( checkContext, elem ) > -1;
-				}, implicitRelative, true ),
-				matchers = [ function( elem, context, xml ) {
-					var ret = ( !leadingRelative && ( xml || context !== outermostContext ) ) || (
-						( checkContext = context ).nodeType ?
-							matchContext( elem, context, xml ) :
-							matchAnyContext( elem, context, xml ) );
-
-					// Avoid hanging onto element (issue #299)
-					checkContext = null;
-					return ret;
-				} ];
-
-			for ( ; i < len; i++ ) {
-				if ( ( matcher = Expr.relative[ tokens[ i ].type ] ) ) {
-					matchers = [ addCombinator( elementMatcher( matchers ), matcher ) ];
-				} else {
-					matcher = Expr.filter[ tokens[ i ].type ].apply( null, tokens[ i ].matches );
-
-					// Return special upon seeing a positional matcher
-					if ( matcher[ expando ] ) {
-
-						// Find the next relative operator (if any) for proper handling
-						j = ++i;
-						for ( ; j < len; j++ ) {
-							if ( Expr.relative[ tokens[ j ].type ] ) {
-								break;
-							}
-						}
-						return setMatcher(
-							i > 1 && elementMatcher( matchers ),
-							i > 1 && toSelector(
-
-							// If the preceding token was a descendant combinator, insert an implicit any-element `*`
-							tokens
-								.slice( 0, i - 1 )
-								.concat( { value: tokens[ i - 2 ].type === " " ? "*" : "" } )
-							).replace( rtrim, "$1" ),
-							matcher,
-							i < j && matcherFromTokens( tokens.slice( i, j ) ),
-							j < len && matcherFromTokens( ( tokens = tokens.slice( j ) ) ),
-							j < len && toSelector( tokens )
-						);
-					}
-					matchers.push( matcher );
-				}
-			}
-
-			return elementMatcher( matchers );
-		}
-
-		function matcherFromGroupMatchers( elementMatchers, setMatchers ) {
-			var bySet = setMatchers.length > 0,
-				byElement = elementMatchers.length > 0,
-				superMatcher = function( seed, context, xml, results, outermost ) {
-					var elem, j, matcher,
-						matchedCount = 0,
-						i = "0",
-						unmatched = seed && [],
-						setMatched = [],
-						contextBackup = outermostContext,
-
-						// We must always have either seed elements or outermost context
-						elems = seed || byElement && Expr.find[ "TAG" ]( "*", outermost ),
-
-						// Use integer dirruns iff this is the outermost matcher
-						dirrunsUnique = ( dirruns += contextBackup == null ? 1 : Math.random() || 0.1 ),
-						len = elems.length;
-
-					if ( outermost ) {
-
+						// Calculate position if both inputs belong to the same document
 						// Support: IE 11+, Edge 17 - 18+
 						// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
 						// two documents; shallow comparisons work.
 						// eslint-disable-next-line eqeqeq
-						outermostContext = context == document || context || outermost;
-					}
+						compare = ( a.ownerDocument || a ) == ( b.ownerDocument || b ) ?
+							a.compareDocumentPosition( b ) :
 
-					// Add elements passing elementMatchers directly to results
-					// Support: IE<9, Safari
-					// Tolerate NodeList properties (IE: "length"; Safari: <number>) matching elements by id
-					for ( ; i !== len && ( elem = elems[ i ] ) != null; i++ ) {
-						if ( byElement && elem ) {
-							j = 0;
+							// Otherwise we know they are disconnected
+							1;
+
+						// Disconnected nodes
+						if ( compare & 1 ||
+							( !support.sortDetached && b.compareDocumentPosition( a ) === compare ) ) {
+
+							// Choose the first element that is related to our preferred document
+							// Support: IE 11+, Edge 17 - 18+
+							// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+							// two documents; shallow comparisons work.
+							// eslint-disable-next-line eqeqeq
+							if ( a == document || a.ownerDocument == preferredDoc &&
+								contains( preferredDoc, a ) ) {
+								return -1;
+							}
 
 							// Support: IE 11+, Edge 17 - 18+
 							// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
 							// two documents; shallow comparisons work.
 							// eslint-disable-next-line eqeqeq
-							if ( !context && elem.ownerDocument != document ) {
-								setDocument( elem );
-								xml = !documentIsHTML;
+							if ( b == document || b.ownerDocument == preferredDoc &&
+								contains( preferredDoc, b ) ) {
+								return 1;
 							}
-							while ( ( matcher = elementMatchers[ j++ ] ) ) {
-								if ( matcher( elem, context || document, xml ) ) {
-									results.push( elem );
-									break;
+
+							// Maintain original order
+							return sortInput ?
+								( indexOf( sortInput, a ) - indexOf( sortInput, b ) ) :
+								0;
+						}
+
+						return compare & 4 ? -1 : 1;
+					} :
+					function( a, b ) {
+
+						// Exit early if the nodes are identical
+						if ( a === b ) {
+							hasDuplicate = true;
+							return 0;
+						}
+
+						var cur,
+							i = 0,
+							aup = a.parentNode,
+							bup = b.parentNode,
+							ap = [ a ],
+							bp = [ b ];
+
+						// Parentless nodes are either documents or disconnected
+						if ( !aup || !bup ) {
+
+							// Support: IE 11+, Edge 17 - 18+
+							// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+							// two documents; shallow comparisons work.
+							/* eslint-disable eqeqeq */
+							return a == document ? -1 :
+								b == document ? 1 :
+								/* eslint-enable eqeqeq */
+								aup ? -1 :
+								bup ? 1 :
+								sortInput ?
+								( indexOf( sortInput, a ) - indexOf( sortInput, b ) ) :
+								0;
+
+						// If the nodes are siblings, we can do a quick check
+						} else if ( aup === bup ) {
+							return siblingCheck( a, b );
+						}
+
+						// Otherwise we need full lists of their ancestors for comparison
+						cur = a;
+						while ( ( cur = cur.parentNode ) ) {
+							ap.unshift( cur );
+						}
+						cur = b;
+						while ( ( cur = cur.parentNode ) ) {
+							bp.unshift( cur );
+						}
+
+						// Walk down the tree looking for a discrepancy
+						while ( ap[ i ] === bp[ i ] ) {
+							i++;
+						}
+
+						return i ?
+
+							// Do a sibling check if the nodes have a common ancestor
+							siblingCheck( ap[ i ], bp[ i ] ) :
+
+							// Otherwise nodes in our document sort first
+							// Support: IE 11+, Edge 17 - 18+
+							// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+							// two documents; shallow comparisons work.
+							/* eslint-disable eqeqeq */
+							ap[ i ] == preferredDoc ? -1 :
+							bp[ i ] == preferredDoc ? 1 :
+							/* eslint-enable eqeqeq */
+							0;
+					};
+
+					return document;
+				};
+
+				Sizzle.matches = function( expr, elements ) {
+					return Sizzle( expr, null, null, elements );
+				};
+
+				Sizzle.matchesSelector = function( elem, expr ) {
+					setDocument( elem );
+
+					if ( support.matchesSelector && documentIsHTML &&
+						!nonnativeSelectorCache[ expr + " " ] &&
+						( !rbuggyMatches || !rbuggyMatches.test( expr ) ) &&
+						( !rbuggyQSA     || !rbuggyQSA.test( expr ) ) ) {
+
+						try {
+							var ret = matches.call( elem, expr );
+
+							// IE 9's matchesSelector returns false on disconnected nodes
+							if ( ret || support.disconnectedMatch ||
+
+								// As well, disconnected nodes are said to be in a document
+								// fragment in IE 9
+								elem.document && elem.document.nodeType !== 11 ) {
+								return ret;
+							}
+						} catch ( e ) {
+							nonnativeSelectorCache( expr, true );
+						}
+					}
+
+					return Sizzle( expr, document, null, [ elem ] ).length > 0;
+				};
+
+				Sizzle.contains = function( context, elem ) {
+
+					// Set document vars if needed
+					// Support: IE 11+, Edge 17 - 18+
+					// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+					// two documents; shallow comparisons work.
+					// eslint-disable-next-line eqeqeq
+					if ( ( context.ownerDocument || context ) != document ) {
+						setDocument( context );
+					}
+					return contains( context, elem );
+				};
+
+				Sizzle.attr = function( elem, name ) {
+
+					// Set document vars if needed
+					// Support: IE 11+, Edge 17 - 18+
+					// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+					// two documents; shallow comparisons work.
+					// eslint-disable-next-line eqeqeq
+					if ( ( elem.ownerDocument || elem ) != document ) {
+						setDocument( elem );
+					}
+
+					var fn = Expr.attrHandle[ name.toLowerCase() ],
+
+						// Don't get fooled by Object.prototype properties (jQuery #13807)
+						val = fn && hasOwn.call( Expr.attrHandle, name.toLowerCase() ) ?
+							fn( elem, name, !documentIsHTML ) :
+							undefined;
+
+					return val !== undefined ?
+						val :
+						support.attributes || !documentIsHTML ?
+							elem.getAttribute( name ) :
+							( val = elem.getAttributeNode( name ) ) && val.specified ?
+								val.value :
+								null;
+				};
+
+				Sizzle.escape = function( sel ) {
+					return ( sel + "" ).replace( rcssescape, fcssescape );
+				};
+
+				Sizzle.error = function( msg ) {
+					throw new Error( "Syntax error, unrecognized expression: " + msg );
+				};
+
+				/**
+				* Document sorting and removing duplicates
+				* @param {ArrayLike} results
+				*/
+				Sizzle.uniqueSort = function( results ) {
+					var elem,
+						duplicates = [],
+						j = 0,
+						i = 0;
+
+					// Unless we *know* we can detect duplicates, assume their presence
+					hasDuplicate = !support.detectDuplicates;
+					sortInput = !support.sortStable && results.slice( 0 );
+					results.sort( sortOrder );
+
+					if ( hasDuplicate ) {
+						while ( ( elem = results[ i++ ] ) ) {
+							if ( elem === results[ i ] ) {
+								j = duplicates.push( i );
+							}
+						}
+						while ( j-- ) {
+							results.splice( duplicates[ j ], 1 );
+						}
+					}
+
+					// Clear input after sorting to release objects
+					// See https://github.com/jquery/sizzle/pull/225
+					sortInput = null;
+
+					return results;
+				};
+
+				/**
+				* Utility function for retrieving the text value of an array of DOM nodes
+				* @param {Array|Element} elem
+				*/
+				getText = Sizzle.getText = function( elem ) {
+					var node,
+						ret = "",
+						i = 0,
+						nodeType = elem.nodeType;
+
+					if ( !nodeType ) {
+
+						// If no nodeType, this is expected to be an array
+						while ( ( node = elem[ i++ ] ) ) {
+
+							// Do not traverse comment nodes
+							ret += getText( node );
+						}
+					} else if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
+
+						// Use textContent for elements
+						// innerText usage removed for consistency of new lines (jQuery #11153)
+						if ( typeof elem.textContent === "string" ) {
+							return elem.textContent;
+						} else {
+
+							// Traverse its children
+							for ( elem = elem.firstChild; elem; elem = elem.nextSibling ) {
+								ret += getText( elem );
+							}
+						}
+					} else if ( nodeType === 3 || nodeType === 4 ) {
+						return elem.nodeValue;
+					}
+
+					// Do not include comment or processing instruction nodes
+
+					return ret;
+				};
+
+				Expr = Sizzle.selectors = {
+
+					// Can be adjusted by the user
+					cacheLength: 50,
+
+					createPseudo: markFunction,
+
+					match: matchExpr,
+
+					attrHandle: {},
+
+					find: {},
+
+					relative: {
+						">": { dir: "parentNode", first: true },
+						" ": { dir: "parentNode" },
+						"+": { dir: "previousSibling", first: true },
+						"~": { dir: "previousSibling" }
+					},
+
+					preFilter: {
+						"ATTR": function( match ) {
+							match[ 1 ] = match[ 1 ].replace( runescape, funescape );
+
+							// Move the given value to match[3] whether quoted or unquoted
+							match[ 3 ] = ( match[ 3 ] || match[ 4 ] ||
+								match[ 5 ] || "" ).replace( runescape, funescape );
+
+							if ( match[ 2 ] === "~=" ) {
+								match[ 3 ] = " " + match[ 3 ] + " ";
+							}
+
+							return match.slice( 0, 4 );
+						},
+
+						"CHILD": function( match ) {
+
+							/* matches from matchExpr["CHILD"]
+								1 type (only|nth|...)
+								2 what (child|of-type)
+								3 argument (even|odd|\d*|\d*n([+-]\d+)?|...)
+								4 xn-component of xn+y argument ([+-]?\d*n|)
+								5 sign of xn-component
+								6 x of xn-component
+								7 sign of y-component
+								8 y of y-component
+							*/
+							match[ 1 ] = match[ 1 ].toLowerCase();
+
+							if ( match[ 1 ].slice( 0, 3 ) === "nth" ) {
+
+								// nth-* requires argument
+								if ( !match[ 3 ] ) {
+									Sizzle.error( match[ 0 ] );
+								}
+
+								// numeric x and y parameters for Expr.filter.CHILD
+								// remember that false/true cast respectively to 0/1
+								match[ 4 ] = +( match[ 4 ] ?
+									match[ 5 ] + ( match[ 6 ] || 1 ) :
+									2 * ( match[ 3 ] === "even" || match[ 3 ] === "odd" ) );
+								match[ 5 ] = +( ( match[ 7 ] + match[ 8 ] ) || match[ 3 ] === "odd" );
+
+								// other types prohibit arguments
+							} else if ( match[ 3 ] ) {
+								Sizzle.error( match[ 0 ] );
+							}
+
+							return match;
+						},
+
+						"PSEUDO": function( match ) {
+							var excess,
+								unquoted = !match[ 6 ] && match[ 2 ];
+
+							if ( matchExpr[ "CHILD" ].test( match[ 0 ] ) ) {
+								return null;
+							}
+
+							// Accept quoted arguments as-is
+							if ( match[ 3 ] ) {
+								match[ 2 ] = match[ 4 ] || match[ 5 ] || "";
+
+							// Strip excess characters from unquoted arguments
+							} else if ( unquoted && rpseudo.test( unquoted ) &&
+
+								// Get excess from tokenize (recursively)
+								( excess = tokenize( unquoted, true ) ) &&
+
+								// advance to the next closing parenthesis
+								( excess = unquoted.indexOf( ")", unquoted.length - excess ) - unquoted.length ) ) {
+
+								// excess is a negative index
+								match[ 0 ] = match[ 0 ].slice( 0, excess );
+								match[ 2 ] = unquoted.slice( 0, excess );
+							}
+
+							// Return only captures needed by the pseudo filter method (type and argument)
+							return match.slice( 0, 3 );
+						}
+					},
+
+					filter: {
+
+						"TAG": function( nodeNameSelector ) {
+							var nodeName = nodeNameSelector.replace( runescape, funescape ).toLowerCase();
+							return nodeNameSelector === "*" ?
+								function() {
+									return true;
+								} :
+								function( elem ) {
+									return elem.nodeName && elem.nodeName.toLowerCase() === nodeName;
+								};
+						},
+
+						"CLASS": function( className ) {
+							var pattern = classCache[ className + " " ];
+
+							return pattern ||
+								( pattern = new RegExp( "(^|" + whitespace +
+									")" + className + "(" + whitespace + "|$)" ) ) && classCache(
+										className, function( elem ) {
+											return pattern.test(
+												typeof elem.className === "string" && elem.className ||
+												typeof elem.getAttribute !== "undefined" &&
+													elem.getAttribute( "class" ) ||
+												""
+											);
+								} );
+						},
+
+						"ATTR": function( name, operator, check ) {
+							return function( elem ) {
+								var result = Sizzle.attr( elem, name );
+
+								if ( result == null ) {
+									return operator === "!=";
+								}
+								if ( !operator ) {
+									return true;
+								}
+
+								result += "";
+
+								/* eslint-disable max-len */
+
+								return operator === "=" ? result === check :
+									operator === "!=" ? result !== check :
+									operator === "^=" ? check && result.indexOf( check ) === 0 :
+									operator === "*=" ? check && result.indexOf( check ) > -1 :
+									operator === "$=" ? check && result.slice( -check.length ) === check :
+									operator === "~=" ? ( " " + result.replace( rwhitespace, " " ) + " " ).indexOf( check ) > -1 :
+									operator === "|=" ? result === check || result.slice( 0, check.length + 1 ) === check + "-" :
+									false;
+								/* eslint-enable max-len */
+
+							};
+						},
+
+						"CHILD": function( type, what, _argument, first, last ) {
+							var simple = type.slice( 0, 3 ) !== "nth",
+								forward = type.slice( -4 ) !== "last",
+								ofType = what === "of-type";
+
+							return first === 1 && last === 0 ?
+
+								// Shortcut for :nth-*(n)
+								function( elem ) {
+									return !!elem.parentNode;
+								} :
+
+								function( elem, _context, xml ) {
+									var cache, uniqueCache, outerCache, node, nodeIndex, start,
+										dir = simple !== forward ? "nextSibling" : "previousSibling",
+										parent = elem.parentNode,
+										name = ofType && elem.nodeName.toLowerCase(),
+										useCache = !xml && !ofType,
+										diff = false;
+
+									if ( parent ) {
+
+										// :(first|last|only)-(child|of-type)
+										if ( simple ) {
+											while ( dir ) {
+												node = elem;
+												while ( ( node = node[ dir ] ) ) {
+													if ( ofType ?
+														node.nodeName.toLowerCase() === name :
+														node.nodeType === 1 ) {
+
+														return false;
+													}
+												}
+
+												// Reverse direction for :only-* (if we haven't yet done so)
+												start = dir = type === "only" && !start && "nextSibling";
+											}
+											return true;
+										}
+
+										start = [ forward ? parent.firstChild : parent.lastChild ];
+
+										// non-xml :nth-child(...) stores cache data on `parent`
+										if ( forward && useCache ) {
+
+											// Seek `elem` from a previously-cached index
+
+											// ...in a gzip-friendly way
+											node = parent;
+											outerCache = node[ expando ] || ( node[ expando ] = {} );
+
+											// Support: IE <9 only
+											// Defend against cloned attroperties (jQuery gh-1709)
+											uniqueCache = outerCache[ node.uniqueID ] ||
+												( outerCache[ node.uniqueID ] = {} );
+
+											cache = uniqueCache[ type ] || [];
+											nodeIndex = cache[ 0 ] === dirruns && cache[ 1 ];
+											diff = nodeIndex && cache[ 2 ];
+											node = nodeIndex && parent.childNodes[ nodeIndex ];
+
+											while ( ( node = ++nodeIndex && node && node[ dir ] ||
+
+												// Fallback to seeking `elem` from the start
+												( diff = nodeIndex = 0 ) || start.pop() ) ) {
+
+												// When found, cache indexes on `parent` and break
+												if ( node.nodeType === 1 && ++diff && node === elem ) {
+													uniqueCache[ type ] = [ dirruns, nodeIndex, diff ];
+													break;
+												}
+											}
+
+										} else {
+
+											// Use previously-cached element index if available
+											if ( useCache ) {
+
+												// ...in a gzip-friendly way
+												node = elem;
+												outerCache = node[ expando ] || ( node[ expando ] = {} );
+
+												// Support: IE <9 only
+												// Defend against cloned attroperties (jQuery gh-1709)
+												uniqueCache = outerCache[ node.uniqueID ] ||
+													( outerCache[ node.uniqueID ] = {} );
+
+												cache = uniqueCache[ type ] || [];
+												nodeIndex = cache[ 0 ] === dirruns && cache[ 1 ];
+												diff = nodeIndex;
+											}
+
+											// xml :nth-child(...)
+											// or :nth-last-child(...) or :nth(-last)?-of-type(...)
+											if ( diff === false ) {
+
+												// Use the same loop as above to seek `elem` from the start
+												while ( ( node = ++nodeIndex && node && node[ dir ] ||
+													( diff = nodeIndex = 0 ) || start.pop() ) ) {
+
+													if ( ( ofType ?
+														node.nodeName.toLowerCase() === name :
+														node.nodeType === 1 ) &&
+														++diff ) {
+
+														// Cache the index of each encountered element
+														if ( useCache ) {
+															outerCache = node[ expando ] ||
+																( node[ expando ] = {} );
+
+															// Support: IE <9 only
+															// Defend against cloned attroperties (jQuery gh-1709)
+															uniqueCache = outerCache[ node.uniqueID ] ||
+																( outerCache[ node.uniqueID ] = {} );
+
+															uniqueCache[ type ] = [ dirruns, diff ];
+														}
+
+														if ( node === elem ) {
+															break;
+														}
+													}
+												}
+											}
+										}
+
+										// Incorporate the offset, then check against cycle size
+										diff -= last;
+										return diff === first || ( diff % first === 0 && diff / first >= 0 );
+									}
+								};
+						},
+
+						"PSEUDO": function( pseudo, argument ) {
+
+							// pseudo-class names are case-insensitive
+							// http://www.w3.org/TR/selectors/#pseudo-classes
+							// Prioritize by case sensitivity in case custom pseudos are added with uppercase letters
+							// Remember that setFilters inherits from pseudos
+							var args,
+								fn = Expr.pseudos[ pseudo ] || Expr.setFilters[ pseudo.toLowerCase() ] ||
+									Sizzle.error( "unsupported pseudo: " + pseudo );
+
+							// The user may use createPseudo to indicate that
+							// arguments are needed to create the filter function
+							// just as Sizzle does
+							if ( fn[ expando ] ) {
+								return fn( argument );
+							}
+
+							// But maintain support for old signatures
+							if ( fn.length > 1 ) {
+								args = [ pseudo, pseudo, "", argument ];
+								return Expr.setFilters.hasOwnProperty( pseudo.toLowerCase() ) ?
+									markFunction( function( seed, matches ) {
+										var idx,
+											matched = fn( seed, argument ),
+											i = matched.length;
+										while ( i-- ) {
+											idx = indexOf( seed, matched[ i ] );
+											seed[ idx ] = !( matches[ idx ] = matched[ i ] );
+										}
+									} ) :
+									function( elem ) {
+										return fn( elem, 0, args );
+									};
+							}
+
+							return fn;
+						}
+					},
+
+					pseudos: {
+
+						// Potentially complex pseudos
+						"not": markFunction( function( selector ) {
+
+							// Trim the selector passed to compile
+							// to avoid treating leading and trailing
+							// spaces as combinators
+							var input = [],
+								results = [],
+								matcher = compile( selector.replace( rtrim, "$1" ) );
+
+							return matcher[ expando ] ?
+								markFunction( function( seed, matches, _context, xml ) {
+									var elem,
+										unmatched = matcher( seed, null, xml, [] ),
+										i = seed.length;
+
+									// Match elements unmatched by `matcher`
+									while ( i-- ) {
+										if ( ( elem = unmatched[ i ] ) ) {
+											seed[ i ] = !( matches[ i ] = elem );
+										}
+									}
+								} ) :
+								function( elem, _context, xml ) {
+									input[ 0 ] = elem;
+									matcher( input, null, xml, results );
+
+									// Don't keep the element (issue #299)
+									input[ 0 ] = null;
+									return !results.pop();
+								};
+						} ),
+
+						"has": markFunction( function( selector ) {
+							return function( elem ) {
+								return Sizzle( selector, elem ).length > 0;
+							};
+						} ),
+
+						"contains": markFunction( function( text ) {
+							text = text.replace( runescape, funescape );
+							return function( elem ) {
+								return ( elem.textContent || getText( elem ) ).indexOf( text ) > -1;
+							};
+						} ),
+
+						// "Whether an element is represented by a :lang() selector
+						// is based solely on the element's language value
+						// being equal to the identifier C,
+						// or beginning with the identifier C immediately followed by "-".
+						// The matching of C against the element's language value is performed case-insensitively.
+						// The identifier C does not have to be a valid language name."
+						// http://www.w3.org/TR/selectors/#lang-pseudo
+						"lang": markFunction( function( lang ) {
+
+							// lang value must be a valid identifier
+							if ( !ridentifier.test( lang || "" ) ) {
+								Sizzle.error( "unsupported lang: " + lang );
+							}
+							lang = lang.replace( runescape, funescape ).toLowerCase();
+							return function( elem ) {
+								var elemLang;
+								do {
+									if ( ( elemLang = documentIsHTML ?
+										elem.lang :
+										elem.getAttribute( "xml:lang" ) || elem.getAttribute( "lang" ) ) ) {
+
+										elemLang = elemLang.toLowerCase();
+										return elemLang === lang || elemLang.indexOf( lang + "-" ) === 0;
+									}
+								} while ( ( elem = elem.parentNode ) && elem.nodeType === 1 );
+								return false;
+							};
+						} ),
+
+						// Miscellaneous
+						"target": function( elem ) {
+							var hash = window.location && window.location.hash;
+							return hash && hash.slice( 1 ) === elem.id;
+						},
+
+						"root": function( elem ) {
+							return elem === docElem;
+						},
+
+						"focus": function( elem ) {
+							return elem === document.activeElement &&
+								( !document.hasFocus || document.hasFocus() ) &&
+								!!( elem.type || elem.href || ~elem.tabIndex );
+						},
+
+						// Boolean properties
+						"enabled": createDisabledPseudo( false ),
+						"disabled": createDisabledPseudo( true ),
+
+						"checked": function( elem ) {
+
+							// In CSS3, :checked should return both checked and selected elements
+							// http://www.w3.org/TR/2011/REC-css3-selectors-20110929/#checked
+							var nodeName = elem.nodeName.toLowerCase();
+							return ( nodeName === "input" && !!elem.checked ) ||
+								( nodeName === "option" && !!elem.selected );
+						},
+
+						"selected": function( elem ) {
+
+							// Accessing this property makes selected-by-default
+							// options in Safari work properly
+							if ( elem.parentNode ) {
+								// eslint-disable-next-line no-unused-expressions
+								elem.parentNode.selectedIndex;
+							}
+
+							return elem.selected === true;
+						},
+
+						// Contents
+						"empty": function( elem ) {
+
+							// http://www.w3.org/TR/selectors/#empty-pseudo
+							// :empty is negated by element (1) or content nodes (text: 3; cdata: 4; entity ref: 5),
+							//   but not by others (comment: 8; processing instruction: 7; etc.)
+							// nodeType < 6 works because attributes (2) do not appear as children
+							for ( elem = elem.firstChild; elem; elem = elem.nextSibling ) {
+								if ( elem.nodeType < 6 ) {
+									return false;
 								}
 							}
-							if ( outermost ) {
-								dirruns = dirrunsUnique;
+							return true;
+						},
+
+						"parent": function( elem ) {
+							return !Expr.pseudos[ "empty" ]( elem );
+						},
+
+						// Element/input types
+						"header": function( elem ) {
+							return rheader.test( elem.nodeName );
+						},
+
+						"input": function( elem ) {
+							return rinputs.test( elem.nodeName );
+						},
+
+						"button": function( elem ) {
+							var name = elem.nodeName.toLowerCase();
+							return name === "input" && elem.type === "button" || name === "button";
+						},
+
+						"text": function( elem ) {
+							var attr;
+							return elem.nodeName.toLowerCase() === "input" &&
+								elem.type === "text" &&
+
+								// Support: IE<8
+								// New HTML5 attribute values (e.g., "search") appear with elem.type === "text"
+								( ( attr = elem.getAttribute( "type" ) ) == null ||
+									attr.toLowerCase() === "text" );
+						},
+
+						// Position-in-collection
+						"first": createPositionalPseudo( function() {
+							return [ 0 ];
+						} ),
+
+						"last": createPositionalPseudo( function( _matchIndexes, length ) {
+							return [ length - 1 ];
+						} ),
+
+						"eq": createPositionalPseudo( function( _matchIndexes, length, argument ) {
+							return [ argument < 0 ? argument + length : argument ];
+						} ),
+
+						"even": createPositionalPseudo( function( matchIndexes, length ) {
+							var i = 0;
+							for ( ; i < length; i += 2 ) {
+								matchIndexes.push( i );
+							}
+							return matchIndexes;
+						} ),
+
+						"odd": createPositionalPseudo( function( matchIndexes, length ) {
+							var i = 1;
+							for ( ; i < length; i += 2 ) {
+								matchIndexes.push( i );
+							}
+							return matchIndexes;
+						} ),
+
+						"lt": createPositionalPseudo( function( matchIndexes, length, argument ) {
+							var i = argument < 0 ?
+								argument + length :
+								argument > length ?
+									length :
+									argument;
+							for ( ; --i >= 0; ) {
+								matchIndexes.push( i );
+							}
+							return matchIndexes;
+						} ),
+
+						"gt": createPositionalPseudo( function( matchIndexes, length, argument ) {
+							var i = argument < 0 ? argument + length : argument;
+							for ( ; ++i < length; ) {
+								matchIndexes.push( i );
+							}
+							return matchIndexes;
+						} )
+					}
+				};
+
+				Expr.pseudos[ "nth" ] = Expr.pseudos[ "eq" ];
+
+				// Add button/input type pseudos
+				for ( i in { radio: true, checkbox: true, file: true, password: true, image: true } ) {
+					Expr.pseudos[ i ] = createInputPseudo( i );
+				}
+				for ( i in { submit: true, reset: true } ) {
+					Expr.pseudos[ i ] = createButtonPseudo( i );
+				}
+
+				// Easy API for creating new setFilters
+				function setFilters() {}
+				setFilters.prototype = Expr.filters = Expr.pseudos;
+				Expr.setFilters = new setFilters();
+
+				tokenize = Sizzle.tokenize = function( selector, parseOnly ) {
+					var matched, match, tokens, type,
+						soFar, groups, preFilters,
+						cached = tokenCache[ selector + " " ];
+
+					if ( cached ) {
+						return parseOnly ? 0 : cached.slice( 0 );
+					}
+
+					soFar = selector;
+					groups = [];
+					preFilters = Expr.preFilter;
+
+					while ( soFar ) {
+
+						// Comma and first run
+						if ( !matched || ( match = rcomma.exec( soFar ) ) ) {
+							if ( match ) {
+
+								// Don't consume trailing commas as valid
+								soFar = soFar.slice( match[ 0 ].length ) || soFar;
+							}
+							groups.push( ( tokens = [] ) );
+						}
+
+						matched = false;
+
+						// Combinators
+						if ( ( match = rcombinators.exec( soFar ) ) ) {
+							matched = match.shift();
+							tokens.push( {
+								value: matched,
+
+								// Cast descendant combinators to space
+								type: match[ 0 ].replace( rtrim, " " )
+							} );
+							soFar = soFar.slice( matched.length );
+						}
+
+						// Filters
+						for ( type in Expr.filter ) {
+							if ( ( match = matchExpr[ type ].exec( soFar ) ) && ( !preFilters[ type ] ||
+								( match = preFilters[ type ]( match ) ) ) ) {
+								matched = match.shift();
+								tokens.push( {
+									value: matched,
+									type: type,
+									matches: match
+								} );
+								soFar = soFar.slice( matched.length );
 							}
 						}
 
-						// Track unmatched elements for set filters
-						if ( bySet ) {
+						if ( !matched ) {
+							break;
+						}
+					}
 
-							// They will have gone through all possible matchers
-							if ( ( elem = !matcher && elem ) ) {
-								matchedCount--;
+					// Return the length of the invalid excess
+					// if we're just parsing
+					// Otherwise, throw an error or return tokens
+					return parseOnly ?
+						soFar.length :
+						soFar ?
+							Sizzle.error( selector ) :
+
+							// Cache the tokens
+							tokenCache( selector, groups ).slice( 0 );
+				};
+
+				function toSelector( tokens ) {
+					var i = 0,
+						len = tokens.length,
+						selector = "";
+					for ( ; i < len; i++ ) {
+						selector += tokens[ i ].value;
+					}
+					return selector;
+				}
+
+				function addCombinator( matcher, combinator, base ) {
+					var dir = combinator.dir,
+						skip = combinator.next,
+						key = skip || dir,
+						checkNonElements = base && key === "parentNode",
+						doneName = done++;
+
+					return combinator.first ?
+
+						// Check against closest ancestor/preceding element
+						function( elem, context, xml ) {
+							while ( ( elem = elem[ dir ] ) ) {
+								if ( elem.nodeType === 1 || checkNonElements ) {
+									return matcher( elem, context, xml );
+								}
 							}
+							return false;
+						} :
 
-							// Lengthen the array for every element, matched or not
-							if ( seed ) {
-								unmatched.push( elem );
+						// Check against all ancestor/preceding elements
+						function( elem, context, xml ) {
+							var oldCache, uniqueCache, outerCache,
+								newCache = [ dirruns, doneName ];
+
+							// We can't set arbitrary data on XML nodes, so they don't benefit from combinator caching
+							if ( xml ) {
+								while ( ( elem = elem[ dir ] ) ) {
+									if ( elem.nodeType === 1 || checkNonElements ) {
+										if ( matcher( elem, context, xml ) ) {
+											return true;
+										}
+									}
+								}
+							} else {
+								while ( ( elem = elem[ dir ] ) ) {
+									if ( elem.nodeType === 1 || checkNonElements ) {
+										outerCache = elem[ expando ] || ( elem[ expando ] = {} );
+
+										// Support: IE <9 only
+										// Defend against cloned attroperties (jQuery gh-1709)
+										uniqueCache = outerCache[ elem.uniqueID ] ||
+											( outerCache[ elem.uniqueID ] = {} );
+
+										if ( skip && skip === elem.nodeName.toLowerCase() ) {
+											elem = elem[ dir ] || elem;
+										} else if ( ( oldCache = uniqueCache[ key ] ) &&
+											oldCache[ 0 ] === dirruns && oldCache[ 1 ] === doneName ) {
+
+											// Assign to newCache so results back-propagate to previous elements
+											return ( newCache[ 2 ] = oldCache[ 2 ] );
+										} else {
+
+											// Reuse newcache so results back-propagate to previous elements
+											uniqueCache[ key ] = newCache;
+
+											// A match means we're done; a fail means we have to keep checking
+											if ( ( newCache[ 2 ] = matcher( elem, context, xml ) ) ) {
+												return true;
+											}
+										}
+									}
+								}
+							}
+							return false;
+						};
+				}
+
+				function elementMatcher( matchers ) {
+					return matchers.length > 1 ?
+						function( elem, context, xml ) {
+							var i = matchers.length;
+							while ( i-- ) {
+								if ( !matchers[ i ]( elem, context, xml ) ) {
+									return false;
+								}
+							}
+							return true;
+						} :
+						matchers[ 0 ];
+				}
+
+				function multipleContexts( selector, contexts, results ) {
+					var i = 0,
+						len = contexts.length;
+					for ( ; i < len; i++ ) {
+						Sizzle( selector, contexts[ i ], results );
+					}
+					return results;
+				}
+
+				function condense( unmatched, map, filter, context, xml ) {
+					var elem,
+						newUnmatched = [],
+						i = 0,
+						len = unmatched.length,
+						mapped = map != null;
+
+					for ( ; i < len; i++ ) {
+						if ( ( elem = unmatched[ i ] ) ) {
+							if ( !filter || filter( elem, context, xml ) ) {
+								newUnmatched.push( elem );
+								if ( mapped ) {
+									map.push( i );
+								}
 							}
 						}
 					}
 
-					// `i` is now the count of elements visited above, and adding it to `matchedCount`
-					// makes the latter nonnegative.
-					matchedCount += i;
+					return newUnmatched;
+				}
 
-					// Apply set filters to unmatched elements
-					// NOTE: This can be skipped if there are no unmatched elements (i.e., `matchedCount`
-					// equals `i`), unless we didn't visit _any_ elements in the above loop because we have
-					// no element matchers and no seed.
-					// Incrementing an initially-string "0" `i` allows `i` to remain a string only in that
-					// case, which will result in a "00" `matchedCount` that differs from `i` but is also
-					// numerically zero.
-					if ( bySet && i !== matchedCount ) {
-						j = 0;
-						while ( ( matcher = setMatchers[ j++ ] ) ) {
-							matcher( unmatched, setMatched, context, xml );
+				function setMatcher( preFilter, selector, matcher, postFilter, postFinder, postSelector ) {
+					if ( postFilter && !postFilter[ expando ] ) {
+						postFilter = setMatcher( postFilter );
+					}
+					if ( postFinder && !postFinder[ expando ] ) {
+						postFinder = setMatcher( postFinder, postSelector );
+					}
+					return markFunction( function( seed, results, context, xml ) {
+						var temp, i, elem,
+							preMap = [],
+							postMap = [],
+							preexisting = results.length,
+
+							// Get initial elements from seed or context
+							elems = seed || multipleContexts(
+								selector || "*",
+								context.nodeType ? [ context ] : context,
+								[]
+							),
+
+							// Prefilter to get matcher input, preserving a map for seed-results synchronization
+							matcherIn = preFilter && ( seed || !selector ) ?
+								condense( elems, preMap, preFilter, context, xml ) :
+								elems,
+
+							matcherOut = matcher ?
+
+								// If we have a postFinder, or filtered seed, or non-seed postFilter or preexisting results,
+								postFinder || ( seed ? preFilter : preexisting || postFilter ) ?
+
+									// ...intermediate processing is necessary
+									[] :
+
+									// ...otherwise use results directly
+									results :
+								matcherIn;
+
+						// Find primary matches
+						if ( matcher ) {
+							matcher( matcherIn, matcherOut, context, xml );
+						}
+
+						// Apply postFilter
+						if ( postFilter ) {
+							temp = condense( matcherOut, postMap );
+							postFilter( temp, [], context, xml );
+
+							// Un-match failing elements by moving them back to matcherIn
+							i = temp.length;
+							while ( i-- ) {
+								if ( ( elem = temp[ i ] ) ) {
+									matcherOut[ postMap[ i ] ] = !( matcherIn[ postMap[ i ] ] = elem );
+								}
+							}
 						}
 
 						if ( seed ) {
+							if ( postFinder || preFilter ) {
+								if ( postFinder ) {
 
-							// Reintegrate element matches to eliminate the need for sorting
-							if ( matchedCount > 0 ) {
+									// Get the final matcherOut by condensing this intermediate into postFinder contexts
+									temp = [];
+									i = matcherOut.length;
+									while ( i-- ) {
+										if ( ( elem = matcherOut[ i ] ) ) {
+
+											// Restore matcherIn since elem is not yet a final match
+											temp.push( ( matcherIn[ i ] = elem ) );
+										}
+									}
+									postFinder( null, ( matcherOut = [] ), temp, xml );
+								}
+
+								// Move matched elements from seed to results to keep them synchronized
+								i = matcherOut.length;
 								while ( i-- ) {
-									if ( !( unmatched[ i ] || setMatched[ i ] ) ) {
-										setMatched[ i ] = pop.call( results );
+									if ( ( elem = matcherOut[ i ] ) &&
+										( temp = postFinder ? indexOf( seed, elem ) : preMap[ i ] ) > -1 ) {
+
+										seed[ temp ] = !( results[ temp ] = elem );
 									}
 								}
 							}
 
-							// Discard index placeholder values to get only actual matches
-							setMatched = condense( setMatched );
+						// Add elements to results, through postFinder if defined
+						} else {
+							matcherOut = condense(
+								matcherOut === results ?
+									matcherOut.splice( preexisting, matcherOut.length ) :
+									matcherOut
+							);
+							if ( postFinder ) {
+								postFinder( null, results, matcherOut, xml );
+							} else {
+								push.apply( results, matcherOut );
+							}
 						}
+					} );
+				}
 
-						// Add matches to results
-						push.apply( results, setMatched );
+				function matcherFromTokens( tokens ) {
+					var checkContext, matcher, j,
+						len = tokens.length,
+						leadingRelative = Expr.relative[ tokens[ 0 ].type ],
+						implicitRelative = leadingRelative || Expr.relative[ " " ],
+						i = leadingRelative ? 1 : 0,
 
-						// Seedless set matches succeeding multiple successful matchers stipulate sorting
-						if ( outermost && !seed && setMatched.length > 0 &&
-							( matchedCount + setMatchers.length ) > 1 ) {
+						// The foundational matcher ensures that elements are reachable from top-level context(s)
+						matchContext = addCombinator( function( elem ) {
+							return elem === checkContext;
+						}, implicitRelative, true ),
+						matchAnyContext = addCombinator( function( elem ) {
+							return indexOf( checkContext, elem ) > -1;
+						}, implicitRelative, true ),
+						matchers = [ function( elem, context, xml ) {
+							var ret = ( !leadingRelative && ( xml || context !== outermostContext ) ) || (
+								( checkContext = context ).nodeType ?
+									matchContext( elem, context, xml ) :
+									matchAnyContext( elem, context, xml ) );
 
-							Sizzle.uniqueSort( results );
+							// Avoid hanging onto element (issue #299)
+							checkContext = null;
+							return ret;
+						} ];
+
+					for ( ; i < len; i++ ) {
+						if ( ( matcher = Expr.relative[ tokens[ i ].type ] ) ) {
+							matchers = [ addCombinator( elementMatcher( matchers ), matcher ) ];
+						} else {
+							matcher = Expr.filter[ tokens[ i ].type ].apply( null, tokens[ i ].matches );
+
+							// Return special upon seeing a positional matcher
+							if ( matcher[ expando ] ) {
+
+								// Find the next relative operator (if any) for proper handling
+								j = ++i;
+								for ( ; j < len; j++ ) {
+									if ( Expr.relative[ tokens[ j ].type ] ) {
+										break;
+									}
+								}
+								return setMatcher(
+									i > 1 && elementMatcher( matchers ),
+									i > 1 && toSelector(
+
+									// If the preceding token was a descendant combinator, insert an implicit any-element `*`
+									tokens
+										.slice( 0, i - 1 )
+										.concat( { value: tokens[ i - 2 ].type === " " ? "*" : "" } )
+									).replace( rtrim, "$1" ),
+									matcher,
+									i < j && matcherFromTokens( tokens.slice( i, j ) ),
+									j < len && matcherFromTokens( ( tokens = tokens.slice( j ) ) ),
+									j < len && toSelector( tokens )
+								);
+							}
+							matchers.push( matcher );
 						}
 					}
 
-					// Override manipulation of globals by nested matchers
-					if ( outermost ) {
-						dirruns = dirrunsUnique;
-						outermostContext = contextBackup;
-					}
-
-					return unmatched;
-				};
-
-			return bySet ?
-				markFunction( superMatcher ) :
-				superMatcher;
-		}
-
-		compile = Sizzle.compile = function( selector, match /* Internal Use Only */ ) {
-			var i,
-				setMatchers = [],
-				elementMatchers = [],
-				cached = compilerCache[ selector + " " ];
-
-			if ( !cached ) {
-
-				// Generate a function of recursive functions that can be used to check each element
-				if ( !match ) {
-					match = tokenize( selector );
-				}
-				i = match.length;
-				while ( i-- ) {
-					cached = matcherFromTokens( match[ i ] );
-					if ( cached[ expando ] ) {
-						setMatchers.push( cached );
-					} else {
-						elementMatchers.push( cached );
-					}
+					return elementMatcher( matchers );
 				}
 
-				// Cache the compiled function
-				cached = compilerCache(
-					selector,
-					matcherFromGroupMatchers( elementMatchers, setMatchers )
-				);
+				function matcherFromGroupMatchers( elementMatchers, setMatchers ) {
+					var bySet = setMatchers.length > 0,
+						byElement = elementMatchers.length > 0,
+						superMatcher = function( seed, context, xml, results, outermost ) {
+							var elem, j, matcher,
+								matchedCount = 0,
+								i = "0",
+								unmatched = seed && [],
+								setMatched = [],
+								contextBackup = outermostContext,
 
-				// Save selector and tokenization
-				cached.selector = selector;
-			}
-			return cached;
-		};
+								// We must always have either seed elements or outermost context
+								elems = seed || byElement && Expr.find[ "TAG" ]( "*", outermost ),
 
-		/**
-		* A low-level selection function that works with Sizzle's compiled
-		*  selector functions
-		* @param {String|Function} selector A selector or a pre-compiled
-		*  selector function built with Sizzle.compile
-		* @param {Element} context
-		* @param {Array} [results]
-		* @param {Array} [seed] A set of elements to match against
-		*/
-		select = Sizzle.select = function( selector, context, results, seed ) {
-			var i, tokens, token, type, find,
-				compiled = typeof selector === "function" && selector,
-				match = !seed && tokenize( ( selector = compiled.selector || selector ) );
+								// Use integer dirruns iff this is the outermost matcher
+								dirrunsUnique = ( dirruns += contextBackup == null ? 1 : Math.random() || 0.1 ),
+								len = elems.length;
 
-			results = results || [];
+							if ( outermost ) {
 
-			// Try to minimize operations if there is only one selector in the list and no seed
-			// (the latter of which guarantees us context)
-			if ( match.length === 1 ) {
-
-				// Reduce context if the leading compound selector is an ID
-				tokens = match[ 0 ] = match[ 0 ].slice( 0 );
-				if ( tokens.length > 2 && ( token = tokens[ 0 ] ).type === "ID" &&
-					context.nodeType === 9 && documentIsHTML && Expr.relative[ tokens[ 1 ].type ] ) {
-
-					context = ( Expr.find[ "ID" ]( token.matches[ 0 ]
-						.replace( runescape, funescape ), context ) || [] )[ 0 ];
-					if ( !context ) {
-						return results;
-
-					// Precompiled matchers will still verify ancestry, so step up a level
-					} else if ( compiled ) {
-						context = context.parentNode;
-					}
-
-					selector = selector.slice( tokens.shift().value.length );
-				}
-
-				// Fetch a seed set for right-to-left matching
-				i = matchExpr[ "needsContext" ].test( selector ) ? 0 : tokens.length;
-				while ( i-- ) {
-					token = tokens[ i ];
-
-					// Abort if we hit a combinator
-					if ( Expr.relative[ ( type = token.type ) ] ) {
-						break;
-					}
-					if ( ( find = Expr.find[ type ] ) ) {
-
-						// Search, expanding context for leading sibling combinators
-						if ( ( seed = find(
-							token.matches[ 0 ].replace( runescape, funescape ),
-							rsibling.test( tokens[ 0 ].type ) && testContext( context.parentNode ) ||
-								context
-						) ) ) {
-
-							// If seed is empty or no tokens remain, we can return early
-							tokens.splice( i, 1 );
-							selector = seed.length && toSelector( tokens );
-							if ( !selector ) {
-								push.apply( results, seed );
-								return results;
+								// Support: IE 11+, Edge 17 - 18+
+								// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+								// two documents; shallow comparisons work.
+								// eslint-disable-next-line eqeqeq
+								outermostContext = context == document || context || outermost;
 							}
 
-							break;
+							// Add elements passing elementMatchers directly to results
+							// Support: IE<9, Safari
+							// Tolerate NodeList properties (IE: "length"; Safari: <number>) matching elements by id
+							for ( ; i !== len && ( elem = elems[ i ] ) != null; i++ ) {
+								if ( byElement && elem ) {
+									j = 0;
+
+									// Support: IE 11+, Edge 17 - 18+
+									// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+									// two documents; shallow comparisons work.
+									// eslint-disable-next-line eqeqeq
+									if ( !context && elem.ownerDocument != document ) {
+										setDocument( elem );
+										xml = !documentIsHTML;
+									}
+									while ( ( matcher = elementMatchers[ j++ ] ) ) {
+										if ( matcher( elem, context || document, xml ) ) {
+											results.push( elem );
+											break;
+										}
+									}
+									if ( outermost ) {
+										dirruns = dirrunsUnique;
+									}
+								}
+
+								// Track unmatched elements for set filters
+								if ( bySet ) {
+
+									// They will have gone through all possible matchers
+									if ( ( elem = !matcher && elem ) ) {
+										matchedCount--;
+									}
+
+									// Lengthen the array for every element, matched or not
+									if ( seed ) {
+										unmatched.push( elem );
+									}
+								}
+							}
+
+							// `i` is now the count of elements visited above, and adding it to `matchedCount`
+							// makes the latter nonnegative.
+							matchedCount += i;
+
+							// Apply set filters to unmatched elements
+							// NOTE: This can be skipped if there are no unmatched elements (i.e., `matchedCount`
+							// equals `i`), unless we didn't visit _any_ elements in the above loop because we have
+							// no element matchers and no seed.
+							// Incrementing an initially-string "0" `i` allows `i` to remain a string only in that
+							// case, which will result in a "00" `matchedCount` that differs from `i` but is also
+							// numerically zero.
+							if ( bySet && i !== matchedCount ) {
+								j = 0;
+								while ( ( matcher = setMatchers[ j++ ] ) ) {
+									matcher( unmatched, setMatched, context, xml );
+								}
+
+								if ( seed ) {
+
+									// Reintegrate element matches to eliminate the need for sorting
+									if ( matchedCount > 0 ) {
+										while ( i-- ) {
+											if ( !( unmatched[ i ] || setMatched[ i ] ) ) {
+												setMatched[ i ] = pop.call( results );
+											}
+										}
+									}
+
+									// Discard index placeholder values to get only actual matches
+									setMatched = condense( setMatched );
+								}
+
+								// Add matches to results
+								push.apply( results, setMatched );
+
+								// Seedless set matches succeeding multiple successful matchers stipulate sorting
+								if ( outermost && !seed && setMatched.length > 0 &&
+									( matchedCount + setMatchers.length ) > 1 ) {
+
+									Sizzle.uniqueSort( results );
+								}
+							}
+
+							// Override manipulation of globals by nested matchers
+							if ( outermost ) {
+								dirruns = dirrunsUnique;
+								outermostContext = contextBackup;
+							}
+
+							return unmatched;
+						};
+
+					return bySet ?
+						markFunction( superMatcher ) :
+						superMatcher;
+				}
+
+				compile = Sizzle.compile = function( selector, match /* Internal Use Only */ ) {
+					var i,
+						setMatchers = [],
+						elementMatchers = [],
+						cached = compilerCache[ selector + " " ];
+
+					if ( !cached ) {
+
+						// Generate a function of recursive functions that can be used to check each element
+						if ( !match ) {
+							match = tokenize( selector );
+						}
+						i = match.length;
+						while ( i-- ) {
+							cached = matcherFromTokens( match[ i ] );
+							if ( cached[ expando ] ) {
+								setMatchers.push( cached );
+							} else {
+								elementMatchers.push( cached );
+							}
+						}
+
+						// Cache the compiled function
+						cached = compilerCache(
+							selector,
+							matcherFromGroupMatchers( elementMatchers, setMatchers )
+						);
+
+						// Save selector and tokenization
+						cached.selector = selector;
+					}
+					return cached;
+				};
+
+				/**
+				* A low-level selection function that works with Sizzle's compiled
+				*  selector functions
+				* @param {String|Function} selector A selector or a pre-compiled
+				*  selector function built with Sizzle.compile
+				* @param {Element} context
+				* @param {Array} [results]
+				* @param {Array} [seed] A set of elements to match against
+				*/
+				select = Sizzle.select = function( selector, context, results, seed ) {
+					var i, tokens, token, type, find,
+						compiled = typeof selector === "function" && selector,
+						match = !seed && tokenize( ( selector = compiled.selector || selector ) );
+
+					results = results || [];
+
+					// Try to minimize operations if there is only one selector in the list and no seed
+					// (the latter of which guarantees us context)
+					if ( match.length === 1 ) {
+
+						// Reduce context if the leading compound selector is an ID
+						tokens = match[ 0 ] = match[ 0 ].slice( 0 );
+						if ( tokens.length > 2 && ( token = tokens[ 0 ] ).type === "ID" &&
+							context.nodeType === 9 && documentIsHTML && Expr.relative[ tokens[ 1 ].type ] ) {
+
+							context = ( Expr.find[ "ID" ]( token.matches[ 0 ]
+								.replace( runescape, funescape ), context ) || [] )[ 0 ];
+							if ( !context ) {
+								return results;
+
+							// Precompiled matchers will still verify ancestry, so step up a level
+							} else if ( compiled ) {
+								context = context.parentNode;
+							}
+
+							selector = selector.slice( tokens.shift().value.length );
+						}
+
+						// Fetch a seed set for right-to-left matching
+						i = matchExpr[ "needsContext" ].test( selector ) ? 0 : tokens.length;
+						while ( i-- ) {
+							token = tokens[ i ];
+
+							// Abort if we hit a combinator
+							if ( Expr.relative[ ( type = token.type ) ] ) {
+								break;
+							}
+							if ( ( find = Expr.find[ type ] ) ) {
+
+								// Search, expanding context for leading sibling combinators
+								if ( ( seed = find(
+									token.matches[ 0 ].replace( runescape, funescape ),
+									rsibling.test( tokens[ 0 ].type ) && testContext( context.parentNode ) ||
+										context
+								) ) ) {
+
+									// If seed is empty or no tokens remain, we can return early
+									tokens.splice( i, 1 );
+									selector = seed.length && toSelector( tokens );
+									if ( !selector ) {
+										push.apply( results, seed );
+										return results;
+									}
+
+									break;
+								}
+							}
 						}
 					}
+
+					// Compile and execute a filtering function if one is not provided
+					// Provide `match` to avoid retokenization if we modified the selector above
+					( compiled || compile( selector, match ) )(
+						seed,
+						context,
+						!documentIsHTML,
+						results,
+						!context || rsibling.test( selector ) && testContext( context.parentNode ) || context
+					);
+					return results;
+				};
+
+				// One-time assignments
+
+				// Sort stability
+				support.sortStable = expando.split( "" ).sort( sortOrder ).join( "" ) === expando;
+
+				// Support: Chrome 14-35+
+				// Always assume duplicates if they aren't passed to the comparison function
+				support.detectDuplicates = !!hasDuplicate;
+
+				// Initialize against the default document
+				setDocument();
+
+				// Support: Webkit<537.32 - Safari 6.0.3/Chrome 25 (fixed in Chrome 27)
+				// Detached nodes confoundingly follow *each other*
+				support.sortDetached = assert( function( el ) {
+
+					// Should return 1, but returns 4 (following)
+					return el.compareDocumentPosition( document.createElement( "fieldset" ) ) & 1;
+				} );
+
+				// Support: IE<8
+				// Prevent attribute/property "interpolation"
+				// https://msdn.microsoft.com/en-us/library/ms536429%28VS.85%29.aspx
+				if ( !assert( function( el ) {
+					el.innerHTML = "<a href='#'></a>";
+					return el.firstChild.getAttribute( "href" ) === "#";
+				} ) ) {
+					addHandle( "type|href|height|width", function( elem, name, isXML ) {
+						if ( !isXML ) {
+							return elem.getAttribute( name, name.toLowerCase() === "type" ? 1 : 2 );
+						}
+					} );
 				}
-			}
 
-			// Compile and execute a filtering function if one is not provided
-			// Provide `match` to avoid retokenization if we modified the selector above
-			( compiled || compile( selector, match ) )(
-				seed,
-				context,
-				!documentIsHTML,
-				results,
-				!context || rsibling.test( selector ) && testContext( context.parentNode ) || context
-			);
-			return results;
-		};
-
-		// One-time assignments
-
-		// Sort stability
-		support.sortStable = expando.split( "" ).sort( sortOrder ).join( "" ) === expando;
-
-		// Support: Chrome 14-35+
-		// Always assume duplicates if they aren't passed to the comparison function
-		support.detectDuplicates = !!hasDuplicate;
-
-		// Initialize against the default document
-		setDocument();
-
-		// Support: Webkit<537.32 - Safari 6.0.3/Chrome 25 (fixed in Chrome 27)
-		// Detached nodes confoundingly follow *each other*
-		support.sortDetached = assert( function( el ) {
-
-			// Should return 1, but returns 4 (following)
-			return el.compareDocumentPosition( document.createElement( "fieldset" ) ) & 1;
-		} );
-
-		// Support: IE<8
-		// Prevent attribute/property "interpolation"
-		// https://msdn.microsoft.com/en-us/library/ms536429%28VS.85%29.aspx
-		if ( !assert( function( el ) {
-			el.innerHTML = "<a href='#'></a>";
-			return el.firstChild.getAttribute( "href" ) === "#";
-		} ) ) {
-			addHandle( "type|href|height|width", function( elem, name, isXML ) {
-				if ( !isXML ) {
-					return elem.getAttribute( name, name.toLowerCase() === "type" ? 1 : 2 );
+				// Support: IE<9
+				// Use defaultValue in place of getAttribute("value")
+				if ( !support.attributes || !assert( function( el ) {
+					el.innerHTML = "<input/>";
+					el.firstChild.setAttribute( "value", "" );
+					return el.firstChild.getAttribute( "value" ) === "";
+				} ) ) {
+					addHandle( "value", function( elem, _name, isXML ) {
+						if ( !isXML && elem.nodeName.toLowerCase() === "input" ) {
+							return elem.defaultValue;
+						}
+					} );
 				}
-			} );
-		}
 
-		// Support: IE<9
-		// Use defaultValue in place of getAttribute("value")
-		if ( !support.attributes || !assert( function( el ) {
-			el.innerHTML = "<input/>";
-			el.firstChild.setAttribute( "value", "" );
-			return el.firstChild.getAttribute( "value" ) === "";
-		} ) ) {
-			addHandle( "value", function( elem, _name, isXML ) {
-				if ( !isXML && elem.nodeName.toLowerCase() === "input" ) {
-					return elem.defaultValue;
+				// Support: IE<9
+				// Use getAttributeNode to fetch booleans when getAttribute lies
+				if ( !assert( function( el ) {
+					return el.getAttribute( "disabled" ) == null;
+				} ) ) {
+					addHandle( booleans, function( elem, name, isXML ) {
+						var val;
+						if ( !isXML ) {
+							return elem[ name ] === true ? name.toLowerCase() :
+								( val = elem.getAttributeNode( name ) ) && val.specified ?
+									val.value :
+									null;
+						}
+					} );
 				}
-			} );
-		}
 
-		// Support: IE<9
-		// Use getAttributeNode to fetch booleans when getAttribute lies
-		if ( !assert( function( el ) {
-			return el.getAttribute( "disabled" ) == null;
-		} ) ) {
-			addHandle( booleans, function( elem, name, isXML ) {
-				var val;
-				if ( !isXML ) {
-					return elem[ name ] === true ? name.toLowerCase() :
-						( val = elem.getAttributeNode( name ) ) && val.specified ?
-							val.value :
-							null;
-				}
-			} );
-		}
-
-		return Sizzle;
+				return Sizzle;
 
 		} )( window );
 
@@ -10886,648 +10923,710 @@
 
 /* jshint browser: true, strict: true, undef: true, unused: true */
 
-( function( window, factory ) {
-  // universal module definition
-  /*jshint strict: false */ /* globals define, module, require */
-  if ( typeof define == 'function' && define.amd ) {
-    // AMD
-    define( [ 'jquery' ], function( jQuery ) {
-      return factory( window, jQuery );
-    });
-  } else if ( typeof module == 'object' && module.exports ) {
-    // CommonJS
-    module.exports = factory(
-      window,
-      require('jquery')
-    );
-  } else {
-    // browser global
-    window.jQueryBridget = factory(
-      window,
-      window.jQuery
-    );
-  }
+(
+	function(window, factory) {
+		// universal module definition
+		/*jshint strict: false */ /* globals define, module, require */
+		if (typeof define == 'function' && define.amd) {
+			// AMD
+			define(
+				['jquery'], function(jQuery) {
+					return factory(window, jQuery);
+				}
+			);
+		} 
+		
+		else if (typeof module == 'object' && module.exports) {
+			// CommonJS
+			module.exports = factory(
+				window,
+				require('jquery')
+			);
+		} 
+		
+		else {
+			// browser global
+			window.jQueryBridget = factory(
+				window,
+				window.jQuery
+			);
+		}
+	} (
+		window, function factory(window, jQuery) {
+			'use strict';
 
-}( window, function factory( window, jQuery ) {
-'use strict';
+			// ----- utils ----- //
 
-// ----- utils ----- //
+			var arraySlice = Array.prototype.slice;
 
-var arraySlice = Array.prototype.slice;
+			// helper function for logging errors
+			// $.error breaks jQuery chaining
+			var console = window.console;
+			var logError = typeof console == 'undefined' ? function() {}:
+				function(message) {
+					console.error(message);
+				};
 
-// helper function for logging errors
-// $.error breaks jQuery chaining
-var console = window.console;
-var logError = typeof console == 'undefined' ? function() {} :
-  function( message ) {
-    console.error( message );
-  };
+			// ----- jQueryBridget ----- //
 
-// ----- jQueryBridget ----- //
+			function jQueryBridget(namespace, PluginClass, $) {
+				$ = $ || jQuery || window.jQuery;
 
-function jQueryBridget( namespace, PluginClass, $ ) {
-  $ = $ || jQuery || window.jQuery;
-  if ( !$ ) {
-    return;
-  }
+				if (!$) {
+					return;
+				}
 
-  // add option method -> $().plugin('option', {...})
-  if ( !PluginClass.prototype.option ) {
-    // option setter
-    PluginClass.prototype.option = function( opts ) {
-      // bail out if not an object
-      if ( !$.isPlainObject( opts ) ){
-        return;
-      }
-      this.options = $.extend( true, this.options, opts );
-    };
-  }
+				// add option method -> $().plugin('option', {...})
+				if (!PluginClass.prototype.option) {
+					// option setter
+					PluginClass.prototype.option = function(opts) {
+						// bail out if not an object
+						if (!$.isPlainObject(opts)) {
+							return;
+						}
 
-  // make jQuery plugin
-  $.fn[ namespace ] = function( arg0 /*, arg1 */ ) {
-    if ( typeof arg0 == 'string' ) {
-      // method call $().plugin( 'methodName', { options } )
-      // shift arguments by 1
-      var args = arraySlice.call( arguments, 1 );
-      return methodCall( this, arg0, args );
-    }
-    // just $().plugin({ options })
-    plainCall( this, arg0 );
-    return this;
-  };
+						this.options = $.extend(true, this.options, opts);
+					};
+				}
 
-  // $().plugin('methodName')
-  function methodCall( $elems, methodName, args ) {
-    var returnValue;
-    var pluginMethodStr = '$().' + namespace + '("' + methodName + '")';
+				// make jQuery plugin
+				$.fn[namespace] = function(arg0 /*, arg1 */) {
+					if (typeof arg0 == 'string') {
+						// method call $().plugin( 'methodName', { options } )
+						// shift arguments by 1
+						var args = arraySlice.call(arguments, 1);
+						return methodCall(this, arg0, args);
+					}
 
-    $elems.each( function( i, elem ) {
-      // get instance
-      var instance = $.data( elem, namespace );
-      if ( !instance ) {
-        logError( namespace + ' not initialized. Cannot call methods, i.e. ' +
-          pluginMethodStr );
-        return;
-      }
+					// just $().plugin({ options })
+					plainCall(this, arg0);
+					return this;
+				};
 
-      var method = instance[ methodName ];
-      if ( !method || methodName.charAt(0) == '_' ) {
-        logError( pluginMethodStr + ' is not a valid method' );
-        return;
-      }
+				// $().plugin('methodName')
+				function methodCall($elems, methodName, args) {
+					var returnValue;
+					var pluginMethodStr = '$().' + namespace + '("' + methodName + '")';
 
-      // apply method, get return value
-      var value = method.apply( instance, args );
-      // set return value if value is returned, use only first value
-      returnValue = returnValue === undefined ? value : returnValue;
-    });
+					$elems.each(
+						function(i, elem) {
+							// get instance
+							var instance = $.data(elem, namespace);
 
-    return returnValue !== undefined ? returnValue : $elems;
-  }
+							if (!instance) {
+								logError(
+									namespace + ' not initialized. Cannot call methods, i.e. ' + pluginMethodStr 
+								);
 
-  function plainCall( $elems, options ) {
-    $elems.each( function( i, elem ) {
-      var instance = $.data( elem, namespace );
-      if ( instance ) {
-        // set options & init
-        instance.option( options );
-        instance._init();
-      } else {
-        // initialize new instance
-        instance = new PluginClass( elem, options );
-        $.data( elem, namespace, instance );
-      }
-    });
-  }
+								return;
+							}
 
-  updateJQuery( $ );
+							var method = instance[methodName];
 
-}
+							if (!method || methodName.charAt(0) == '_') {
+								logError(pluginMethodStr + ' is not a valid method');
+								return;
+							}
 
-// ----- updateJQuery ----- //
+							// apply method, get return value
+							var value = method.apply(instance, args);
 
-// set $.bridget for v1 backwards compatibility
-function updateJQuery( $ ) {
-  if ( !$ || ( $ && $.bridget ) ) {
-    return;
-  }
-  $.bridget = jQueryBridget;
-}
+							// set return value if value is returned, use only first value
+							returnValue = returnValue === undefined ? value: returnValue;
+						}
+					);
 
-updateJQuery( jQuery || window.jQuery );
+					return returnValue !== undefined ? returnValue: $elems;
+				}
 
-// -----  ----- //
+				function plainCall($elems, options) {
+					$elems.each(
+						function(i, elem) {
+							var instance = $.data(elem, namespace);
 
-return jQueryBridget;
+							if (instance) {
+								// set options & init
+								instance.option(options);
+								instance._init();
+							} 
+							
+							else {
+								// initialize new instance
+								instance = new PluginClass(elem, options);
+								$.data(elem, namespace, instance);
+							}
+						}
+					);
+				}
 
-}));
+				updateJQuery($);
+			}
+
+			// ----- updateJQuery ----- //
+
+			// set $.bridget for v1 backwards compatibility
+			function updateJQuery($) {
+				if (!$ || ($ && $.bridget)) {
+					return;
+				}
+
+				$.bridget = jQueryBridget;
+			}
+
+			updateJQuery(jQuery || window.jQuery);
+
+			// -----  ----- //
+
+			return jQueryBridget;
+		}
+	)
+);
+
 /*!
  * Infinite Scroll v2.0.4
  * measure size of elements
  * MIT license
  */
 
-( function( window, factory ) {
-  if ( typeof module == 'object' && module.exports ) {
-    // CommonJS
-    module.exports = factory();
-  } else {
-    // browser global
-    window.getSize = factory();
-  }
+(
+	function(window, factory) {
+		if (typeof module == 'object' && module.exports) {
+			// CommonJS
+			module.exports = factory();
+		} 
+		
+		else {
+			// browser global
+			window.getSize = factory();
+		}
+	} 
+) (
+	window, function factory() {
+		// -------------------------- helpers -------------------------- //
 
-} )( window, function factory() {
+		// get a number from a string, not a percentage
+		function getStyleSize(value) {
+			let num = parseFloat(value);
 
-// -------------------------- helpers -------------------------- //
+			// not a percent like '100%', and a number
+			let isValid = value.indexOf('%') == -1 && !isNaN(num);
+			return isValid && num;
+		}
 
-// get a number from a string, not a percentage
-function getStyleSize( value ) {
-  let num = parseFloat( value );
-  // not a percent like '100%', and a number
-  let isValid = value.indexOf('%') == -1 && !isNaN( num );
-  return isValid && num;
-}
+		// -------------------------- measurements -------------------------- //
 
-// -------------------------- measurements -------------------------- //
+		let measurements = [
+			'paddingLeft',
+			'paddingRight',
+			'paddingTop',
+			'paddingBottom',
+			'marginLeft',
+			'marginRight',
+			'marginTop',
+			'marginBottom',
+			'borderLeftWidth',
+			'borderRightWidth',
+			'borderTopWidth',
+			'borderBottomWidth',
+		];
 
-let measurements = [
-  'paddingLeft',
-  'paddingRight',
-  'paddingTop',
-  'paddingBottom',
-  'marginLeft',
-  'marginRight',
-  'marginTop',
-  'marginBottom',
-  'borderLeftWidth',
-  'borderRightWidth',
-  'borderTopWidth',
-  'borderBottomWidth',
-];
+		let measurementsLength = measurements.length;
 
-let measurementsLength = measurements.length;
+		function getZeroSize() {
+			let size = {
+				width: 0,
+				height: 0,
+				innerWidth: 0,
+				innerHeight: 0,
+				outerWidth: 0,
+				outerHeight: 0,
+			};
 
-function getZeroSize() {
-  let size = {
-    width: 0,
-    height: 0,
-    innerWidth: 0,
-    innerHeight: 0,
-    outerWidth: 0,
-    outerHeight: 0,
-  };
-  measurements.forEach( ( measurement ) => {
-    size[ measurement ] = 0;
-  } );
-  return size;
-}
+			measurements.forEach(
+				(measurement) => {
+					size[measurement] = 0;
+				} 
+			);
 
-// -------------------------- getSize -------------------------- //
+			return size;
+		}
 
-function getSize( elem ) {
-  // use querySeletor if elem is string
-  if ( typeof elem == 'string' ) elem = document.querySelector( elem );
+		// -------------------------- getSize -------------------------- //
 
-  // do not proceed on non-objects
-  let isElement = elem && typeof elem == 'object' && elem.nodeType;
-  if ( !isElement ) return;
+		function getSize(elem) {
+			// use querySeletor if elem is string
+			if (typeof elem == 'string') elem = document.querySelector(elem);
 
-  let style = getComputedStyle( elem );
+			// do not proceed on non-objects
+			let isElement = elem && typeof elem == 'object' && elem.nodeType;
+			if (!isElement) return;
 
-  // if hidden, everything is 0
-  if ( style.display == 'none' ) return getZeroSize();
+			let style = getComputedStyle(elem);
 
-  let size = {};
-  size.width = elem.offsetWidth;
-  size.height = elem.offsetHeight;
+			// if hidden, everything is 0
+			if (style.display == 'none') return getZeroSize();
 
-  let isBorderBox = size.isBorderBox = style.boxSizing == 'border-box';
+			let size = {};
+			size.width = elem.offsetWidth;
+			size.height = elem.offsetHeight;
 
-  // get all measurements
-  measurements.forEach( ( measurement ) => {
-    let value = style[ measurement ];
-    let num = parseFloat( value );
-    // any 'auto', 'medium' value will be 0
-    size[ measurement ] = !isNaN( num ) ? num : 0;
-  } );
+			let isBorderBox = size.isBorderBox = style.boxSizing == 'border-box';
 
-  let paddingWidth = size.paddingLeft + size.paddingRight;
-  let paddingHeight = size.paddingTop + size.paddingBottom;
-  let marginWidth = size.marginLeft + size.marginRight;
-  let marginHeight = size.marginTop + size.marginBottom;
-  let borderWidth = size.borderLeftWidth + size.borderRightWidth;
-  let borderHeight = size.borderTopWidth + size.borderBottomWidth;
+			// get all measurements
+			measurements.forEach (
+				(measurement) => {
+					let value = style[measurement];
+					let num = parseFloat(value);
 
-  // overwrite width and height if we can get it from style
-  let styleWidth = getStyleSize( style.width );
-  if ( styleWidth !== false ) {
-    size.width = styleWidth +
-      // add padding and border unless it's already including it
-      ( isBorderBox ? 0 : paddingWidth + borderWidth );
-  }
+					// any 'auto', 'medium' value will be 0
+					size[measurement] = !isNaN(num) ? num: 0;
+				} 
+			);
 
-  let styleHeight = getStyleSize( style.height );
-  if ( styleHeight !== false ) {
-    size.height = styleHeight +
-      // add padding and border unless it's already including it
-      ( isBorderBox ? 0 : paddingHeight + borderHeight );
-  }
+			let paddingWidth = size.paddingLeft + size.paddingRight;
+			let paddingHeight = size.paddingTop + size.paddingBottom;
+			let marginWidth = size.marginLeft + size.marginRight;
+			let marginHeight = size.marginTop + size.marginBottom;
+			let borderWidth = size.borderLeftWidth + size.borderRightWidth;
+			let borderHeight = size.borderTopWidth + size.borderBottomWidth;
 
-  size.innerWidth = size.width - ( paddingWidth + borderWidth );
-  size.innerHeight = size.height - ( paddingHeight + borderHeight );
+			// overwrite width and height if we can get it from style
+			let styleWidth = getStyleSize(style.width);
+			if (styleWidth !== false) {
+				size.width = styleWidth +
+				// add padding and border unless it's already including it
+				(isBorderBox ? 0: paddingWidth + borderWidth);
+			}
 
-  size.outerWidth = size.width + marginWidth;
-  size.outerHeight = size.height + marginHeight;
+			let styleHeight = getStyleSize(style.height);
+			if (styleHeight !== false) {
+				size.height = styleHeight +
+				// add padding and border unless it's already including it
+				(isBorderBox ? 0: paddingHeight + borderHeight);
+			}
 
-  return size;
-}
+			size.innerWidth = size.width - (paddingWidth + borderWidth);
+			size.innerHeight = size.height - (paddingHeight + borderHeight);
 
-return getSize;
+			size.outerWidth = size.width + marginWidth;
+			size.outerHeight = size.height + marginHeight;
 
-} );
+			return size;
+		}
+
+		return getSize;
+	} 
+);
+
 /**
  * EvEmitter v2.1.1
  * Lil' event emitter
  * MIT License
  */
 
-( function( global, factory ) {
-  // universal module definition
-  if ( typeof module == 'object' && module.exports ) {
-    // CommonJS - Browserify, Webpack
-    module.exports = factory();
-  } else {
-    // Browser globals
-    global.EvEmitter = factory();
-  }
+(
+	function(global, factory) {
+		// universal module definition
+		if (typeof module == 'object' && module.exports) {
+			// CommonJS - Browserify, Webpack
+			module.exports = factory();
+		} 
+		
+		else {
+			// Browser globals
+			global.EvEmitter = factory();
+		}
+	} (
+		typeof window != 'undefined' ? window: this, function() {
+			function EvEmitter() {}
 
-}( typeof window != 'undefined' ? window : this, function() {
+			let proto = EvEmitter.prototype;
 
-function EvEmitter() {}
+			proto.on = function(eventName, listener) {
+				if (!eventName || !listener) return this;
 
-let proto = EvEmitter.prototype;
+				// set events hash
+				let events = this._events = this._events || {};
 
-proto.on = function( eventName, listener ) {
-  if ( !eventName || !listener ) return this;
+				// set listeners array
+				let listeners = events[eventName] = events[eventName] || [];
 
-  // set events hash
-  let events = this._events = this._events || {};
-  // set listeners array
-  let listeners = events[ eventName ] = events[ eventName ] || [];
-  // only add once
-  if ( !listeners.includes( listener ) ) {
-    listeners.push( listener );
-  }
+				// only add once
+				if (!listeners.includes(listener)) {
+					listeners.push(listener);
+				}
 
-  return this;
-};
+				return this;
+			};
 
-proto.once = function( eventName, listener ) {
-  if ( !eventName || !listener ) return this;
+			proto.once = function(eventName, listener) {
+				if (!eventName || !listener) return this;
 
-  // add event
-  this.on( eventName, listener );
-  // set once flag
-  // set onceEvents hash
-  let onceEvents = this._onceEvents = this._onceEvents || {};
-  // set onceListeners object
-  let onceListeners = onceEvents[ eventName ] = onceEvents[ eventName ] || {};
-  // set flag
-  onceListeners[ listener ] = true;
+				// add event
+				this.on(eventName, listener);
 
-  return this;
-};
+				// set once flag
+				// set onceEvents hash
+				let onceEvents = this._onceEvents = this._onceEvents || {};
 
-proto.off = function( eventName, listener ) {
-  let listeners = this._events && this._events[ eventName ];
-  if ( !listeners || !listeners.length ) return this;
+				// set onceListeners object
+				let onceListeners = onceEvents[eventName] = onceEvents[eventName] || {};
 
-  let index = listeners.indexOf( listener );
-  if ( index != -1 ) {
-    listeners.splice( index, 1 );
-  }
+				// set flag
+				onceListeners[listener] = true;
 
-  return this;
-};
+				return this;
+			};
 
-proto.emitEvent = function( eventName, args ) {
-  let listeners = this._events && this._events[ eventName ];
-  if ( !listeners || !listeners.length ) return this;
+			proto.off = function(eventName, listener) {
+				let listeners = this._events && this._events[eventName];
+				if (!listeners || !listeners.length) return this;
 
-  // copy over to avoid interference if .off() in listener
-  listeners = listeners.slice( 0 );
-  args = args || [];
-  // once stuff
-  let onceListeners = this._onceEvents && this._onceEvents[ eventName ];
+				let index = listeners.indexOf(listener);
+				if (index != -1) {
+					listeners.splice(index, 1);
+				}
 
-  for ( let listener of listeners ) {
-    let isOnce = onceListeners && onceListeners[ listener ];
-    if ( isOnce ) {
-      // remove listener
-      // remove before trigger to prevent recursion
-      this.off( eventName, listener );
-      // unset once flag
-      delete onceListeners[ listener ];
-    }
-    // trigger listener
-    listener.apply( this, args );
-  }
+				return this;
+			};
 
-  return this;
-};
+			proto.emitEvent = function(eventName, args) {
+				let listeners = this._events && this._events[eventName];
+				if (!listeners || !listeners.length) return this;
 
-proto.allOff = function() {
-  delete this._events;
-  delete this._onceEvents;
-  return this;
-};
+				// copy over to avoid interference if .off() in listener
+				listeners = listeners.slice(0);
+				args = args || [];
 
-return EvEmitter;
+				// once stuff
+				let onceListeners = this._onceEvents && this._onceEvents[eventName];
 
-} ) );
+				for (let listener of listeners) {
+					let isOnce = onceListeners && onceListeners[listener];
+					if (isOnce) {
+						// remove listener
+						// remove before trigger to prevent recursion
+						this.off(eventName, listener);
+
+						// unset once flag
+						delete onceListeners[listener];
+					}
+
+					// trigger listener
+					listener.apply(this, args);
+				}
+
+				return this;
+			};
+
+			proto.allOff = function() {
+				delete this._events;
+				delete this._onceEvents;
+				return this;
+			};
+
+			return EvEmitter;
+		} 
+	) 
+);
+
 /*!
  * Unidragger v3.0.0
  * Draggable base class
  * MIT license
  */
 
-( function( window, factory ) {
-  // universal module definition
-  if ( typeof module == 'object' && module.exports ) {
-    // CommonJS
-    module.exports = factory(
-        window,
-        require('ev-emitter'),
-    );
-  } else {
-    // browser global
-    window.Unidragger = factory(
-        window,
-        window.EvEmitter,
-    );
-  }
+(
+	function(window, factory) {
+		// universal module definition
+		if (typeof module == 'object' && module.exports) {
+			// CommonJS
+			module.exports = factory (
+				window,
+				require('ev-emitter'),
+			);
+		} 
+		
+		else {
+			// browser global
+			window.Unidragger = factory (
+				window,
+				window.EvEmitter,
+			);
+		}
+	} (typeof window != 'undefined' ? window: this, function factory(window, EvEmitter) {
+		function Unidragger() {}
 
-}( typeof window != 'undefined' ? window : this, function factory( window, EvEmitter ) {
+		// inherit EvEmitter
+		let proto = Unidragger.prototype = Object.create(EvEmitter.prototype);
 
-function Unidragger() {}
+		// ----- bind start ----- //
 
-// inherit EvEmitter
-let proto = Unidragger.prototype = Object.create( EvEmitter.prototype );
+		// trigger handler methods for events
+		proto.handleEvent = function(event) {
+			let method = 'on' + event.type;
 
-// ----- bind start ----- //
+			if (this[method]) {
+				this[method](event);
+			}
+		};
 
-// trigger handler methods for events
-proto.handleEvent = function( event ) {
-  let method = 'on' + event.type;
-  if ( this[ method ] ) {
-    this[ method ]( event );
-  }
-};
+		let startEvent, activeEvents;
 
-let startEvent, activeEvents;
-if ( 'ontouchstart' in window ) {
-  // HACK prefer Touch Events as you can preventDefault on touchstart to
-  // disable scroll in iOS & mobile Chrome metafizzy/flickity#1177
-  startEvent = 'touchstart';
-  activeEvents = [ 'touchmove', 'touchend', 'touchcancel' ];
-} else if ( window.PointerEvent ) {
-  // Pointer Events
-  startEvent = 'pointerdown';
-  activeEvents = [ 'pointermove', 'pointerup', 'pointercancel' ];
-} else {
-  // mouse events
-  startEvent = 'mousedown';
-  activeEvents = [ 'mousemove', 'mouseup' ];
-}
+		if ('ontouchstart' in window) {
+			// HACK prefer Touch Events as you can preventDefault on touchstart to
+			// disable scroll in iOS & mobile Chrome metafizzy/flickity#1177
+			startEvent = 'touchstart';
+			activeEvents = ['touchmove', 'touchend', 'touchcancel'];
+		} 
+		
+		else if (window.PointerEvent) {
+			// Pointer Events
+			startEvent = 'pointerdown';
+			activeEvents = ['pointermove', 'pointerup', 'pointercancel'];
+		} 
+		
+		else {
+			// mouse events
+			startEvent = 'mousedown';
+			activeEvents = ['mousemove', 'mouseup'];
+		}
 
-// prototype so it can be overwriteable by Flickity
-proto.touchActionValue = 'none';
+		// prototype so it can be overwriteable by Flickity
+		proto.touchActionValue = 'none';
 
-proto.bindHandles = function() {
-  this._bindHandles( 'addEventListener', this.touchActionValue );
-};
+		proto.bindHandles = function() {
+			this._bindHandles('addEventListener', this.touchActionValue);
+		};
 
-proto.unbindHandles = function() {
-  this._bindHandles( 'removeEventListener', '' );
-};
+		proto.unbindHandles = function() {
+			this._bindHandles('removeEventListener', '');
+		};
 
-/**
- * Add or remove start event
- * @param {String} bindMethod - addEventListener or removeEventListener
- * @param {String} touchAction - value for touch-action CSS property
- */
-proto._bindHandles = function( bindMethod, touchAction ) {
-  this.handles.forEach( ( handle ) => {
-    handle[ bindMethod ]( startEvent, this );
-    handle[ bindMethod ]( 'click', this );
-    // touch-action: none to override browser touch gestures. metafizzy/flickity#540
-    if ( window.PointerEvent ) handle.style.touchAction = touchAction;
-  } );
-};
+		/**
+		 * Add or remove start event
+		 * @param {String} bindMethod - addEventListener or removeEventListener
+		 * @param {String} touchAction - value for touch-action CSS property
+		 */
+		proto._bindHandles = function(bindMethod, touchAction) {
+			this.handles.forEach ( 
+				(handle) => {
+					handle[bindMethod](startEvent, this);
+					handle[bindMethod]('click', this);
 
-proto.bindActivePointerEvents = function() {
-  activeEvents.forEach( ( eventName ) => {
-    window.addEventListener( eventName, this );
-  } );
-};
+					// touch-action: none to override browser touch gestures. metafizzy/flickity#540
+					if (window.PointerEvent) handle.style.touchAction = touchAction;
+				} 
+			);
+		};
 
-proto.unbindActivePointerEvents = function() {
-  activeEvents.forEach( ( eventName ) => {
-    window.removeEventListener( eventName, this );
-  } );
-};
+		proto.bindActivePointerEvents = function() {
+			activeEvents.forEach ( 
+				(eventName) => {
+					window.addEventListener(eventName, this);
+				} 
+			);
+		};
 
-// ----- event handler helpers ----- //
+		proto.unbindActivePointerEvents = function() {
+			activeEvents.forEach(
+				(eventName) => {
+					window.removeEventListener(eventName, this);
+				} 
+			);
+		};
 
-// trigger method with matching pointer
-proto.withPointer = function( methodName, event ) {
-  if ( event.pointerId == this.pointerIdentifier ) {
-    this[ methodName ]( event, event );
-  }
-};
+		// ----- event handler helpers ----- //
+// Marker
+		// trigger method with matching pointer
+		proto.withPointer = function( methodName, event ) {
+		if ( event.pointerId == this.pointerIdentifier ) {
+			this[ methodName ]( event, event );
+		}
+		};
 
-// trigger method with matching touch
-proto.withTouch = function( methodName, event ) {
-  let touch;
-  for ( let changedTouch of event.changedTouches ) {
-    if ( changedTouch.identifier == this.pointerIdentifier ) {
-      touch = changedTouch;
-    }
-  }
-  if ( touch ) this[ methodName ]( event, touch );
-};
+		// trigger method with matching touch
+		proto.withTouch = function( methodName, event ) {
+		let touch;
+		for ( let changedTouch of event.changedTouches ) {
+			if ( changedTouch.identifier == this.pointerIdentifier ) {
+			touch = changedTouch;
+			}
+		}
+		if ( touch ) this[ methodName ]( event, touch );
+		};
 
-// ----- start event ----- //
+		// ----- start event ----- //
 
-proto.onmousedown = function( event ) {
-  this.pointerDown( event, event );
-};
+		proto.onmousedown = function( event ) {
+		this.pointerDown( event, event );
+		};
 
-proto.ontouchstart = function( event ) {
-  this.pointerDown( event, event.changedTouches[0] );
-};
+		proto.ontouchstart = function( event ) {
+		this.pointerDown( event, event.changedTouches[0] );
+		};
 
-proto.onpointerdown = function( event ) {
-  this.pointerDown( event, event );
-};
+		proto.onpointerdown = function( event ) {
+		this.pointerDown( event, event );
+		};
 
-// nodes that have text fields
-const cursorNodes = [ 'TEXTAREA', 'INPUT', 'SELECT', 'OPTION' ];
-// input types that do not have text fields
-const clickTypes = [ 'radio', 'checkbox', 'button', 'submit', 'image', 'file' ];
+		// nodes that have text fields
+		const cursorNodes = [ 'TEXTAREA', 'INPUT', 'SELECT', 'OPTION' ];
+		// input types that do not have text fields
+		const clickTypes = [ 'radio', 'checkbox', 'button', 'submit', 'image', 'file' ];
 
-/**
- * any time you set `event, pointer` it refers to:
- * @param {Event} event
- * @param {Event | Touch} pointer
- */
-proto.pointerDown = function( event, pointer ) {
-  // dismiss multi-touch taps, right clicks, and clicks on text fields
-  let isCursorNode = cursorNodes.includes( event.target.nodeName );
-  let isClickType = clickTypes.includes( event.target.type );
-  let isOkayElement = !isCursorNode || isClickType;
-  let isOkay = !this.isPointerDown && !event.button && isOkayElement;
-  if ( !isOkay ) return;
+		/**
+		 * any time you set `event, pointer` it refers to:
+		 * @param {Event} event
+		 * @param {Event | Touch} pointer
+		 */
+		proto.pointerDown = function( event, pointer ) {
+		// dismiss multi-touch taps, right clicks, and clicks on text fields
+		let isCursorNode = cursorNodes.includes( event.target.nodeName );
+		let isClickType = clickTypes.includes( event.target.type );
+		let isOkayElement = !isCursorNode || isClickType;
+		let isOkay = !this.isPointerDown && !event.button && isOkayElement;
+		if ( !isOkay ) return;
 
-  this.isPointerDown = true;
-  // save pointer identifier to match up touch events
-  this.pointerIdentifier = pointer.pointerId !== undefined ?
-    // pointerId for pointer events, touch.indentifier for touch events
-    pointer.pointerId : pointer.identifier;
+		this.isPointerDown = true;
+		// save pointer identifier to match up touch events
+		this.pointerIdentifier = pointer.pointerId !== undefined ?
+			// pointerId for pointer events, touch.indentifier for touch events
+			pointer.pointerId : pointer.identifier;
 
-  this.pointerDown( event, pointer );
-  this.bindActivePointerEvents();
-  this.emitEvent( 'pointerDown', [ event, pointer ] );
-};
+		this.pointerDown( event, pointer );
+		this.bindActivePointerEvents();
+		this.emitEvent( 'pointerDown', [ event, pointer ] );
+		};
 
-// ----- move ----- //
+		// ----- move ----- //
 
-proto.onmousemove = function( event ) {
-  this.pointerMove( event, event );
-};
+		proto.onmousemove = function( event ) {
+		this.pointerMove( event, event );
+		};
 
-proto.onpointermove = function( event ) {
-  this.withPointer( 'pointerMove', event );
-};
+		proto.onpointermove = function( event ) {
+		this.withPointer( 'pointerMove', event );
+		};
 
-proto.ontouchmove = function( event ) {
-  this.withTouch( 'pointerMove', event );
-};
+		proto.ontouchmove = function( event ) {
+		this.withTouch( 'pointerMove', event );
+		};
 
-proto.pointerMove = function( event, pointer ) {
-  let moveVector = {
-    x: pointer.pageX - this.pointerDownPointer.pageX,
-    y: pointer.pageY - this.pointerDownPointer.pageY,
-  };
-  this.emitEvent( 'pointerMove', [ event, pointer, moveVector ] );
-  // start drag if pointer has moved far enough to start drag
-  let isDragStarting = !this.isDragging && this.hasDragStarted( moveVector );
-  if ( isDragStarting ) this.dragStart( event, pointer );
-  if ( this.isDragging ) this.dragMove( event, pointer, moveVector );
-};
+		proto.pointerMove = function( event, pointer ) {
+		let moveVector = {
+			x: pointer.pageX - this.pointerDownPointer.pageX,
+			y: pointer.pageY - this.pointerDownPointer.pageY,
+		};
+		this.emitEvent( 'pointerMove', [ event, pointer, moveVector ] );
+		// start drag if pointer has moved far enough to start drag
+		let isDragStarting = !this.isDragging && this.hasDragStarted( moveVector );
+		if ( isDragStarting ) this.dragStart( event, pointer );
+		if ( this.isDragging ) this.dragMove( event, pointer, moveVector );
+		};
 
-// condition if pointer has moved far enough to start drag
-proto.hasDragStarted = function( moveVector ) {
-  return Math.abs( moveVector.x ) > 3 || Math.abs( moveVector.y ) > 3;
-};
+		// condition if pointer has moved far enough to start drag
+		proto.hasDragStarted = function( moveVector ) {
+		return Math.abs( moveVector.x ) > 3 || Math.abs( moveVector.y ) > 3;
+		};
 
-// ----- drag ----- //
+		// ----- drag ----- //
 
-proto.dragStart = function( event, pointer ) {
-  this.isDragging = true;
-  this.isPreventingClicks = true; // set flag to prevent clicks
-  this.emitEvent( 'dragStart', [ event, pointer ] );
-};
+		proto.dragStart = function( event, pointer ) {
+		this.isDragging = true;
+		this.isPreventingClicks = true; // set flag to prevent clicks
+		this.emitEvent( 'dragStart', [ event, pointer ] );
+		};
 
-proto.dragMove = function( event, pointer, moveVector ) {
-  this.emitEvent( 'dragMove', [ event, pointer, moveVector ] );
-};
+		proto.dragMove = function( event, pointer, moveVector ) {
+		this.emitEvent( 'dragMove', [ event, pointer, moveVector ] );
+		};
 
-// ----- end ----- //
+		// ----- end ----- //
 
-proto.onmouseup = function( event ) {
-  this.pointerUp( event, event );
-};
+		proto.onmouseup = function( event ) {
+		this.pointerUp( event, event );
+		};
 
-proto.onpointerup = function( event ) {
-  this.withPointer( 'pointerUp', event );
-};
+		proto.onpointerup = function( event ) {
+		this.withPointer( 'pointerUp', event );
+		};
 
-proto.ontouchend = function( event ) {
-  this.withTouch( 'pointerUp', event );
-};
+		proto.ontouchend = function( event ) {
+		this.withTouch( 'pointerUp', event );
+		};
 
-proto.pointerUp = function( event, pointer ) {
-  this.pointerDone();
-  this.emitEvent( 'pointerUp', [ event, pointer ] );
+		proto.pointerUp = function( event, pointer ) {
+		this.pointerDone();
+		this.emitEvent( 'pointerUp', [ event, pointer ] );
 
-  if ( this.isDragging ) {
-    this.dragEnd( event, pointer );
-  } else {
-    // pointer didn't move enough for drag to start
-    this.staticClick( event, pointer );
-  }
-};
+		if ( this.isDragging ) {
+			this.dragEnd( event, pointer );
+		} else {
+			// pointer didn't move enough for drag to start
+			this.staticClick( event, pointer );
+		}
+		};
 
-proto.dragEnd = function( event, pointer ) {
-  this.isDragging = false; // reset flag
-  // re-enable clicking async
-  setTimeout( () => delete this.isPreventingClicks );
+		proto.dragEnd = function( event, pointer ) {
+		this.isDragging = false; // reset flag
+		// re-enable clicking async
+		setTimeout( () => delete this.isPreventingClicks );
 
-  this.emitEvent( 'dragEnd', [ event, pointer ] );
-};
+		this.emitEvent( 'dragEnd', [ event, pointer ] );
+		};
 
-// triggered on pointer up & pointer cancel
-proto.pointerDone = function() {
-  this.isPointerDown = false;
-  delete this.pointerIdentifier;
-  this.unbindActivePointerEvents();
-  this.emitEvent('pointerDone');
-};
+		// triggered on pointer up & pointer cancel
+		proto.pointerDone = function() {
+		this.isPointerDown = false;
+		delete this.pointerIdentifier;
+		this.unbindActivePointerEvents();
+		this.emitEvent('pointerDone');
+		};
 
-// ----- cancel ----- //
+		// ----- cancel ----- //
 
-proto.onpointercancel = function( event ) {
-  this.withPointer( 'pointerCancel', event );
-};
+		proto.onpointercancel = function( event ) {
+		this.withPointer( 'pointerCancel', event );
+		};
 
-proto.ontouchcancel = function( event ) {
-  this.withTouch( 'pointerCancel', event );
-};
+		proto.ontouchcancel = function( event ) {
+		this.withTouch( 'pointerCancel', event );
+		};
 
-proto.pointerCancel = function( event, pointer ) {
-  this.pointerDone();
-  this.emitEvent( 'pointerCancel', [ event, pointer ] );
-};
+		proto.pointerCancel = function( event, pointer ) {
+		this.pointerDone();
+		this.emitEvent( 'pointerCancel', [ event, pointer ] );
+		};
 
-// ----- click ----- //
+		// ----- click ----- //
 
-// handle all clicks and prevent clicks when dragging
-proto.onclick = function( event ) {
-  if ( this.isPreventingClicks ) event.preventDefault();
-};
+		// handle all clicks and prevent clicks when dragging
+		proto.onclick = function( event ) {
+		if ( this.isPreventingClicks ) event.preventDefault();
+		};
 
-// triggered after pointer down & up with no/tiny movement
-proto.staticClick = function( event, pointer ) {
-  // ignore emulated mouse up clicks
-  let isMouseup = event.type == 'mouseup';
-  if ( isMouseup && this.isIgnoringMouseUp ) return;
+		// triggered after pointer down & up with no/tiny movement
+		proto.staticClick = function( event, pointer ) {
+		// ignore emulated mouse up clicks
+		let isMouseup = event.type == 'mouseup';
+		if ( isMouseup && this.isIgnoringMouseUp ) return;
 
-  this.emitEvent( 'staticClick', [ event, pointer ] );
+		this.emitEvent( 'staticClick', [ event, pointer ] );
 
-  // set flag for emulated clicks 300ms after touchend
-  if ( isMouseup ) {
-    this.isIgnoringMouseUp = true;
-    // reset flag after 400ms
-    setTimeout( () => {
-      delete this.isIgnoringMouseUp;
-    }, 400 );
-  }
-};
+		// set flag for emulated clicks 300ms after touchend
+		if ( isMouseup ) {
+			this.isIgnoringMouseUp = true;
+			// reset flag after 400ms
+			setTimeout( () => {
+			delete this.isIgnoringMouseUp;
+			}, 400 );
+		}
+		};
 
-// -----  ----- //
+		// -----  ----- //
 
-return Unidragger;
+		return Unidragger;
 
 } ) );
 /*!
@@ -12003,11 +12102,11 @@ window.GetRackEquipData = function() {
 				for(var rackEquip in data) {
 					rackEquips.push(
 						new RackEquip(
-							data[rackEquip].Brand 	|| "",
-							data[rackEquip].Name 	|| "",
-							data[rackEquip].Width 	|| "",
-							data[rackEquip].Height 	|| "",
-							data[rackEquip].Image 	|| ""
+							data[rackEquip].Brand || "",
+							data[rackEquip].Name || "",
+							data[rackEquip].Width || "",
+							data[rackEquip].Height || "",
+							data[rackEquip].Image || ""
 						)
 					);
 				}
