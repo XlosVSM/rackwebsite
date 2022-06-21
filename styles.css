@@ -1,11 +1,11 @@
-.pedalboard {
+.rack {
 	background: #f9f9f9;
 	border: 3px solid #999;
 	width: 800px;
 	height: 600px;
 }
 
-.pedal {
+.rackEquip {
 	background-repeat: no-repeat;
 	background-size: cover;
 	background-position: center;

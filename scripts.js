@@ -11938,39 +11938,39 @@ return Draggabilly;
 $(document).ready(
 	function() {
 		// Run function to ajax scope data
-		GetPedalData();
+		GetRackEquipData();
 
 		var multiplier = "15";
 
-		var $draggable = $('.pedal').draggabilly (
+		var $draggable = $('.rackEquip').draggabilly (
 			{
-				containment: '.pedalboard',
+				containment: '.rack',
 			}
 		)
 
 		$('body').on (
 			'click', 'a', function() {
-				$('.pedalboard').css('border','1px solid red').width(1000).height(768).append('<div class="pedal" />');
-				$('.pedal').draggabilly (
+				$('.rack').css('border','1px solid red').width(1000).height(768).append('<div class="rackEquip" />');
+				$('.rackEquip').draggabilly (
 					{
-						containment: '.pedalboard',
+						containment: '.rack',
 					}
 				);
 			}
 		);
 
 		$('body').on(
-			'click', '#add-pedal button', function() {
-				var selected = $('#add-pedal').find(":selected");
+			'click', '#add-rack-equip button', function() {
+				var selected = $('#add-rack-equip').find(":selected");
 				var width = $(selected).data("width") * multiplier;
 				var height = $(selected).data("height") * multiplier;
 				var image = $(selected).data("image");
-				var pedal = '<div class="pedal" style="width:'+width+'px;height:'+height+'px; background-image:url('+image+')" />';
+				var rackEquip = '<div class="rackEquip" style="width:'+width+'px;height:'+height+'px; background-image:url('+image+')" />';
 
-				$('.pedalboard').append(pedal);
-				$('.pedal').draggabilly (
+				$('.rack').append(rackEquip);
+				$('.rackEquip').draggabilly (
 					{
-						containment: '.pedalboard'
+						containment: '.rack'
 					}
 				);
 
@@ -11980,7 +11980,7 @@ $(document).ready(
 	}
 );
 
-window.Pedal = function(brand, name, width, height, image) {
+window.RackEquip = function(brand, name, width, height, image) {
 	this.Brand = brand || "";
 	this.Name = name || "";
 	this.Width = width || "";
@@ -11988,8 +11988,8 @@ window.Pedal = function(brand, name, width, height, image) {
 	this.Image = image || "";
 }
 
-window.GetPedalData = function() {
-	console.log('GetPedalData');
+window.GetRackEquipData = function() {
+	console.log('GetRackEquipData');
 	$.ajax(
 		{
 			url: "data/rackEquip.json",
@@ -11998,42 +11998,42 @@ window.GetPedalData = function() {
 			success: function(data) {
 				data = $.parseJSON(data.replace(/\r\n/g, "").replace(/\t/g, ""));
 
-				var pedals = [];
+				var rackEquips = [];
 
-				for(var pedal in data) {
-					pedals.push(
-						new Pedal(
-							data[pedal].Brand 	|| "",
-							data[pedal].Name 	|| "",
-							data[pedal].Width 	|| "",
-							data[pedal].Height 	|| "",
-							data[pedal].Image 	|| ""
+				for(var rackEquip in data) {
+					rackEquips.push(
+						new RackEquip(
+							data[rackEquip].Brand 	|| "",
+							data[rackEquip].Name 	|| "",
+							data[rackEquip].Width 	|| "",
+							data[rackEquip].Height 	|| "",
+							data[rackEquip].Image 	|| ""
 						)
 					);
 				}
 
-				RenderPedals(pedals);
+				RenderRackEquips(rackEquips);
 				console.log("ajax success");
 			}
 		}
 	);
 };
 
-window.RenderPedals = function(pedals) {
-	console.log('RenderPedals');
+window.RenderRackEquips = function(rackEquips) {
+	console.log('RenderRackEquips');
 	
-	for(var i in pedals) {
+	for(var i in rackEquips) {
 		// <option id="bd-2" data-width="2.75" data-height="5">Blues Driver</option>
 		// <option id="dd-500" data-width="6.75" data-height="5.44">DD-500</option>
 		// <option id="fv-30" data-width="3.15" data-height="7.56">FV-30L</option>
 
-		var $pedal = $("<option>"+ pedals[i].Brand + " " + pedals[i].Name +"</option>").attr('id', pedals[i].Name.toLowerCase().replace(/\s+/g, "-").replace(/'/g, ''));
+		var $rackEquip = $("<option>"+ rackEquips[i].Brand + " " + rackEquips[i].Name +"</option>").attr('id', rackEquips[i].Name.toLowerCase().replace(/\s+/g, "-").replace(/'/g, ''));
 
-		$pedal.data('width', pedals[i].Width);
-		$pedal.data('height', pedals[i].Height);
-		$pedal.data('height', pedals[i].Height);
-		$pedal.data('image', pedals[i].Image);
+		$rackEquip.data('width', rackEquips[i].Width);
+		$rackEquip.data('height', rackEquips[i].Height);
+		$rackEquip.data('height', rackEquips[i].Height);
+		$rackEquip.data('image', rackEquips[i].Image);
 
-		$pedal.appendTo('.pedal-list');
+		$rackEquip.appendTo('.rack-equip-list');
 	}
 }
