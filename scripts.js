@@ -696,41 +696,38 @@
 						rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
 
 						rsibling = /[+~]/,
-// Marker
+
 						// CSS escapes
 						// http://www.w3.org/TR/CSS21/syndata.html#escaped-characters
-						runescape = new RegExp( "\\\\[\\da-fA-F]{1,6}" + whitespace + "?|\\\\([^\\r\\n\\f])", "g" ),
-						funescape = function( escape, nonHex ) {
-							var high = "0x" + escape.slice( 1 ) - 0x10000;
+						runescape = new RegExp("\\\\[\\da-fA-F]{1,6}" + whitespace + "?|\\\\([^\\r\\n\\f])", "g"),
+						funescape = function(escape, nonHex) {
+							var high = "0x" + escape.slice(1) - 0x10000;
 
 							return nonHex ?
 
 								// Strip the backslash prefix from a non-hex escape sequence
-								nonHex :
+								nonHex:
 
-								// Replace a hexadecimal escape sequence with the encoded Unicode code point
-								// Support: IE <=11+
-								// For values outside the Basic Multilingual Plane (BMP), manually construct a
-								// surrogate pair
-								high < 0 ?
-									String.fromCharCode( high + 0x10000 ) :
-									String.fromCharCode( high >> 10 | 0xD800, high & 0x3FF | 0xDC00 );
+									// Replace a hexadecimal escape sequence with the encoded Unicode code point
+									// Support: IE <=11+
+									// For values outside the Basic Multilingual Plane (BMP), manually construct a
+									// surrogate pair
+									high < 0 ? String.fromCharCode(high + 0x10000):
+										String.fromCharCode(high >> 10 | 0xD800, high & 0x3FF | 0xDC00);
 						},
 
 						// CSS string/identifier serialization
 						// https://drafts.csswg.org/cssom/#common-serializing-idioms
 						rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\0-\x1f\x7f-\uFFFF\w-]/g,
-						fcssescape = function( ch, asCodePoint ) {
-							if ( asCodePoint ) {
-
+						fcssescape = function(ch, asCodePoint) {
+							if (asCodePoint) {
 								// U+0000 NULL becomes U+FFFD REPLACEMENT CHARACTER
-								if ( ch === "\0" ) {
+								if (ch === "\0") {
 									return "\uFFFD";
 								}
 
 								// Control characters and (dependent upon position) numbers get escaped as code points
-								return ch.slice( 0, -1 ) + "\\" +
-									ch.charCodeAt( ch.length - 1 ).toString( 16 ) + " ";
+								return ch.slice(0, -1) + "\\" + ch.charCodeAt(ch.length - 1).toString(16) + " ";
 							}
 
 							// Other potentially-special ASCII characters get backslash-escaped
@@ -745,462 +742,481 @@
 							setDocument();
 						},
 
-						inDisabledFieldset = addCombinator(
-							function( elem ) {
+						inDisabledFieldset = addCombinator (
+							function(elem) {
 								return elem.disabled === true && elem.nodeName.toLowerCase() === "fieldset";
 							},
-							{ dir: "parentNode", next: "legend" }
+							{dir: "parentNode", next: "legend"}
 						);
 
-					// Optimize for push.apply( _, NodeList )
-					try {
-						push.apply(
-							( arr = slice.call( preferredDoc.childNodes ) ),
-							preferredDoc.childNodes
-						);
+						// Optimize for push.apply( _, NodeList )
+						try {
+							push.apply (
+								(arr = slice.call(preferredDoc.childNodes)),
+								preferredDoc.childNodes
+							);
 
-						// Support: Android<4.0
-						// Detect silently failing push.apply
-						// eslint-disable-next-line no-unused-expressions
-						arr[ preferredDoc.childNodes.length ].nodeType;
-					} catch ( e ) {
-						push = { apply: arr.length ?
+							// Support: Android<4.0
+							// Detect silently failing push.apply
+							// eslint-disable-next-line no-unused-expressions
+							arr[preferredDoc.childNodes.length].nodeType;
+						} 
+						
+						catch (e) {
+							push = {
+								apply: arr.length ?
+									// Leverage slice if possible
+									function(target, els) {
+										pushNative.apply(target, slice.call(els));
+									}:
+										// Support: IE<9
+										// Otherwise append directly
+										function(target, els) {
+											var j = target.length,
+												i = 0;
 
-							// Leverage slice if possible
-							function( target, els ) {
-								pushNative.apply( target, slice.call( els ) );
-							} :
-
-							// Support: IE<9
-							// Otherwise append directly
-							function( target, els ) {
-								var j = target.length,
-									i = 0;
-
-								// Can't trust NodeList.length
-								while ( ( target[ j++ ] = els[ i++ ] ) ) {}
-								target.length = j - 1;
-							}
-						};
-					}
-
-					function Sizzle( selector, context, results, seed ) {
-						var m, i, elem, nid, match, groups, newSelector,
-							newContext = context && context.ownerDocument,
-
-							// nodeType defaults to 9, since context defaults to document
-							nodeType = context ? context.nodeType : 9;
-
-						results = results || [];
-
-						// Return early from calls with invalid selector or context
-						if ( typeof selector !== "string" || !selector ||
-							nodeType !== 1 && nodeType !== 9 && nodeType !== 11 ) {
-
-							return results;
+											// Can't trust NodeList.length
+											while ((target[j++] = els[i++])) {}
+											target.length = j - 1;
+										}
+							};
 						}
+																										
+						function Sizzle(selector, context, results, seed) {
+							var m, i, elem, nid, match, groups, newSelector,
+								newContext = context && context.ownerDocument,
 
-						// Try to shortcut find operations (as opposed to filters) in HTML documents
-						if ( !seed ) {
-							setDocument( context );
-							context = context || document;
+								// nodeType defaults to 9, since context defaults to document
+								nodeType = context ? context.nodeType : 9;
 
-							if ( documentIsHTML ) {
+							results = results || [];
 
-								// If the selector is sufficiently simple, try using a "get*By*" DOM method
-								// (excepting DocumentFragment context, where the methods don't exist)
-								if ( nodeType !== 11 && ( match = rquickExpr.exec( selector ) ) ) {
+							// Return early from calls with invalid selector or context
+							if (
+								typeof selector !== "string" || !selector ||
+								nodeType !== 1 && nodeType !== 9 && nodeType !== 11 
+							) {
+								return results;
+							}
 
-									// ID selector
-									if ( ( m = match[ 1 ] ) ) {
+							// Try to shortcut find operations (as opposed to filters) in HTML documents
+							if (!seed) {
+								setDocument(context);
+								context = context || document;
 
-										// Document context
-										if ( nodeType === 9 ) {
-											if ( ( elem = context.getElementById( m ) ) ) {
-
+								if (documentIsHTML) {
+									// If the selector is sufficiently simple, try using a "get*By*" DOM method
+									// (excepting DocumentFragment context, where the methods don't exist)
+									if (nodeType !== 11 && (match = rquickExpr.exec(selector))) {
+										// ID selector
+										if ((m = match[1])) {
+											// Document context
+											if (nodeType === 9) {
+												if ((elem = context.getElementById(m))) {
+													// Support: IE, Opera, Webkit
+													// TODO: identify versions
+													// getElementById can match elements by name instead of ID
+													if (elem.id === m) {
+														results.push(elem);
+														return results;
+													}
+												} 
+												
+												else {
+													return results;
+												}
+											} 
+											
+											// Element context
+											else {
 												// Support: IE, Opera, Webkit
 												// TODO: identify versions
 												// getElementById can match elements by name instead of ID
-												if ( elem.id === m ) {
-													results.push( elem );
+												if (
+													newContext && (elem = newContext.getElementById(m)) &&
+													contains(context, elem) &&
+													elem.id === m
+												) {
+													results.push(elem);
 													return results;
 												}
-											} else {
-												return results;
+											}										
+										} 
+										
+										// Type selector
+										else if (match[2]) {
+											push.apply(results, context.getElementsByTagName(selector));
+											return results;
+										} 
+										
+										// Class selector
+										else if (
+											(m = match[3]) && support.getElementsByClassName &&
+											context.getElementsByClassName
+										) {
+											push.apply(results, context.getElementsByClassName(m));
+											return results;
+										}
+									}
+
+									// Take advantage of querySelectorAll
+									if (
+										support.qsa &&
+										!nonnativeSelectorCache[selector + " "] &&
+										(!rbuggyQSA || !rbuggyQSA.test(selector)) &&
+
+										// Support: IE 8 only
+										// Exclude object elements
+										(nodeType !== 1 || context.nodeName.toLowerCase() !== "object") 
+									) {
+										newSelector = selector;
+										newContext = context;
+
+										// qSA considers elements outside a scoping root when evaluating child or
+										// descendant combinators, which is not what we want.
+										// In such cases, we work around the behavior by prefixing every selector in the
+										// list with an ID selector referencing the scope context.
+										// The technique has to be used as well when a leading combinator is used
+										// as such selectors are not recognized by querySelectorAll.
+										// Thanks to Andrew Dupont for this technique.
+										if (
+											nodeType === 1 &&
+											(rdescend.test(selector) || rcombinators.test(selector))
+										) {
+											// Expand context for sibling selectors
+											newContext = rsibling.test(selector) && testContext(context.parentNode) || context;
+
+											// We can use :scope instead of the ID hack if the browser
+											// supports it & if we're not changing the context.
+											if (newContext !== context || !support.scope) {
+												// Capture the context ID, setting it first if necessary
+												if ((nid = context.getAttribute("id"))) {
+													nid = nid.replace(rcssescape, fcssescape);
+												} 
+												
+												else {
+													context.setAttribute("id", (nid = expando));
+												}
 											}
 
-										// Element context
-										} else {
+											// Prefix every selector in the list
+											groups = tokenize(selector);
+											i = groups.length;
+											while (i--) {
+												groups[i] = (nid ? "#" + nid : ":scope") + " " + toSelector(groups[i]);
+											}
 
-											// Support: IE, Opera, Webkit
-											// TODO: identify versions
-											// getElementById can match elements by name instead of ID
-											if ( newContext && ( elem = newContext.getElementById( m ) ) &&
-												contains( context, elem ) &&
-												elem.id === m ) {
+											newSelector = groups.join(",");
+										}
 
-												results.push( elem );
-												return results;
+										try {
+											push.apply(
+												results,
+												newContext.querySelectorAll(newSelector)
+											);
+
+											return results;
+										} 
+										
+										catch (qsaError) {
+											nonnativeSelectorCache(selector, true);
+										} 
+										
+										finally {
+											if (nid === expando) {
+												context.removeAttribute("id");
+											}
+										}
+									}
+								}
+							}
+
+							// All others
+							return select(selector.replace(rtrim, "$1"), context, results, seed);
+						}
+
+						/**
+						* Create key-value caches of limited size
+						* @returns {function(string, object)} Returns the Object data after storing it on itself with
+						*	property name the (space-suffixed) string and (if the cache is larger than Expr.cacheLength)
+						*	deleting the oldest entry
+						*/
+						function createCache() {
+							var keys = [];
+
+							function cache(key, value) {
+								// Use (key + " ") to avoid collision with native prototype properties (see Issue #157)
+								if (keys.push(key + " ") > Expr.cacheLength) {
+									// Only keep the most recent entries
+									delete cache[keys.shift()];
+								}
+								return (cache[key + " "] = value);
+							}
+
+							return cache;
+						}
+
+						/**
+						* Mark a function for special use by Sizzle
+						* @param {Function} fn The function to mark
+						*/
+						function markFunction(fn) {
+							fn[expando] = true;
+							return fn;
+						}
+
+						/**
+						* Support testing using an element
+						* @param {Function} fn Passed the created element and returns a boolean result
+						*/
+						function assert(fn) {
+							var el = document.createElement("fieldset");
+
+							try {
+								return !!fn(el);
+							} 
+							
+							catch (e) {
+								return false;
+							} 
+							
+							finally {
+								// Remove from its parent by default
+								if (el.parentNode) {
+									el.parentNode.removeChild(el);
+								}
+
+								// release memory in IE
+								el = null;
+							}
+						}
+
+						/**
+						* Adds the same handler for all of the specified attrs
+						* @param {String} attrs Pipe-separated list of attributes
+						* @param {Function} handler The method that will be applied
+						*/
+						function addHandle(attrs, handler) {
+							var arr = attrs.split("|"), i = arr.length;
+
+							while (i--) {
+								Expr.attrHandle[arr[i]] = handler;
+							}
+						}
+
+						/**
+						* Checks document order of two siblings
+						* @param {Element} a
+						* @param {Element} b
+						* @returns {Number} Returns less than 0 if a precedes b, greater than 0 if a follows b
+						*/
+						function siblingCheck(a, b) {
+							var cur = b && a,
+								diff = cur && a.nodeType === 1 && b.nodeType === 1 &&
+									a.sourceIndex - b.sourceIndex;
+
+							// Use IE sourceIndex if available on both nodes
+							if (diff) {
+								return diff;
+							}
+
+							// Check if b follows a
+							if (cur) {
+								while ((cur = cur.nextSibling)) {
+									if (cur === b) {
+										return -1;
+									}
+								}
+							}
+
+							return a ? 1: -1;
+						}
+
+						/**
+						* Returns a function to use in pseudos for input types
+						* @param {String} type
+						*/
+						function createInputPseudo(type) {
+							return function(elem) {
+								var name = elem.nodeName.toLowerCase();
+
+								return name === "input" && elem.type === type;
+							};
+						}
+
+						/**
+						* Returns a function to use in pseudos for buttons
+						* @param {String} type
+						*/
+						function createButtonPseudo(type) {
+							return function(elem) {
+								var name = elem.nodeName.toLowerCase();
+
+								return (name === "input" || name === "button") && elem.type === type;
+							};
+						}
+
+						/**
+						* Returns a function to use in pseudos for :enabled/:disabled
+						* @param {Boolean} disabled true for :disabled; false for :enabled
+						*/
+						function createDisabledPseudo(disabled) {
+							// Known :disabled false positives: fieldset[disabled] > legend:nth-of-type(n+2) :can-disable
+							return function(elem) {
+								// Only certain elements can match :enabled or :disabled
+								// https://html.spec.whatwg.org/multipage/scripting.html#selector-enabled
+								// https://html.spec.whatwg.org/multipage/scripting.html#selector-disabled
+								if ("form" in elem) {
+									// Check for inherited disabledness on relevant non-disabled elements:
+									// * listed form-associated elements in a disabled fieldset
+									//   https://html.spec.whatwg.org/multipage/forms.html#category-listed
+									//   https://html.spec.whatwg.org/multipage/forms.html#concept-fe-disabled
+									// * option elements in a disabled optgroup
+									//   https://html.spec.whatwg.org/multipage/forms.html#concept-option-disabled
+									// All such elements have a "form" property.
+									if (elem.parentNode && elem.disabled === false) {
+										// Option elements defer to a parent optgroup if present
+										if ("label" in elem) {
+											if ("label" in elem.parentNode) {
+												return elem.parentNode.disabled === disabled;
+											} 
+											
+											else {
+												return elem.disabled === disabled;
 											}
 										}
 
-									// Type selector
-									} else if ( match[ 2 ] ) {
-										push.apply( results, context.getElementsByTagName( selector ) );
-										return results;
+										// Support: IE 6 - 11
+										// Use the isDisabled shortcut property to check for disabled fieldset ancestors
+										return elem.isDisabled === disabled ||
 
-									// Class selector
-									} else if ( ( m = match[ 3 ] ) && support.getElementsByClassName &&
-										context.getElementsByClassName ) {
-
-										push.apply( results, context.getElementsByClassName( m ) );
-										return results;
+											// Where there is no isDisabled, check manually
+											/* jshint -W018 */
+											elem.isDisabled !== !disabled &&
+											inDisabledFieldset(elem) === disabled;
 									}
+
+									return elem.disabled === disabled;								
+								} 
+								
+								// Try to winnow out elements that can't be disabled before trusting the disabled property.
+								// Some victims get caught in our net (label, legend, menu, track), but it shouldn't
+								// even exist on them, let alone have a boolean value.
+								else if ("label" in elem) {
+									return elem.disabled === disabled;
 								}
 
-								// Take advantage of querySelectorAll
-								if ( support.qsa &&
-									!nonnativeSelectorCache[ selector + " " ] &&
-									( !rbuggyQSA || !rbuggyQSA.test( selector ) ) &&
+								// Remaining elements are neither :enabled nor :disabled
+								return false;
+							};
+						}
 
-									// Support: IE 8 only
-									// Exclude object elements
-									( nodeType !== 1 || context.nodeName.toLowerCase() !== "object" ) ) {
+						/**
+						* Returns a function to use in pseudos for positionals
+						* @param {Function} fn
+						*/
+						function createPositionalPseudo(fn) {
+							return markFunction(
+								function(argument) {
+									argument = +argument;
 
-									newSelector = selector;
-									newContext = context;
+									return markFunction(
+										function(seed, matches) {
+											var j,
+												matchIndexes = fn([], seed.length, argument),
+												i = matchIndexes.length;
 
-									// qSA considers elements outside a scoping root when evaluating child or
-									// descendant combinators, which is not what we want.
-									// In such cases, we work around the behavior by prefixing every selector in the
-									// list with an ID selector referencing the scope context.
-									// The technique has to be used as well when a leading combinator is used
-									// as such selectors are not recognized by querySelectorAll.
-									// Thanks to Andrew Dupont for this technique.
-									if ( nodeType === 1 &&
-										( rdescend.test( selector ) || rcombinators.test( selector ) ) ) {
-
-										// Expand context for sibling selectors
-										newContext = rsibling.test( selector ) && testContext( context.parentNode ) ||
-											context;
-
-										// We can use :scope instead of the ID hack if the browser
-										// supports it & if we're not changing the context.
-										if ( newContext !== context || !support.scope ) {
-
-											// Capture the context ID, setting it first if necessary
-											if ( ( nid = context.getAttribute( "id" ) ) ) {
-												nid = nid.replace( rcssescape, fcssescape );
-											} else {
-												context.setAttribute( "id", ( nid = expando ) );
+											// Match elements found at the specified indexes
+											while (i--) {
+												if (seed[(j = matchIndexes[i])]) {
+													seed[j] = !(matches[j] = seed[j]);
+												}
 											}
-										}
+										} 
+									);
+								} 
+							);
+						}
 
-										// Prefix every selector in the list
-										groups = tokenize( selector );
-										i = groups.length;
-										while ( i-- ) {
-											groups[ i ] = ( nid ? "#" + nid : ":scope" ) + " " +
-												toSelector( groups[ i ] );
-										}
-										newSelector = groups.join( "," );
-									}
+						/**
+						* Checks a node for validity as a Sizzle context
+						* @param {Element|Object=} context
+						* @returns {Element|Object|Boolean} The input node if acceptable, otherwise a falsy value
+						*/
+						function testContext(context) {
+							return context && typeof context.getElementsByTagName !== "undefined" && context;
+						}
 
-									try {
-										push.apply( results,
-											newContext.querySelectorAll( newSelector )
-										);
-										return results;
-									} catch ( qsaError ) {
-										nonnativeSelectorCache( selector, true );
-									} finally {
-										if ( nid === expando ) {
-											context.removeAttribute( "id" );
-										}
-									}
+						// Expose support vars for convenience
+						support = Sizzle.support = {};
+
+						/**
+						* Detects XML nodes
+						* @param {Element|Object} elem An element or a document
+						* @returns {Boolean} True iff elem is a non-HTML XML node
+						*/
+						isXML = Sizzle.isXML = function(elem) {
+							var namespace = elem && elem.namespaceURI,
+								docElem = elem && (elem.ownerDocument || elem).documentElement;
+
+							// Support: IE <=8
+							// Assume HTML when documentElement doesn't yet exist, such as inside loading iframes
+							// https://bugs.jquery.com/ticket/4833
+							return !rhtml.test(namespace || docElem && docElem.nodeName || "HTML");
+						};
+
+						/**
+						* Sets document-related variables once based on the current document
+						* @param {Element|Object} [doc] An element or document object to use to set the document
+						* @returns {Object} Returns the current document
+						*/
+						setDocument = Sizzle.setDocument = function(node) {
+							var hasCompare, subWindow,
+								doc = node ? node.ownerDocument || node: preferredDoc;
+// Marker
+							// Return early if doc is invalid or already selected
+							// Support: IE 11+, Edge 17 - 18+
+							// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+							// two documents; shallow comparisons work.
+							// eslint-disable-next-line eqeqeq
+							if ( doc == document || doc.nodeType !== 9 || !doc.documentElement ) {
+								return document;
+							}
+
+							// Update global variables
+							document = doc;
+							docElem = document.documentElement;
+							documentIsHTML = !isXML( document );
+
+							// Support: IE 9 - 11+, Edge 12 - 18+
+							// Accessing iframe documents after unload throws "permission denied" errors (jQuery #13936)
+							// Support: IE 11+, Edge 17 - 18+
+							// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+							// two documents; shallow comparisons work.
+							// eslint-disable-next-line eqeqeq
+							if ( preferredDoc != document &&
+								( subWindow = document.defaultView ) && subWindow.top !== subWindow ) {
+
+								// Support: IE 11, Edge
+								if ( subWindow.addEventListener ) {
+									subWindow.addEventListener( "unload", unloadHandler, false );
+
+								// Support: IE 9 - 10 only
+								} else if ( subWindow.attachEvent ) {
+									subWindow.attachEvent( "onunload", unloadHandler );
 								}
 							}
-						}
 
-						// All others
-						return select( selector.replace( rtrim, "$1" ), context, results, seed );
-					}
-
-				/**
-				* Create key-value caches of limited size
-				* @returns {function(string, object)} Returns the Object data after storing it on itself with
-				*	property name the (space-suffixed) string and (if the cache is larger than Expr.cacheLength)
-				*	deleting the oldest entry
-				*/
-				function createCache() {
-					var keys = [];
-
-					function cache( key, value ) {
-
-						// Use (key + " ") to avoid collision with native prototype properties (see Issue #157)
-						if ( keys.push( key + " " ) > Expr.cacheLength ) {
-
-							// Only keep the most recent entries
-							delete cache[ keys.shift() ];
-						}
-						return ( cache[ key + " " ] = value );
-					}
-					return cache;
-				}
-
-				/**
-				* Mark a function for special use by Sizzle
-				* @param {Function} fn The function to mark
-				*/
-				function markFunction( fn ) {
-					fn[ expando ] = true;
-					return fn;
-				}
-
-				/**
-				* Support testing using an element
-				* @param {Function} fn Passed the created element and returns a boolean result
-				*/
-				function assert( fn ) {
-					var el = document.createElement( "fieldset" );
-
-					try {
-						return !!fn( el );
-					} catch ( e ) {
-						return false;
-					} finally {
-
-						// Remove from its parent by default
-						if ( el.parentNode ) {
-							el.parentNode.removeChild( el );
-						}
-
-						// release memory in IE
-						el = null;
-					}
-				}
-
-				/**
-				* Adds the same handler for all of the specified attrs
-				* @param {String} attrs Pipe-separated list of attributes
-				* @param {Function} handler The method that will be applied
-				*/
-				function addHandle( attrs, handler ) {
-					var arr = attrs.split( "|" ),
-						i = arr.length;
-
-					while ( i-- ) {
-						Expr.attrHandle[ arr[ i ] ] = handler;
-					}
-				}
-
-				/**
-				* Checks document order of two siblings
-				* @param {Element} a
-				* @param {Element} b
-				* @returns {Number} Returns less than 0 if a precedes b, greater than 0 if a follows b
-				*/
-				function siblingCheck( a, b ) {
-					var cur = b && a,
-						diff = cur && a.nodeType === 1 && b.nodeType === 1 &&
-							a.sourceIndex - b.sourceIndex;
-
-					// Use IE sourceIndex if available on both nodes
-					if ( diff ) {
-						return diff;
-					}
-
-					// Check if b follows a
-					if ( cur ) {
-						while ( ( cur = cur.nextSibling ) ) {
-							if ( cur === b ) {
-								return -1;
-							}
-						}
-					}
-
-					return a ? 1 : -1;
-				}
-
-				/**
-				* Returns a function to use in pseudos for input types
-				* @param {String} type
-				*/
-				function createInputPseudo( type ) {
-					return function( elem ) {
-						var name = elem.nodeName.toLowerCase();
-						return name === "input" && elem.type === type;
-					};
-				}
-
-				/**
-				* Returns a function to use in pseudos for buttons
-				* @param {String} type
-				*/
-				function createButtonPseudo( type ) {
-					return function( elem ) {
-						var name = elem.nodeName.toLowerCase();
-						return ( name === "input" || name === "button" ) && elem.type === type;
-					};
-				}
-
-				/**
-				* Returns a function to use in pseudos for :enabled/:disabled
-				* @param {Boolean} disabled true for :disabled; false for :enabled
-				*/
-				function createDisabledPseudo( disabled ) {
-
-					// Known :disabled false positives: fieldset[disabled] > legend:nth-of-type(n+2) :can-disable
-					return function( elem ) {
-
-						// Only certain elements can match :enabled or :disabled
-						// https://html.spec.whatwg.org/multipage/scripting.html#selector-enabled
-						// https://html.spec.whatwg.org/multipage/scripting.html#selector-disabled
-						if ( "form" in elem ) {
-
-							// Check for inherited disabledness on relevant non-disabled elements:
-							// * listed form-associated elements in a disabled fieldset
-							//   https://html.spec.whatwg.org/multipage/forms.html#category-listed
-							//   https://html.spec.whatwg.org/multipage/forms.html#concept-fe-disabled
-							// * option elements in a disabled optgroup
-							//   https://html.spec.whatwg.org/multipage/forms.html#concept-option-disabled
-							// All such elements have a "form" property.
-							if ( elem.parentNode && elem.disabled === false ) {
-
-								// Option elements defer to a parent optgroup if present
-								if ( "label" in elem ) {
-									if ( "label" in elem.parentNode ) {
-										return elem.parentNode.disabled === disabled;
-									} else {
-										return elem.disabled === disabled;
-									}
-								}
-
-								// Support: IE 6 - 11
-								// Use the isDisabled shortcut property to check for disabled fieldset ancestors
-								return elem.isDisabled === disabled ||
-
-									// Where there is no isDisabled, check manually
-									/* jshint -W018 */
-									elem.isDisabled !== !disabled &&
-									inDisabledFieldset( elem ) === disabled;
-							}
-
-							return elem.disabled === disabled;
-
-						// Try to winnow out elements that can't be disabled before trusting the disabled property.
-						// Some victims get caught in our net (label, legend, menu, track), but it shouldn't
-						// even exist on them, let alone have a boolean value.
-						} else if ( "label" in elem ) {
-							return elem.disabled === disabled;
-						}
-
-						// Remaining elements are neither :enabled nor :disabled
-						return false;
-					};
-				}
-
-				/**
-				* Returns a function to use in pseudos for positionals
-				* @param {Function} fn
-				*/
-				function createPositionalPseudo( fn ) {
-					return markFunction( function( argument ) {
-						argument = +argument;
-						return markFunction( function( seed, matches ) {
-							var j,
-								matchIndexes = fn( [], seed.length, argument ),
-								i = matchIndexes.length;
-
-							// Match elements found at the specified indexes
-							while ( i-- ) {
-								if ( seed[ ( j = matchIndexes[ i ] ) ] ) {
-									seed[ j ] = !( matches[ j ] = seed[ j ] );
-								}
-							}
-						} );
-					} );
-				}
-
-				/**
-				* Checks a node for validity as a Sizzle context
-				* @param {Element|Object=} context
-				* @returns {Element|Object|Boolean} The input node if acceptable, otherwise a falsy value
-				*/
-				function testContext( context ) {
-					return context && typeof context.getElementsByTagName !== "undefined" && context;
-				}
-
-				// Expose support vars for convenience
-				support = Sizzle.support = {};
-
-				/**
-				* Detects XML nodes
-				* @param {Element|Object} elem An element or a document
-				* @returns {Boolean} True iff elem is a non-HTML XML node
-				*/
-				isXML = Sizzle.isXML = function( elem ) {
-					var namespace = elem && elem.namespaceURI,
-						docElem = elem && ( elem.ownerDocument || elem ).documentElement;
-
-					// Support: IE <=8
-					// Assume HTML when documentElement doesn't yet exist, such as inside loading iframes
-					// https://bugs.jquery.com/ticket/4833
-					return !rhtml.test( namespace || docElem && docElem.nodeName || "HTML" );
-				};
-
-				/**
-				* Sets document-related variables once based on the current document
-				* @param {Element|Object} [doc] An element or document object to use to set the document
-				* @returns {Object} Returns the current document
-				*/
-				setDocument = Sizzle.setDocument = function( node ) {
-					var hasCompare, subWindow,
-						doc = node ? node.ownerDocument || node : preferredDoc;
-
-					// Return early if doc is invalid or already selected
-					// Support: IE 11+, Edge 17 - 18+
-					// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-					// two documents; shallow comparisons work.
-					// eslint-disable-next-line eqeqeq
-					if ( doc == document || doc.nodeType !== 9 || !doc.documentElement ) {
-						return document;
-					}
-
-					// Update global variables
-					document = doc;
-					docElem = document.documentElement;
-					documentIsHTML = !isXML( document );
-
-					// Support: IE 9 - 11+, Edge 12 - 18+
-					// Accessing iframe documents after unload throws "permission denied" errors (jQuery #13936)
-					// Support: IE 11+, Edge 17 - 18+
-					// IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-					// two documents; shallow comparisons work.
-					// eslint-disable-next-line eqeqeq
-					if ( preferredDoc != document &&
-						( subWindow = document.defaultView ) && subWindow.top !== subWindow ) {
-
-						// Support: IE 11, Edge
-						if ( subWindow.addEventListener ) {
-							subWindow.addEventListener( "unload", unloadHandler, false );
-
-						// Support: IE 9 - 10 only
-						} else if ( subWindow.attachEvent ) {
-							subWindow.attachEvent( "onunload", unloadHandler );
-						}
-					}
-
-					// Support: IE 8 - 11+, Edge 12 - 18+, Chrome <=16 - 25 only, Firefox <=3.6 - 31 only,
-					// Safari 4 - 5 only, Opera <=11.6 - 12.x only
-					// IE/Edge & older browsers don't support the :scope pseudo-class.
-					// Support: Safari 6.0 only
-					// Safari 6.0 supports :scope but it's an alias of :root there.
-					support.scope = assert( function( el ) {
-						docElem.appendChild( el ).appendChild( document.createElement( "div" ) );
-						return typeof el.querySelectorAll !== "undefined" &&
-							!el.querySelectorAll( ":scope fieldset div" ).length;
-					} );
+							// Support: IE 8 - 11+, Edge 12 - 18+, Chrome <=16 - 25 only, Firefox <=3.6 - 31 only,
+							// Safari 4 - 5 only, Opera <=11.6 - 12.x only
+							// IE/Edge & older browsers don't support the :scope pseudo-class.
+							// Support: Safari 6.0 only
+							// Safari 6.0 supports :scope but it's an alias of :root there.
+							support.scope = assert( function( el ) {
+								docElem.appendChild( el ).appendChild( document.createElement( "div" ) );
+								return typeof el.querySelectorAll !== "undefined" &&
+									!el.querySelectorAll( ":scope fieldset div" ).length;
+							} );
 
 					/* Attributes
 					---------------------------------------------------------------------- */
